@@ -49,7 +49,23 @@
   <footer>
     <p>&copy; 2025 Planeta Projeto. Todos os direitos reservados.</p>
   </footer>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyBdWzf45GmW58N7sy7WMT9MG9G4Jy3wjsg",
+    authDomain: "planeta-projeto.firebaseapp.com",
+    projectId: "planeta-projeto",
+    storageBucket: "planeta-projeto.appspot.com", <!-- Corrigido -->
+    messagingSenderId: "1060342659751",
+    appId: "1:1060342659751:web:fbd4c421de3a02db8cb982",
+    measurementId: "G-59Z35M8MM1"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
   <script type="module" src="script.js"></script>
 </body>
 </html>
