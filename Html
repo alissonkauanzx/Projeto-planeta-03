@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Planeta Projeto</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header>
+    <h1>🌱 Planeta Projeto</h1>
+    <nav>
+      <button onclick="showLogin()">Login</button>
+      <button onclick="logout()">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="login-section" style="display: none;">
+      <h2>Entrar</h2>
+      <input type="email" id="email" placeholder="E-mail" />
+      <input type="password" id="password" placeholder="Senha" />
+      <button onclick="login()">Entrar</button>
+      <p>Não tem conta? <a href="#" onclick="showRegister()">Registrar</a></p>
+    </section>
+
+    <section id="register-section" style="display: none;">
+      <h2>Registrar</h2>
+      <input type="email" id="reg-email" placeholder="E-mail" />
+      <input type="password" id="reg-password" placeholder="Senha" />
+      <button onclick="register()">Registrar</button>
+      <p>Já tem conta? <a href="#" onclick="showLogin()">Entrar</a></p>
+    </section>
+
+    <section id="project-form" style="display: none;">
+      <h2>Enviar Projeto Sustentável</h2>
+      <input type="text" id="project-title" placeholder="Título do Projeto" />
+      <textarea id="project-desc" placeholder="Descrição"></textarea>
+      <input type="file" id="project-image" />
+      <button onclick="submitProject()">Enviar</button>
+    </section>
+
+    <section id="project-list">
+      <h2>Projetos da Comunidade</h2>
+      <div id="projects"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Planeta Projeto. Todos os direitos reservados.</p>
+  </footer>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
