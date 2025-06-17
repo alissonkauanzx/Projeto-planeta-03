@@ -60,3 +60,24 @@ window.showRegister = function () {
 window.addEventListener("DOMContentLoaded", () => {
   showLogin();
 });
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+import { auth } from "./firebaseConfig.js"; // ou substitua por sua variável 'auth' atual se não tiver separado
+
+// Função para mostrar ou esconder botões de acordo com o login
+onAuthStateChanged(auth, (user) => {
+  const loginBtn = document.querySelector('button[onclick="showLogin()"]');
+  const logoutBtn = document.querySelector('button[onclick="logout()"]');
+  const projectForm = document.getElementById("project-form");
+
+  if (user) {
+    // Usuário está logado
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+    projectForm.style.display = "block";
+  } else {
+    // Usuário não está logado
+    loginBtn.style.display = "inline-block";
+    logoutBtn.style.display = "none";
+    projectForm.style.display = "none";
+  }
+});
