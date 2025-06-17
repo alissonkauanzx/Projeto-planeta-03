@@ -1,10 +1,13 @@
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut
+  signOut,
+  onAuthStateChanged,
+  getAuth
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
-const auth = window.firebaseAuth;
+// Inicializa o Firebase Auth (supondo que você já tenha inicializado o Firebase App em outro arquivo)
+const auth = getAuth();
 
 window.login = function () {
   const email = document.getElementById("email").value;
@@ -42,6 +45,9 @@ window.logout = function () {
       alert("Logout realizado com sucesso.");
       document.getElementById("project-form").style.display = "none";
       showLogin();
+    })
+    .catch(error => {
+      alert("Erro no logout: " + error.message);
     });
 };
 
@@ -60,22 +66,18 @@ window.showRegister = function () {
 window.addEventListener("DOMContentLoaded", () => {
   showLogin();
 });
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
-import { auth } from "./firebaseConfig.js"; // ou substitua por sua variável 'auth' atual se não tiver separado
 
-// Função para mostrar ou esconder botões de acordo com o login
+// Controla a visibilidade dos botões conforme o estado de autenticação
 onAuthStateChanged(auth, (user) => {
   const loginBtn = document.querySelector('button[onclick="showLogin()"]');
   const logoutBtn = document.querySelector('button[onclick="logout()"]');
   const projectForm = document.getElementById("project-form");
 
   if (user) {
-    // Usuário está logado
     loginBtn.style.display = "none";
     logoutBtn.style.display = "inline-block";
     projectForm.style.display = "block";
   } else {
-    // Usuário não está logado
     loginBtn.style.display = "inline-block";
     logoutBtn.style.display = "none";
     projectForm.style.display = "none";
