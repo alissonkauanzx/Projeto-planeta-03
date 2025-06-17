@@ -5,10 +5,9 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
-// Usa a instância do auth que foi inicializada no HTML
+// Usa o auth que foi inicializado no index.html
 const auth = window.firebaseAuth;
 
-// Função de login
 window.login = function () {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -25,7 +24,6 @@ window.login = function () {
     });
 };
 
-// Função de registro
 window.register = function () {
   const email = document.getElementById("reg-email").value;
   const password = document.getElementById("reg-password").value;
@@ -40,7 +38,6 @@ window.register = function () {
     });
 };
 
-// Função de logout
 window.logout = function () {
   signOut(auth)
     .then(() => {
@@ -53,26 +50,23 @@ window.logout = function () {
     });
 };
 
-// Mostrar tela de login
 window.showLogin = function () {
   document.getElementById("login-section").style.display = "block";
   document.getElementById("register-section").style.display = "none";
   document.getElementById("project-form").style.display = "none";
 };
 
-// Mostrar tela de registro
 window.showRegister = function () {
   document.getElementById("login-section").style.display = "none";
   document.getElementById("register-section").style.display = "block";
   document.getElementById("project-form").style.display = "none";
 };
 
-// Quando a página carrega, mostra a tela certa
 window.addEventListener("DOMContentLoaded", () => {
   showLogin();
 });
 
-// Controla visibilidade dos botões e formulários com base no login
+// Controla os botões "Login" e "Sair" com base no estado de autenticação
 onAuthStateChanged(auth, (user) => {
   const loginBtn = document.querySelector('button[onclick="showLogin()"]');
   const logoutBtn = document.querySelector('button[onclick="logout()"]');
