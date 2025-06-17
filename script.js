@@ -2,19 +2,19 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
-  getAuth
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
-// Inicializa o Firebase Auth (supondo que você já tenha inicializado o Firebase App em outro arquivo)
-const auth = getAuth();
+// Usa a instância do auth que foi inicializada no HTML
+const auth = window.firebaseAuth;
 
+// Função de login
 window.login = function () {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
   signInWithEmailAndPassword(auth, email, password)
-    .then(userCredential => {
+    .then(() => {
       alert("Login feito com sucesso!");
       document.getElementById("login-section").style.display = "none";
       document.getElementById("register-section").style.display = "none";
@@ -25,12 +25,13 @@ window.login = function () {
     });
 };
 
+// Função de registro
 window.register = function () {
   const email = document.getElementById("reg-email").value;
   const password = document.getElementById("reg-password").value;
 
   createUserWithEmailAndPassword(auth, email, password)
-    .then(userCredential => {
+    .then(() => {
       alert("Registro feito com sucesso!");
       showLogin();
     })
@@ -39,6 +40,7 @@ window.register = function () {
     });
 };
 
+// Função de logout
 window.logout = function () {
   signOut(auth)
     .then(() => {
@@ -51,23 +53,26 @@ window.logout = function () {
     });
 };
 
+// Mostrar tela de login
 window.showLogin = function () {
   document.getElementById("login-section").style.display = "block";
   document.getElementById("register-section").style.display = "none";
   document.getElementById("project-form").style.display = "none";
 };
 
+// Mostrar tela de registro
 window.showRegister = function () {
   document.getElementById("login-section").style.display = "none";
   document.getElementById("register-section").style.display = "block";
   document.getElementById("project-form").style.display = "none";
 };
 
+// Quando a página carrega, mostra a tela certa
 window.addEventListener("DOMContentLoaded", () => {
   showLogin();
 });
 
-// Controla a visibilidade dos botões conforme o estado de autenticação
+// Controla visibilidade dos botões e formulários com base no login
 onAuthStateChanged(auth, (user) => {
   const loginBtn = document.querySelector('button[onclick="showLogin()"]');
   const logoutBtn = document.querySelector('button[onclick="logout()"]');
