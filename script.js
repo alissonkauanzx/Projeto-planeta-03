@@ -169,3 +169,41 @@ onSnapshot(
 window.addEventListener("DOMContentLoaded", () => {
   showLogin();
 });
+// =================== LISTAR PROJETOS DA COMUNIDADE ===================
+const projectsContainer = document.getElementById("projects");
+
+function renderProjects(projects) {
+  projectsContainer.innerHTML = "";
+  projects.forEach((proj) => {
+    const div = document.createElement("div");
+    div.classList.add("project-card");
+
+    div.innerHTML = `
+      <h3>${proj.title}</h3>
+      <p>${proj.description}</p>
+      ${proj.imageUrl ? `<img src="${proj.imageUrl}" alt="${proj.title}" />` : ""}
+      ${proj.videoUrl ? `<video src="${proj.videoUrl}" controls></video>` : ""}
+    `;
+
+    projectsContainer.appendChild(div);
+  });
+}
+
+// Atualização automática a partir do Firestore
+import {
+  getFirestore,
+  collection,
+  query,
+  orderBy,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+const db = getFirestore();
+
+onSnapshot(
+  query(collection(db, "projects"), orderBy("createdAt", "desc")),
+  (snapshot) => {
+    const projects = snapshot.docs.map((doc) => doc.data());
+    renderProjects(projects);
+  }
+);
