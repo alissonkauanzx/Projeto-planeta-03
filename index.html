@@ -5,7 +5,7 @@
   <title>🌱 Planeta Projeto</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase Config -->
+  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getAuth } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
@@ -35,40 +35,43 @@
     </nav>
   </header>
 
-  <!-- FORMULÁRIO DE LOGIN -->
-  <section id="login-section" class="auth-section">
-    <h2>Entre para continuar</h2>
-    <input type="email" id="email" placeholder="E-mail" />
-    <input type="password" id="password" placeholder="Senha" />
-    <button onclick="login()">Entrar</button>
-    <p>Não tem conta? <a href="#" onclick="showRegister()">Registrar</a></p>
-  </section>
+  <!-- CONTEÚDO CENTRAL -->
+  <main class="center-wrapper">
 
-  <!-- FORMULÁRIO DE REGISTRO -->
-  <section id="register-section" class="auth-section" style="display:none;">
-    <h2>Crie sua conta</h2>
-    <input type="email" id="reg-email" placeholder="E-mail" />
-    <input type="password" id="reg-password" placeholder="Senha" />
-    <button onclick="register()">Registrar</button>
-    <p>Já tem conta? <a href="#" onclick="showLogin()">Entrar</a></p>
-  </section>
+    <!-- FORMULÁRIO DE LOGIN -->
+    <section id="login-section" class="auth-section">
+      <h2>Entre para continuar</h2>
+      <input type="email" id="email" placeholder="E-mail" />
+      <input type="password" id="password" placeholder="Senha" />
+      <button onclick="login()">Entrar</button>
+      <p>Não tem conta? <a href="#" onclick="showRegister()">Registrar</a></p>
+    </section>
 
-  <!-- FORMULÁRIO DE PROJETO -->
-  <section id="project-form" class="project-form-section" style="display:none;">
-    <h2>Enviar Projeto Sustentável</h2>
-    <input type="text" id="project-title" placeholder="Título do Projeto" required />
-    <textarea id="project-desc" placeholder="Descrição"></textarea>
-    <input type="file" id="project-image" accept="image/*" required />
-    <input type="file" id="project-video" accept="video/*" />
-    <button onclick="submitProject()">Enviar Projeto</button>
-  </section>
+    <!-- FORMULÁRIO DE REGISTRO -->
+    <section id="register-section" class="auth-section" style="display:none;">
+      <h2>Crie sua conta</h2>
+      <input type="email" id="reg-email" placeholder="E-mail" />
+      <input type="password" id="reg-password" placeholder="Senha" />
+      <button onclick="register()">Registrar</button>
+      <p>Já tem conta? <a href="#" onclick="showLogin()">Entrar</a></p>
+    </section>
 
-  <!-- LISTA DE PROJETOS -->
-  <main id="project-list" class="projects-section">
-    <h2>Projetos da Comunidade</h2>
-    <div id="projects" class="projects-grid">
-      <!-- Os projetos são gerados dinamicamente aqui via JS -->
-    </div>
+    <!-- FORMULÁRIO DE PROJETO -->
+    <section id="project-form" class="project-form-section" style="display:none;">
+      <h2>Enviar Projeto Sustentável</h2>
+      <input type="text" id="project-title" placeholder="Título do Projeto" required />
+      <textarea id="project-desc" placeholder="Descrição"></textarea>
+      <input type="file" id="project-image" accept="image/*" required />
+      <input type="file" id="project-video" accept="video/*" />
+      <button onclick="submitProject()">Enviar Projeto</button>
+    </section>
+
+    <!-- LISTA DE PROJETOS -->
+    <section id="project-list" class="projects-section">
+      <h2>Projetos da Comunidade</h2>
+      <div id="projects" class="projects-grid"></div>
+    </section>
+
   </main>
 
   <!-- RODAPÉ -->
