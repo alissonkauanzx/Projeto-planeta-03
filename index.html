@@ -2,14 +2,12 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Planeta Projeto</title>
+  <title>🌱 Planeta Projeto</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase SDKs e inicialização -->
+  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
     import { getAuth } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
     const firebaseConfig = {
@@ -18,62 +16,63 @@
       projectId: "planeta-projeto",
       storageBucket: "planeta-projeto.appspot.com",
       messagingSenderId: "1060342659751",
-      appId: "1:1060342659751:web:fbd4c421de3a02db8cb982",
-      measurementId: "G-59Z35M8MM1"
+      appId: "1:1060342659751:web:fbd4c421de3a02db8cb982"
     };
-
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const auth = getAuth(app);
-
-    window.firebaseAuth = auth;
+    window.firebaseAuth = getAuth(app);
   </script>
 </head>
+
 <body>
+  <!-- CABEÇALHO -->
   <header>
-    <h1>🌱 Planeta Projeto</h1>
-    <nav>
-      <button onclick="showLogin()">Login</button>
-      <button onclick="logout()">Sair</button>
+    <nav class="navbar">
+      <button id="logout-btn" onclick="logout()" style="display:none;">Sair</button>
+      <h1>🌱 Planeta Projeto</h1>
+      <button id="post-project-btn" onclick="showProjectForm()" style="display:none;">Postar meu projeto</button>
     </nav>
   </header>
 
-  <main>
-    <section id="login-section" style="display: none;">
-      <h2>Entrar</h2>
-      <input type="email" id="email" placeholder="E-mail" />
-      <input type="password" id="password" placeholder="Senha" />
-      <button onclick="login()">Entrar</button>
-      <p>Não tem conta? <a href="#" onclick="showRegister()">Registrar</a></p>
-    </section>
+  <!-- FORMULÁRIO DE LOGIN -->
+  <section id="login-section" class="auth-section">
+    <h2>Entre para continuar</h2>
+    <input type="email" id="email" placeholder="E-mail" />
+    <input type="password" id="password" placeholder="Senha" />
+    <button onclick="login()">Entrar</button>
+    <p>Não tem conta? <a href="#" onclick="showRegister()">Registrar</a></p>
+  </section>
 
-    <section id="register-section" style="display: none;">
-      <h2>Registrar</h2>
-      <input type="email" id="reg-email" placeholder="E-mail" />
-      <input type="password" id="reg-password" placeholder="Senha" />
-      <button onclick="register()">Registrar</button>
-      <p>Já tem conta? <a href="#" onclick="showLogin()">Entrar</a></p>
-    </section>
+  <!-- FORMULÁRIO DE REGISTRO -->
+  <section id="register-section" class="auth-section" style="display:none;">
+    <h2>Crie sua conta</h2>
+    <input type="email" id="reg-email" placeholder="E-mail" />
+    <input type="password" id="reg-password" placeholder="Senha" />
+    <button onclick="register()">Registrar</button>
+    <p>Já tem conta? <a href="#" onclick="showLogin()">Entrar</a></p>
+  </section>
 
-    <section id="project-form" style="display: none;">
-      <h2>Enviar Projeto Sustentável</h2>
-      <input type="text" id="project-title" placeholder="Título do Projeto" />
-      <textarea id="project-desc" placeholder="Descrição"></textarea>
-      <input type="file" id="project-image" />
-      <button onclick="submitProject()">Enviar</button>
-    </section>
+  <!-- FORMULÁRIO DE PROJETO -->
+  <section id="project-form" style="display:none;" class="project-form-section">
+    <h2>Enviar Projeto Sustentável</h2>
+    <input type="text" id="project-title" placeholder="Título do Projeto" required />
+    <textarea id="project-desc" placeholder="Descrição"></textarea>
+    <input type="file" id="project-image" accept="image/*" required />
+    <input type="file" id="project-video" accept="video/*" />
+    <button onclick="submitProject()">Enviar Projeto</button>
+  </section>
 
-    <section id="project-list">
-      <h2>Projetos da Comunidade</h2>
-      <div id="projects"></div>
-    </section>
+  <!-- LISTA DE PROJETOS -->
+  <main id="project-list" class="projects-section">
+    <h2>Projetos da Comunidade</h2>
+    <div id="projects" class="projects-grid"></div>
   </main>
 
+  <!-- RODAPÉ -->
   <footer>
     <p>&copy; 2025 Planeta Projeto. Todos os direitos reservados.</p>
   </footer>
 
-  <!-- Importa o JS externo -->
-  <script type="module" src="script.js"></script>
+  <!-- SCRIPT JS -->
+  <script type="module" src="./script.js"></script>
 </body>
 </html>
