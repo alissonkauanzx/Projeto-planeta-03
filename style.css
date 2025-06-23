@@ -4,19 +4,18 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 html, body {
   height: 100%;
 }
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #e6f0e6, #cce5cc);
   color: #2e3a2e;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* centraliza vertical */
-  align-items: center;     /* centraliza horizontal */
-  padding: 0 15px;
+  min-height: 100vh;
 }
 
 /* ==================== Cabeçalho ==================== */
@@ -29,25 +28,28 @@ header {
   top: 0;
   z-index: 1000;
 }
+
 nav.navbar {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 1200px;
-  margin: 0 auto;
 }
+
 nav.navbar h1 {
   font-size: 2rem;
   color: #2e7d32;
   font-weight: 700;
-  letter-spacing: 1px;
-  flex: 1;
   text-align: center;
+  flex: 1;
 }
+
 nav.navbar .right-buttons {
   display: flex;
   gap: 12px;
 }
+
 nav.navbar button {
   background: #2e7d32;
   color: #fff;
@@ -56,31 +58,46 @@ nav.navbar button {
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background 0.3s, box-shadow 0.3s;
 }
+
 nav.navbar button:hover {
   background: #1b5e20;
   box-shadow: 0 0 8px #1b5e20aa;
 }
 
-/* ==================== Seções de Login / Registro / Projeto ==================== */
+/* ==================== Área Centralizada ==================== */
+main.center-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  gap: 24px;
+}
+
+/* ==================== Formulários ==================== */
 .auth-section, .project-form-section {
   background: #ffffffdd;
   padding: 40px 50px;
   border-radius: 14px;
   box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
-  text-align: center;
   width: 100%;
   max-width: 520px;
-  margin: 20px auto; /* margem para dar espaçamento entre seções */
+  text-align: center;
 }
-.auth-section h2, .project-form-section h2 {
+
+.auth-section h2,
+.project-form-section h2 {
   margin-bottom: 24px;
   font-weight: 700;
   font-size: 1.8rem;
   color: #2e7d32;
 }
-.auth-section input, .project-form-section input,
+
+.auth-section input,
+.project-form-section input,
 .project-form-section textarea {
   width: 100%;
   padding: 14px 16px;
@@ -89,20 +106,20 @@ nav.navbar button:hover {
   border-radius: 8px;
   font-size: 1.1rem;
   color: #2e3a2e;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
-.auth-section input:focus, .project-form-section input:focus,
+
+.auth-section input:focus,
+.project-form-section input:focus,
 .project-form-section textarea:focus {
   outline: none;
   border-color: #2e7d32;
   box-shadow: 0 0 8px #2e7d32aa;
   background: #f4fcf4;
 }
-.project-form-section textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-.auth-section button, .project-form-section button {
+
+.auth-section button,
+.project-form-section button {
   width: 100%;
   padding: 14px 0;
   margin-top: 18px;
@@ -114,23 +131,28 @@ nav.navbar button:hover {
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 6px 10px rgba(46, 125, 50, 0.4);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
 }
-.auth-section button:hover, .project-form-section button:hover {
+
+.auth-section button:hover,
+.project-form-section button:hover {
   background: #1b5e20;
   box-shadow: 0 8px 14px #1b5e20cc;
   transform: translateY(-2px);
 }
+
 .auth-section p {
   font-size: 0.9rem;
   margin-top: 16px;
   color: #496849;
 }
+
 .auth-section a {
   color: #2e7d32;
   font-weight: 600;
   text-decoration: none;
 }
+
 .auth-section a:hover {
   text-decoration: underline;
 }
@@ -140,50 +162,51 @@ nav.navbar button:hover {
   width: 100%;
   max-width: 1100px;
   padding: 40px 15px;
-  margin: 20px auto;
-  flex-grow: 1; /* para ocupar espaço e empurrar footer pra baixo */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
+
 .projects-section h2 {
   text-align: center;
   margin-bottom: 30px;
   font-size: 2rem;
   font-weight: 700;
   color: #2e7d32;
-  width: 100%;
 }
+
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
-  width: 100%;
 }
+
 .projects-grid .project-card {
   background: white;
   padding: 16px;
   border-radius: 14px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s;
   display: flex;
   flex-direction: column;
 }
+
 .projects-grid .project-card:hover {
   box-shadow: 0 6px 18px rgba(46, 125, 50, 0.3);
 }
-.projects-grid img, .projects-grid video {
+
+.projects-grid img,
+.projects-grid video {
   width: 100%;
   border-radius: 8px;
   margin-top: 12px;
   object-fit: cover;
 }
+
 .projects-grid h3 {
   color: #2e7d32;
   margin-top: 12px;
   font-weight: 700;
   font-size: 1.2rem;
 }
+
 .projects-grid p {
   font-size: 1rem;
   margin: 10px 0 0 0;
@@ -197,11 +220,13 @@ nav.navbar button:hover {
   margin-top: 16px;
   width: 100%;
 }
+
 .comments-section h4 {
   font-size: 1.1rem;
   color: #2e7d32;
   margin-bottom: 8px;
 }
+
 .comments-list {
   list-style: none;
   padding: 0;
@@ -209,19 +234,23 @@ nav.navbar button:hover {
   max-height: 150px;
   overflow-y: auto;
 }
-.comments-list li {
+
+.comments-list div.comment {
   padding: 6px 0;
   border-bottom: 1px solid #cce5cc;
   font-size: 0.9rem;
   color: #2e3a2e;
 }
-.comments-list li:last-child {
+
+.comments-list div.comment:last-child {
   border-bottom: none;
 }
+
 .new-comment {
   display: flex;
   gap: 8px;
 }
+
 .new-comment input {
   flex: 1;
   padding: 8px;
@@ -229,6 +258,7 @@ nav.navbar button:hover {
   border-radius: 6px;
   font-size: 1rem;
 }
+
 .new-comment button {
   background: #2e7d32;
   color: #fff;
@@ -236,9 +266,10 @@ nav.navbar button:hover {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s;
   font-size: 1rem;
 }
+
 .new-comment button:hover {
   background: #1b5e20;
 }
@@ -248,7 +279,6 @@ footer {
   background: #d1e7dd;
   padding: 12px 20px;
   text-align: center;
-  margin-top: auto;
   font-size: 1rem;
   color: #496849;
   box-shadow: inset 0 1px 2px #b3ccb3;
@@ -263,7 +293,7 @@ footer {
     gap: 8px;
   }
   .auth-section, .project-form-section {
-    padding: 25px 20px;
+    padding: 24px 20px;
     max-width: 95%;
   }
   .projects-grid {
