@@ -27,7 +27,7 @@ const auth = window.firebaseAuth;
 const db = getFirestore();
 const storage = getStorage();
 
-// =================== LOGIN E REGISTRO ===================
+// =================== FUNÇÕES DE AUTENTICAÇÃO ===================
 window.login = async function () {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -35,7 +35,6 @@ window.login = async function () {
   try {
     await signInWithEmailAndPassword(auth, email, password);
     alert("Login feito com sucesso!");
-    document.getElementById("project-form").style.display = "block";
   } catch (error) {
     alert("Erro no login: " + error.message);
   }
@@ -75,19 +74,32 @@ window.showRegister = function () {
   document.getElementById("project-form").style.display = "none";
 };
 
+window.showProjectForm = function () {
+  document.getElementById("project-form").style.display = "block";
+  document.getElementById("login-section").style.display = "none";
+  document.getElementById("register-section").style.display = "none";
+};
+
+// =================== ESTADO DE AUTENTICAÇÃO ===================
 onAuthStateChanged(auth, (user) => {
-  const loginBtn = document.querySelector('button[onclick="showLogin()"]');
-  const logoutBtn = document.querySelector('button[onclick="logout()"]');
+  const loginSection = document.getElementById("login-section");
+  const registerSection = document.getElementById("register-section");
   const projectForm = document.getElementById("project-form");
+  const postProjectBtn = document.getElementById("post-project-btn");
+  const logoutBtn = document.getElementById("logout-btn");
 
   if (user) {
-    loginBtn.style.display = "none";
-    logoutBtn.style.display = "inline-block";
-    projectForm.style.display = "block";
-  } else {
-    loginBtn.style.display = "inline-block";
-    logoutBtn.style.display = "none";
+    loginSection.style.display = "none";
+    registerSection.style.display = "none";
     projectForm.style.display = "none";
+    postProjectBtn.style.display = "inline-block";
+    logoutBtn.style.display = "inline-block";
+  } else {
+    loginSection.style.display = "block";
+    registerSection.style.display = "none";
+    projectForm.style.display = "none";
+    postProjectBtn.style.display = "none";
+    logoutBtn.style.display = "none";
   }
 });
 
@@ -96,20 +108,19 @@ window.submitProject = async function () {
   const title = document.getElementById("project-title").value.trim();
   const description = document.getElementById("project-desc").value.trim();
   const imageFile = document.getElementById("project-image").files[0];
-  const videoFile = document.getElementById("project-video")
-    ? document.getElementById("project-video").files[0]
-    : null;
+  const videoFile = document.getElementById("project-video").files[0];
 
   if (!title || !description || !imageFile) {
     return alert("Preencha todos os campos obrigatórios e selecione uma imagem.");
   }
 
   try {
-    // ================= UPLOAD IMAGEM =================
+    // Upload da imagem
     const imageRef = ref(storage, `images/${Date.now()}_${imageFile.name}`);
     await uploadBytes(imageRef, imageFile);
     const imageUrl = await getDownloadURL(imageRef);
 
+    // Upload do vídeo (se existir)
     let videoUrl = "";
     if (videoFile) {
       const videoRef = ref(storage, `videos/${Date.now()}_${videoFile.name}`);
@@ -117,7 +128,7 @@ window.submitProject = async function () {
       videoUrl = await getDownloadURL(videoRef);
     }
 
-    // ================= SALVA NO FIRESTORE =================
+    // Salva o projeto no Firestore
     await addDoc(collection(db, "projects"), {
       title,
       description,
@@ -130,46 +141,13 @@ window.submitProject = async function () {
     document.getElementById("project-title").value = "";
     document.getElementById("project-desc").value = "";
     document.getElementById("project-image").value = "";
-    if (document.getElementById("project-video")) {
-      document.getElementById("project-video").value = "";
-    }
+    document.getElementById("project-video").value = "";
   } catch (error) {
     alert("Erro ao enviar projeto: " + error.message);
   }
 };
 
-// =================== LISTAR PROJETOS ===================
-const projectsContainer = document.getElementById("projects");
-
-function renderProjects(projects) {
-  projectsContainer.innerHTML = "";
-  projects.forEach((proj) => {
-    const div = document.createElement("div");
-    div.classList.add("project-card");
-    div.innerHTML = `
-      <img src="${proj.imageUrl}" alt="${proj.title}" style="max-width:200px;" />
-      <h3>${proj.title}</h3>
-      <p>${proj.description}</p>
-      ${proj.videoUrl ? `<video src="${proj.videoUrl}" controls style="max-width:200px;"></video>` : ""}
-    `;
-    projectsContainer.appendChild(div);
-  });
-}
-
-// Atualização em tempo real
-onSnapshot(
-  query(collection(db, "projects"), orderBy("createdAt", "desc")),
-  (snapshot) => {
-    const projects = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    renderProjects(projects);
-  }
-);
-
-// =================== INICIALIZAÇÃO ===================
-window.addEventListener("DOMContentLoaded", () => {
-  showLogin();
-});
-// =================== LISTAR PROJETOS DA COMUNIDADE ===================
+// =================== LISTAGEM DE PROJETOS ===================
 const projectsContainer = document.getElementById("projects");
 
 function renderProjects(projects) {
@@ -190,20 +168,15 @@ function renderProjects(projects) {
 }
 
 // Atualização automática a partir do Firestore
-import {
-  getFirestore,
-  collection,
-  query,
-  orderBy,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
-
-const db = getFirestore();
-
 onSnapshot(
   query(collection(db, "projects"), orderBy("createdAt", "desc")),
   (snapshot) => {
-    const projects = snapshot.docs.map((doc) => doc.data());
+    const projects = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     renderProjects(projects);
   }
 );
+
+// =================== INICIALIZAÇÃO ===================
+window.addEventListener("DOMContentLoaded", () => {
+  showLogin();
+});
