@@ -1,21 +1,22 @@
-/* Reset e estilos básicos */
+/* ==================== Reset e Base ==================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+html, body {
+  height: 100%;
 }
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #e6f0e6, #cce5cc);
   color: #2e3a2e;
   padding: 0 15px;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
-/* Cabeçalho e Navbar */
+/* ==================== Cabeçalho ==================== */
 header {
   width: 100%;
   background: #d1e7dd;
@@ -33,12 +34,16 @@ nav.navbar {
   margin: 0 auto;
 }
 nav.navbar h1 {
-  flex: 1;
-  text-align: center;
   font-size: 2rem;
   color: #2e7d32;
   font-weight: 700;
   letter-spacing: 1px;
+  flex: 1;
+  text-align: center;
+}
+nav.navbar .right-buttons {
+  display: flex;
+  gap: 12px;
 }
 nav.navbar button {
   background: #2e7d32;
@@ -55,20 +60,15 @@ nav.navbar button:hover {
   box-shadow: 0 0 8px #1b5e20aa;
 }
 
-/* Seções de formulário de autenticação e projetos */
+/* ==================== Centralização do Login ==================== */
 .auth-section, .project-form-section {
-  width: 100%;
-  max-width: 480px;
   background: #ffffffdd;
-  padding: 30px 40px;
-  margin: 60px auto 40px auto;
+  padding: 40px 50px;
   border-radius: 14px;
   box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
   text-align: center;
-  transition: transform 0.25s ease;
-}
-.auth-section:hover, .project-form-section:hover {
-  transform: scale(1.02);
+  width: 100%;
+  max-width: 520px;
 }
 .auth-section h2, .project-form-section h2 {
   margin-bottom: 24px;
@@ -76,8 +76,6 @@ nav.navbar button:hover {
   font-size: 1.8rem;
   color: #2e7d32;
 }
-
-/* Inputs e Textareas */
 .auth-section input, .project-form-section input,
 .project-form-section textarea {
   width: 100%;
@@ -86,7 +84,6 @@ nav.navbar button:hover {
   border: 2px solid #a3c293;
   border-radius: 8px;
   font-size: 1.1rem;
-  font-weight: 500;
   color: #2e3a2e;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
@@ -97,12 +94,6 @@ nav.navbar button:hover {
   box-shadow: 0 0 8px #2e7d32aa;
   background: #f4fcf4;
 }
-.project-form-section textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-/* Botões */
 .auth-section button, .project-form-section button {
   width: 100%;
   padding: 14px 0;
@@ -122,12 +113,6 @@ nav.navbar button:hover {
   box-shadow: 0 8px 14px #1b5e20cc;
   transform: translateY(-2px);
 }
-.auth-section button:active, .project-form-section button:active {
-  transform: translateY(0);
-  box-shadow: 0 5px 8px #145214cc;
-}
-
-/* Textos auxiliares */
 .auth-section p {
   font-size: 0.9rem;
   margin-top: 16px;
@@ -137,17 +122,22 @@ nav.navbar button:hover {
   color: #2e7d32;
   font-weight: 600;
   text-decoration: none;
-  transition: text-decoration 0.3s ease;
 }
 .auth-section a:hover {
   text-decoration: underline;
 }
 
-/* Lista de Projetos */
+/* ==================== Espaço flex para centralização vertical ==================== */
+.auth-section, #register-section {
+  margin: auto;
+  margin-top: 0; /* Remove margens que empurram para baixo */
+}
+
+/* ==================== Projetos ==================== */
 .projects-section {
   width: 100%;
   max-width: 1100px;
-  padding: 20px 15px 40px 15px;
+  padding: 40px 15px;
   margin: 0 auto;
 }
 .projects-section h2 {
@@ -189,7 +179,55 @@ nav.navbar button:hover {
   color: #4a594a;
 }
 
-/* Rodapé */
+/* ==================== Comentários (área pronta para o HTML) ==================== */
+.comments-section {
+  border-top: 2px solid #a3c293;
+  padding-top: 16px;
+  margin-top: 16px;
+}
+.comments-section h4 {
+  font-size: 1.1rem;
+  color: #2e7d32;
+  margin-bottom: 8px;
+}
+.comments-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+}
+.comments-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid #cce5cc;
+  font-size: 0.9rem;
+  color: #2e3a2e;
+}
+.comments-list li:last-child {
+  border-bottom: none;
+}
+.new-comment {
+  display: flex;
+  gap: 8px;
+}
+.new-comment input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #a3c293;
+  border-radius: 6px;
+}
+.new-comment button {
+  background: #2e7d32;
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.new-comment button:hover {
+  background: #1b5e20;
+}
+
+/* ==================== Rodapé ==================== */
 footer {
   background: #d1e7dd;
   padding: 12px 20px;
@@ -200,7 +238,7 @@ footer {
   box-shadow: inset 0 1px 2px #b3ccb3;
 }
 
-/* Responsividade */
+/* ==================== Responsividade ==================== */
 @media (max-width: 600px) {
   nav.navbar h1 {
     font-size: 1.5rem;
