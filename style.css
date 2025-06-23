@@ -1,167 +1,213 @@
-/* ==================== RESET ==================== */
+/* Reset e estilos básicos */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(180deg, #e6f2e6, #f0f8f0);
-  color: #333;
-  padding: 0 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #e6f0e6, #cce5cc);
+  color: #2e3a2e;
+  padding: 0 15px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-h1, h2 {
-  color: #2e7d32;
-}
-a {
-  color: #2e7d32;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-a:hover {
-  color: #1b5e20;
-  text-decoration: underline;
+  align-items: center;
 }
 
-/* ==================== NAVBAR ==================== */
+/* Cabeçalho e Navbar */
 header {
+  width: 100%;
   background: #d1e7dd;
-  padding: 10px 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 12px 24px;
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 nav.navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 nav.navbar h1 {
   flex: 1;
   text-align: center;
-  font-size: 1.8rem;
-  margin: 10px 0;
+  font-size: 2rem;
+  color: #2e7d32;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 nav.navbar button {
   background: #2e7d32;
   color: #fff;
-  padding: 8px 14px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  margin: 5px;
-  transition: background 0.3s ease, transform 0.2s ease;
+  font-weight: 600;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 nav.navbar button:hover {
   background: #1b5e20;
-  transform: scale(1.03);
+  box-shadow: 0 0 8px #1b5e20aa;
 }
 
-/* ==================== FORMS ==================== */
+/* Seções de formulário de autenticação e projetos */
 .auth-section, .project-form-section {
-  max-width: 400px;
   width: 100%;
-  margin: 40px auto;
+  max-width: 480px;
   background: #ffffffdd;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.08);
+  padding: 30px 40px;
+  margin: 60px auto 40px auto;
+  border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
   text-align: center;
-  animation: fadeIn 0.4s ease;
+  transition: transform 0.25s ease;
+}
+.auth-section:hover, .project-form-section:hover {
+  transform: scale(1.02);
 }
 .auth-section h2, .project-form-section h2 {
-  margin-bottom: 20px;
-  font-size: 1.4rem;
+  margin-bottom: 24px;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #2e7d32;
 }
-.auth-section input,
-.project-form-section input,
-.project-form-section textarea,
-.auth-section button,
-.project-form-section button {
+
+/* Inputs e Textareas */
+.auth-section input, .project-form-section input,
+.project-form-section textarea {
   width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
+  padding: 14px 16px;
+  margin: 12px 0;
+  border: 2px solid #a3c293;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #2e3a2e;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
+.auth-section input:focus, .project-form-section input:focus,
+.project-form-section textarea:focus {
+  outline: none;
+  border-color: #2e7d32;
+  box-shadow: 0 0 8px #2e7d32aa;
+  background: #f4fcf4;
+}
+.project-form-section textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Botões */
 .auth-section button, .project-form-section button {
+  width: 100%;
+  padding: 14px 0;
+  margin-top: 18px;
   background: #2e7d32;
+  border: none;
+  border-radius: 10px;
   color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.3s ease;
+  box-shadow: 0 6px 10px rgba(46, 125, 50, 0.4);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 .auth-section button:hover, .project-form-section button:hover {
   background: #1b5e20;
+  box-shadow: 0 8px 14px #1b5e20cc;
+  transform: translateY(-2px);
 }
-.auth-section p {
-  font-size: 0.9rem;
-  margin-top: 10px;
+.auth-section button:active, .project-form-section button:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 8px #145214cc;
 }
 
-/* ==================== LISTA DE PROJETOS ==================== */
+/* Textos auxiliares */
+.auth-section p {
+  font-size: 0.9rem;
+  margin-top: 16px;
+  color: #496849;
+}
+.auth-section a {
+  color: #2e7d32;
+  font-weight: 600;
+  text-decoration: none;
+  transition: text-decoration 0.3s ease;
+}
+.auth-section a:hover {
+  text-decoration: underline;
+}
+
+/* Lista de Projetos */
 .projects-section {
-  padding: 20px 10px;
-  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  padding: 20px 15px 40px 15px;
+  margin: 0 auto;
 }
 .projects-section h2 {
   text-align: center;
-  margin-bottom: 20px;
-  font-size: 1.5rem;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2e7d32;
 }
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
 }
 .projects-grid .project-card {
   background: white;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s ease;
 }
 .projects-grid .project-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 18px rgba(46, 125, 50, 0.3);
 }
 .projects-grid img, .projects-grid video {
   width: 100%;
-  border-radius: 4px;
-  margin-top: 10px;
+  border-radius: 8px;
+  margin-top: 12px;
 }
 .projects-grid h3 {
   color: #2e7d32;
-  margin: 5px 0;
-  font-size: 1.1rem;
+  margin-top: 12px;
+  font-weight: 700;
+  font-size: 1.2rem;
 }
 .projects-grid p {
-  font-size: 0.9rem;
-  margin: 8px 0;
-  color: #555;
+  font-size: 1rem;
+  margin: 10px 0 0 0;
+  color: #4a594a;
 }
 
-/* ==================== FOOTER ==================== */
+/* Rodapé */
 footer {
   background: #d1e7dd;
-  padding: 10px;
+  padding: 12px 20px;
   text-align: center;
-  font-size: 0.9rem;
-  margin-top: 40px;
+  margin-top: auto;
+  font-size: 1rem;
+  color: #496849;
+  box-shadow: inset 0 1px 2px #b3ccb3;
 }
 
-/* ==================== ANIMAÇÕES ==================== */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ==================== RESPONSIVO ==================== */
-@media (max-width: 500px) {
+/* Responsividade */
+@media (max-width: 600px) {
   nav.navbar h1 {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+  }
+  .auth-section, .project-form-section {
+    padding: 25px 20px;
+    max-width: 95%;
   }
   .projects-grid {
     grid-template-columns: 1fr;
