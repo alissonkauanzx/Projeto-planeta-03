@@ -27,9 +27,11 @@
   <!-- CABEÇALHO -->
   <header>
     <nav class="navbar">
-      <button id="logout-btn" onclick="logout()" style="display:none;">Sair</button>
       <h1>🌱 Planeta Projeto</h1>
-      <button id="post-project-btn" onclick="showProjectForm()" style="display:none;">Postar meu projeto</button>
+      <div class="right-buttons">
+        <button id="post-project-btn" onclick="showProjectForm()" style="display:none;">Postar meu projeto</button>
+        <button id="logout-btn" onclick="logout()" style="display:none;">Sair</button>
+      </div>
     </nav>
   </header>
 
@@ -52,7 +54,7 @@
   </section>
 
   <!-- FORMULÁRIO DE PROJETO -->
-  <section id="project-form" style="display:none;" class="project-form-section">
+  <section id="project-form" class="project-form-section" style="display:none;">
     <h2>Enviar Projeto Sustentável</h2>
     <input type="text" id="project-title" placeholder="Título do Projeto" required />
     <textarea id="project-desc" placeholder="Descrição"></textarea>
@@ -64,7 +66,29 @@
   <!-- LISTA DE PROJETOS -->
   <main id="project-list" class="projects-section">
     <h2>Projetos da Comunidade</h2>
-    <div id="projects" class="projects-grid"></div>
+    <div id="projects" class="projects-grid">
+
+      <!-- Exemplo de projeto (será gerado dinamicamente via JS) -->
+      <!--
+      <div class="project-card">
+        <h3>Título do Projeto</h3>
+        <p>Descrição do projeto aqui...</p>
+        <img src="caminho-da-imagem" alt="Imagem do projeto" />
+        <video src="caminho-do-video" controls></video>
+
+        <div class="comments-section">
+          <h4>Comentários</h4>
+          <ul class="comments-list">
+            <li>Esse projeto ficou incrível! – João</li>
+          </ul>
+          <div class="new-comment">
+            <input type="text" placeholder="Adicione um comentário..." />
+            <button>Enviar</button>
+          </div>
+        </div>
+      </div>
+      -->
+    </div>
   </main>
 
   <!-- RODAPÉ -->
