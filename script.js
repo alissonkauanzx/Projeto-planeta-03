@@ -49,14 +49,20 @@ const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
 
 // ==================== FUNÇÕES AUXILIARES ====================
-const showElement = el => el.style.display = "block";
-const hideElement = el => el.style.display = "none";
+const showElement = el => { if (el) el.style.display = "block"; };
+const hideElement = el => { if (el) el.style.display = "none"; };
 
 function resetProjectForm() {
-  document.getElementById("project-title").value = "";
-  document.getElementById("project-desc").value = "";
-  document.getElementById("project-image").value = "";
-  document.getElementById("project-video").value = "";
+  const titleInput = document.getElementById("project-title");
+  const descInput = document.getElementById("project-desc");
+  const imageInput = document.getElementById("project-image");
+  const videoInput = document.getElementById("project-video");
+
+  if (titleInput) titleInput.value = "";
+  if (descInput) descInput.value = "";
+  if (imageInput) imageInput.value = "";
+  if (videoInput) videoInput.value = "";
+
   hideElement(uploadProgress);
   hideElement(uploadMessage);
   delete window.currentProjectId;
@@ -83,25 +89,31 @@ window.showProjectForm = () => {
 
 // ==================== AUTENTICAÇÃO ====================
 window.login = async () => {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const email = document.getElementById("email")?.value.trim();
+  const password = document.getElementById("password")?.value.trim();
+
   if (!email || !password) return alert("Preencha e-mail e senha.");
+
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (error) {
+    console.error("Erro no login:", error);
     alert("Erro no login: " + error.message);
   }
 };
 
 window.register = async () => {
-  const email = document.getElementById("reg-email").value.trim();
-  const password = document.getElementById("reg-password").value.trim();
+  const email = document.getElementById("reg-email")?.value.trim();
+  const password = document.getElementById("reg-password")?.value.trim();
+
   if (!email || !password) return alert("Preencha e-mail e senha.");
+
   try {
     await createUserWithEmailAndPassword(auth, email, password);
     alert("Conta criada com sucesso!");
     showLogin();
   } catch (error) {
+    console.error("Erro no registro:", error);
     alert("Erro no registro: " + error.message);
   }
 };
@@ -110,6 +122,7 @@ window.logout = async () => {
   try {
     await signOut(auth);
   } catch (error) {
+    console.error("Erro ao sair:", error);
     alert("Erro ao sair: " + error.message);
   }
 };
@@ -134,26 +147,36 @@ onAuthStateChanged(auth, (user) => {
 async function canUpload(newBytes) {
   const today = new Date().toISOString().split('T')[0];
   const dailyRef = doc(db, "dailyUsage", today);
-  const snap = await getDoc(dailyRef);
-  const usedBytes = snap.exists() ? snap.data().totalBytes : 0;
 
-  if (usedBytes + newBytes > MAX_DAILY_BYTES) {
-    alert("⚠️ Limite diário de 5 GB atingido. Tente novamente amanhã.");
+  try {
+    const snap = await getDoc(dailyRef);
+    const usedBytes = snap.exists() ? snap.data().totalBytes : 0;
+
+    if (usedBytes + newBytes > MAX_DAILY_BYTES) {
+      alert("⚠️ Limite diário de 5 GB atingido. Tente novamente amanhã.");
+      return false;
+    }
+
+    if (snap.exists()) {
+      await updateDoc(dailyRef, { totalBytes: increment(newBytes) });
+    } else {
+      await setDoc(dailyRef, { totalBytes: newBytes });
+    }
+    return true;
+  } catch (error) {
+    console.error("Erro no canUpload:", error);
+    alert("Erro ao verificar limite de upload. Tente novamente.");
     return false;
   }
-
-  if (snap.exists()) {
-    await updateDoc(dailyRef, { totalBytes: increment(newBytes) });
-  } else {
-    await setDoc(dailyRef, { totalBytes: newBytes });
-  }
-  return true;
 }
 
 // ==================== UPLOAD DE ARQUIVOS COM PROGRESSO ====================
 function uploadFileWithProgress(file, path) {
   return new Promise((resolve, reject) => {
-    if (file.size > MAX_FILE_SIZE_BYTES) return reject(new Error(`"${file.name}" excede 5 GB.`));
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      reject(new Error(`"${file.name}" excede 5 GB.`));
+      return;
+    }
 
     const fileRef = ref(storage, path);
     const uploadTask = uploadBytesResumable(fileRef, file);
@@ -171,13 +194,19 @@ function uploadFileWithProgress(file, path) {
       (error) => {
         hideElement(uploadProgress);
         hideElement(uploadMessage);
+        console.error("Erro no upload:", error);
         reject(error);
       },
       async () => {
         hideElement(uploadProgress);
         hideElement(uploadMessage);
-        const url = await getDownloadURL(uploadTask.snapshot.ref);
-        resolve(url);
+        try {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve(url);
+        } catch (error) {
+          console.error("Erro ao obter URL do arquivo:", error);
+          reject(error);
+        }
       }
     );
   });
@@ -185,15 +214,16 @@ function uploadFileWithProgress(file, path) {
 
 // ==================== ENVIO DE PROJETO ====================
 window.submitProject = async () => {
-  const title = document.getElementById("project-title").value.trim();
-  const description = document.getElementById("project-desc").value.trim();
-  const imageFile = document.getElementById("project-image").files[0];
-  const videoFile = document.getElementById("project-video").files[0];
-  const uid = auth.currentUser.uid;
+  const title = document.getElementById("project-title")?.value.trim();
+  const description = document.getElementById("project-desc")?.value.trim();
+  const imageFile = document.getElementById("project-image")?.files[0];
+  const videoFile = document.getElementById("project-video")?.files[0];
+  const uid = auth.currentUser?.uid;
 
   if (!title || !description) return alert("Preencha todos os campos obrigatórios.");
+  if (!uid) return alert("Usuário não autenticado.");
 
-  const totalBytesToUpload = (imageFile ? imageFile.size : 0) + (videoFile ? videoFile.size : 0);
+  const totalBytesToUpload = (imageFile?.size || 0) + (videoFile?.size || 0);
 
   if (!(await canUpload(totalBytesToUpload))) return;
 
@@ -231,6 +261,7 @@ window.submitProject = async () => {
     loadProjects();
     resetProjectForm();
   } catch (error) {
+    console.error("Erro ao salvar projeto:", error);
     alert(`Erro ao salvar projeto: ${error.message}`);
   }
 };
@@ -277,12 +308,12 @@ function createProjectCard(project) {
   if (auth.currentUser && (auth.currentUser.uid === project.userId || auth.currentUser.uid === ADMIN_UID)) {
     const editButton = document.createElement("button");
     editButton.textContent = "Editar";
-    editButton.onclick = () => editProject(project);
+    editButton.addEventListener("click", () => editProject(project));
     actions.appendChild(editButton);
 
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "Apagar";
-    deleteButton.onclick = () => deleteProject(project.id);
+    deleteButton.addEventListener("click", () => deleteProject(project.id));
     actions.appendChild(deleteButton);
   }
 
@@ -291,10 +322,17 @@ function createProjectCard(project) {
   (project.comments || []).forEach(comment => addCommentToList(list, comment));
 
   // Enviar novo comentário
-  card.querySelector(".btn-comment").addEventListener("click", async () => {
-    const inputComment = card.querySelector(".new-comment input");
+  const commentBtn = card.querySelector(".btn-comment");
+  const inputComment = card.querySelector(".new-comment input");
+
+  commentBtn.addEventListener("click", async () => {
     const text = inputComment.value.trim();
     if (!text) return;
+
+    if (!auth.currentUser) {
+      alert("Você precisa estar logado para comentar.");
+      return;
+    }
 
     const commentData = {
       userId: auth.currentUser.uid,
@@ -303,12 +341,17 @@ function createProjectCard(project) {
       createdAt: new Date()
     };
 
-    await updateDoc(doc(db, "projects", project.id), {
-      comments: arrayUnion(commentData)
-    });
+    try {
+      await updateDoc(doc(db, "projects", project.id), {
+        comments: arrayUnion(commentData)
+      });
 
-    addCommentToList(list, commentData);
-    inputComment.value = "";
+      addCommentToList(list, commentData);
+      inputComment.value = "";
+    } catch (error) {
+      console.error("Erro ao enviar comentário:", error);
+      alert("Erro ao enviar comentário. Tente novamente.");
+    }
   });
 
   return card;
@@ -329,6 +372,7 @@ async function deleteProject(projectId) {
     await deleteDoc(doc(db, "projects", projectId));
     alert("Projeto apagado com sucesso!");
   } catch (error) {
+    console.error("Erro ao apagar projeto:", error);
     alert(`Erro ao apagar: ${error.message}`);
   }
 }
@@ -338,9 +382,8 @@ function addCommentToList(container, comment) {
   const div = document.createElement("div");
   div.classList.add("comment");
 
-  const dateStr = new Date(
-    comment.createdAt.seconds ? comment.createdAt.seconds * 1000 : comment.createdAt
-  ).toLocaleString();
+  const dateObj = comment.createdAt.seconds ? new Date(comment.createdAt.seconds * 1000) : new Date(comment.createdAt);
+  const dateStr = dateObj.toLocaleString();
 
   div.innerHTML = `
     <p><strong>${comment.userEmail}</strong> <em>(${dateStr})</em></p>
