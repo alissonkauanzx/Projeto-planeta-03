@@ -3,7 +3,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
 import {
@@ -15,20 +15,22 @@ import {
   onSnapshot,
   doc,
   updateDoc,
-  arrayUnion,
+  arrayUnion
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 import {
   getStorage,
   ref,
   uploadBytesResumable,
-  getDownloadURL,
+  getDownloadURL
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js";
 
-// ==================== CONFIGURAÇÕES ====================
+// ==================== CONFIGURAÇÃO ====================
 const auth = window.firebaseAuth;
 const db = getFirestore();
 const storage = getStorage();
+
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB
 
 // ==================== SELETORES ====================
 const loginSection = document.getElementById("login-section");
@@ -41,14 +43,9 @@ const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
 
 // ==================== HELPERS ====================
-function showElement(el) {
-  el.style.display = "block";
-  el.classList.add("fade-in"); // animação suave
-}
-function hideElement(el) {
-  el.style.display = "none";
-  el.classList.remove("fade-in");
-}
+function showElement(el) { el.style.display = "block"; }
+function hideElement(el) { el.style.display = "none"; }
+
 function resetProjectForm() {
   document.getElementById("project-title").value = "";
   document.getElementById("project-desc").value = "";
@@ -63,52 +60,42 @@ window.showLogin = () => {
   showElement(loginSection);
   hideElement(registerSection);
   hideElement(projectForm);
-  hideElement(uploadProgress);
-  hideElement(uploadMessage);
 };
 
 window.showRegister = () => {
   hideElement(loginSection);
   showElement(registerSection);
   hideElement(projectForm);
-  hideElement(uploadProgress);
-  hideElement(uploadMessage);
 };
 
 window.showProjectForm = () => {
   hideElement(loginSection);
   hideElement(registerSection);
   showElement(projectForm);
-  hideElement(uploadProgress);
-  hideElement(uploadMessage);
 };
 
 // ==================== AUTENTICAÇÃO ====================
 window.login = async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
-  if (!email || !password) {
-    return alert("Por favor, preencha o e-mail e a senha.");
-  }
+  if (!email || !password) return alert("Preencha e-mail e senha.");
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (error) {
-    alert(`Erro ao entrar: ${error.message}`);
+    alert("Erro no login: " + error.message);
   }
 };
 
 window.register = async () => {
   const email = document.getElementById("reg-email").value.trim();
   const password = document.getElementById("reg-password").value.trim();
-  if (!email || !password) {
-    return alert("Por favor, preencha o e-mail e a senha.");
-  }
+  if (!email || !password) return alert("Preencha e-mail e senha.");
   try {
     await createUserWithEmailAndPassword(auth, email, password);
-    alert("✅ Conta criada com sucesso! Faça o login.");
+    alert("Conta criada com sucesso!");
     showLogin();
   } catch (error) {
-    alert(`Erro no registro: ${error.message}`);
+    alert("Erro no registro: " + error.message);
   }
 };
 
@@ -116,11 +103,10 @@ window.logout = async () => {
   try {
     await signOut(auth);
   } catch (error) {
-    alert(`Erro ao sair: ${error.message}`);
+    alert("Erro ao sair: " + error.message);
   }
 };
 
-// ==================== CONTROLE DE AUTENTICAÇÃO ====================
 onAuthStateChanged(auth, (user) => {
   if (user) {
     hideElement(loginSection);
@@ -138,21 +124,12 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ==================== UPLOAD COM PROGRESSO ====================
-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB
-
-function showUploadMessage(msg) {
-  uploadMessage.textContent = msg;
-  showElement(uploadMessage);
-}
-
-function hideUploadMessage() {
-  hideElement(uploadMessage);
-}
-
-async function uploadFileWithProgress(file, path) {
+function uploadFileWithProgress(file, path) {
   return new Promise((resolve, reject) => {
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      return reject(new Error(`"${file.name}" ultrapassa o limite de 5 GB.`));
+      return reject(
+        new Error(`O arquivo "${file.name}" excede o limite de 5 GB.`)
+      );
     }
 
     const fileRef = ref(storage, path);
@@ -160,27 +137,24 @@ async function uploadFileWithProgress(file, path) {
 
     showElement(uploadProgress);
     uploadProgress.value = 0;
-    showUploadMessage(`Enviando "${file.name}" (${(file.size / (1024 * 1024)).toFixed(2)} MB)...`);
+    uploadMessage.textContent = `Enviando "${file.name}" (${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
+    showElement(uploadMessage);
 
     task.on(
       "state_changed",
       (snap) => {
-        uploadProgress.value = (snap.bytesTransferred / snap.totalBytes) * 100;
+        const progress = (snap.bytesTransferred / snap.totalBytes) * 100;
+        uploadProgress.value = progress;
       },
       (error) => {
         hideElement(uploadProgress);
-        hideUploadMessage();
+        hideElement(uploadMessage);
         reject(error);
       },
       async () => {
         hideElement(uploadProgress);
-        hideUploadMessage();
-        try {
-          const downloadURL = await getDownloadURL(task.snapshot.ref);
-          resolve(downloadURL);
-        } catch (err) {
-          reject(err);
-        }
+        hideElement(uploadMessage);
+        resolve(await getDownloadURL(task.snapshot.ref));
       }
     );
   });
@@ -194,22 +168,14 @@ window.submitProject = async () => {
   const videoFile = document.getElementById("project-video").files[0];
 
   if (!title || !description || !imageFile) {
-    return alert("Por favor, preencha título, descrição e selecione uma imagem.");
+    return alert("Preencha todos os campos obrigatórios.");
   }
 
   try {
-    // Envia imagem
-    const imageUrl = await uploadFileWithProgress(
-      imageFile,
-      `images/${Date.now()}-${imageFile.name}`
-    );
-
+    const imageUrl = await uploadFileWithProgress(imageFile, `images/${Date.now()}-${imageFile.name}`);
     let videoUrl = "";
     if (videoFile) {
-      videoUrl = await uploadFileWithProgress(
-        videoFile,
-        `videos/${Date.now()}-${videoFile.name}`
-      );
+      videoUrl = await uploadFileWithProgress(videoFile, `videos/${Date.now()}-${videoFile.name}`);
     }
 
     await addDoc(collection(db, "projects"), {
@@ -219,10 +185,10 @@ window.submitProject = async () => {
       videoUrl,
       createdAt: new Date(),
       userId: auth.currentUser.uid,
-      comments: [],
+      comments: []
     });
 
-    alert("✅ Projeto enviado com sucesso!");
+    alert("Projeto enviado com sucesso!");
     hideElement(projectForm);
     loadProjects();
     resetProjectForm();
@@ -231,13 +197,13 @@ window.submitProject = async () => {
   }
 };
 
-// ==================== LISTAGEM DE PROJETOS ====================
+// ==================== CARREGAMENTO DE PROJETOS ====================
 function loadProjects() {
   const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
   onSnapshot(q, (snapshot) => {
     projectsContainer.innerHTML = "";
     if (snapshot.empty) {
-      projectsContainer.innerHTML = "<p>Nenhum projeto postado ainda. Seja o primeiro! 🌱</p>";
+      projectsContainer.innerHTML = "<p>Nenhum projeto postado ainda.</p>";
       return;
     }
     snapshot.docs.forEach((docSnap) => {
@@ -247,15 +213,15 @@ function loadProjects() {
   });
 }
 
-// ==================== CRIAÇÃO DE CARD ====================
+// ==================== CRIA CARD DO PROJETO ====================
 function createProjectCard(project) {
   const card = document.createElement("div");
-  card.classList.add("project-card");
+  card.classList.add("project-card", "fade-in");
 
   card.innerHTML = `
     <h3>${project.title}</h3>
     <p>${project.description}</p>
-    ${project.imageUrl ? `<img src="${project.imageUrl}" alt="${project.title}">` : ""}
+    ${project.imageUrl ? `<img src="${project.imageUrl}" alt="${project.title}" />` : ""}
     ${project.videoUrl ? `<video src="${project.videoUrl}" controls></video>` : ""}
     <div class="comments-section">
       <h4>Comentários</h4>
@@ -269,6 +235,7 @@ function createProjectCard(project) {
 
   const list = card.querySelector(".comments-list");
   (project.comments || []).forEach((c) => addCommentToList(list, c));
+
   const btnComment = card.querySelector(".btn-comment");
   const inputComment = card.querySelector(".new-comment input");
 
@@ -288,18 +255,17 @@ function createProjectCard(project) {
       addCommentToList(list, commentData);
       inputComment.value = "";
     } catch (error) {
-      alert(`Erro ao enviar comentário: ${error.message}`);
+      alert("Erro ao enviar comentário: " + error.message);
     }
   });
 
   return card;
 }
 
-// ==================== COMENTÁRIOS ====================
+// ==================== ADICIONA COMENTÁRIO ====================
 function addCommentToList(container, comment) {
   const commentDiv = document.createElement("div");
   commentDiv.classList.add("comment");
-
   const dateStr = new Date(
     comment.createdAt.seconds ? comment.createdAt.seconds * 1000 : comment.createdAt
   ).toLocaleString();
@@ -312,4 +278,4 @@ function addCommentToList(container, comment) {
 }
 
 // ==================== INICIALIZAÇÃO ====================
-document.addEventListener("DOMContentLoaded", () => showLogin());
+document.addEventListener("DOMContentLoaded", showLogin);
