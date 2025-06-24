@@ -6,18 +6,35 @@
 }
 
 html, body {
-  height: 100%;
-  font-size: 16px;
-  background: linear-gradient(135deg, #e6f0e6, #cce5cc);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e1f5e1, #c7e8c7);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #2e3a2e;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  background-attachment: fixed;
+}
+
+/* ==================== Animação Fade-in ==================== */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.4s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
 
 /* ==================== Cabeçalho ==================== */
 header {
   background: #d1e7dd;
   padding: 14px 24px;
-  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.12);
+  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.2);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -36,9 +53,9 @@ nav.navbar h1 {
   flex: 1;
   font-size: 2rem;
   color: #2e7d32;
+  text-align: center;
   font-weight: 800;
   letter-spacing: 0.5px;
-  text-align: center;
 }
 
 nav.navbar .right-buttons {
@@ -54,38 +71,40 @@ nav.navbar button {
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  box-shadow: 0 2px 5px rgba(46, 125, 50, 0.3);
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.3);
   transition: all 0.3s ease;
 }
 nav.navbar button:hover {
   background: #1b5e20;
   box-shadow: 0 4px 10px rgba(46, 125, 50, 0.35);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
-/* ==================== Conteúdo Principal ==================== */
+/* ==================== Área Central ==================== */
 main.center-wrapper {
   flex: 1;
-  min-height: calc(100vh - 70px); /* Centralização vertical correta */
-  padding: 24px;
+  padding: 32px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: center; /* Centralização vertical */
+  width: 100%;
   gap: 32px;
-  animation: fadeIn 0.6s ease;
 }
 
 /* ==================== Formulários ==================== */
-.auth-section, .project-form-section {
-  background: #ffffffee;
-  padding: 40px;
+.auth-section,
+.project-form-section {
+  background: #ffffffcc;
+  padding: 40px 32px;
   border-radius: 14px;
-  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.2);
+  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.2);
   width: 100%;
-  max-width: 520px;
+  max-width: 480px;
   text-align: center;
-  animation: slideUp 0.6s ease;
+  backdrop-filter: blur(2px);
+  transition: all 0.3s ease;
+  animation: fadeIn 0.4s ease forwards;
 }
 
 .auth-section h2,
@@ -94,7 +113,6 @@ main.center-wrapper {
   margin-bottom: 24px;
   font-size: 1.8rem;
   font-weight: 800;
-  letter-spacing: 0.3px;
 }
 
 .auth-section input,
@@ -107,7 +125,7 @@ main.center-wrapper {
   border-radius: 8px;
   font-size: 1rem;
   color: #2e3a2e;
-  background: #f8fcf8;
+  background: #f5fff5;
   transition: all 0.3s;
 }
 .auth-section input:focus,
@@ -160,9 +178,7 @@ main.center-wrapper {
 .projects-section {
   width: 100%;
   max-width: 1200px;
-  padding: 40px 0;
 }
-
 .projects-section h2 {
   text-align: center;
   margin-bottom: 32px;
@@ -170,32 +186,31 @@ main.center-wrapper {
   color: #2e7d32;
   font-weight: 800;
 }
-
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
 }
-
 .projects-grid .project-card {
-  background: white;
+  background: #ffffffdd;
   padding: 16px;
   border-radius: 14px;
   box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
-  transition: box-shadow 0.3s, transform 0.3s;
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
 .projects-grid .project-card:hover {
   box-shadow: 0 8px 18px rgba(46, 125, 50, 0.3);
   transform: scale(1.02);
 }
-.projects-grid img,
-.projects-grid video {
+.projects-grid .project-card img,
+.projects-grid .project-card video {
   width: 100%;
   border-radius: 8px;
   margin-top: 12px;
   max-height: 200px;
   object-fit: cover;
-  background: #f0f8f0;
+  background: #e1f5e1;
 }
 .projects-grid h3 {
   color: #2e7d32;
@@ -227,6 +242,7 @@ main.center-wrapper {
   margin: 0 0 12px 0;
   max-height: 180px;
   overflow-y: auto;
+  padding-right: 8px;
 }
 .comment {
   padding: 8px 0;
@@ -251,7 +267,7 @@ main.center-wrapper {
 }
 .new-comment input:focus {
   border-color: #2e7d32;
-  box-shadow: 0 0 4px #2e7d32aa;
+  box-shadow: 0 0 4px rgba(46, 125, 50, 0.3);
   outline: none;
 }
 .new-comment button {
@@ -268,7 +284,7 @@ main.center-wrapper {
   background: #1b5e20;
 }
 
-/* ==================== Upload Mensagem e Progresso ==================== */
+/* ==================== Upload e progresso ==================== */
 .upload-message {
   display: block;
   margin-top: 8px;
@@ -301,15 +317,6 @@ footer {
   font-size: 1rem;
   color: #496849;
   box-shadow: inset 0 1px 2px #b3ccb3;
-}
-
-/* ==================== Animações ==================== */
-@keyframes fadeIn {
-  from { opacity: 0; } to { opacity: 1; }
-}
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ==================== Responsividade ==================== */
