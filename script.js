@@ -1,300 +1,107 @@
-// ==================== IMPORTS ====================
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌱 Planeta Projeto</title>
+  <link rel="stylesheet" href="style.css" />
 
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  onSnapshot,
-  doc,
-  updateDoc,
-  arrayUnion
-} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js";
-
-// ==================== CONFIGURAÇÕES ====================
-const auth = window.firebaseAuth;
-const db = getFirestore();
-const storage = getStorage();
-
-// ==================== SELETORES ====================
-const loginSection = document.getElementById("login-section");
-const registerSection = document.getElementById("register-section");
-const projectForm = document.getElementById("project-form");
-const postProjectBtn = document.getElementById("post-project-btn");
-const logoutBtn = document.getElementById("logout-btn");
-const projectsContainer = document.getElementById("projects");
-const uploadProgress = document.getElementById("upload-progress");  // barra <progress>
-const uploadMessage = document.getElementById("upload-message");  // mensagem de upload
-
-// ==================== HELPERS ====================
-function showElement(el) { el.style.display = "block"; }
-function hideElement(el) { el.style.display = "none"; }
-
-function resetProjectForm() {
-  document.getElementById("project-title").value = "";
-  document.getElementById("project-desc").value = "";
-  document.getElementById("project-image").value = "";
-  document.getElementById("project-video").value = "";
-  hideElement(uploadProgress);
-  hideElement(uploadMessage);
-}
-
-// ==================== VISIBILIDADE DE SEÇÕES ====================
-window.showLogin = () => { 
-  showElement(loginSection); 
-  hideElement(registerSection); 
-  hideElement(projectForm); 
-  hideElement(uploadProgress);
-  hideElement(uploadMessage);
-};
-window.showRegister = () => { 
-  hideElement(loginSection); 
-  showElement(registerSection); 
-  hideElement(projectForm); 
-  hideElement(uploadProgress);
-  hideElement(uploadMessage);
-};
-window.showProjectForm = () => { 
-  hideElement(loginSection); 
-  hideElement(registerSection); 
-  showElement(projectForm); 
-  hideElement(uploadProgress);
-  hideElement(uploadMessage);
-};
-
-// ==================== AUTENTICAÇÃO ====================
-window.login = async () => {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  if (!email || !password) return alert("Preencha e-mail e senha.");
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (error) {
-    alert("Erro no login: " + error.message);
-  }
-};
-
-window.register = async () => {
-  const email = document.getElementById("reg-email").value.trim();
-  const password = document.getElementById("reg-password").value.trim();
-  if (!email || !password) return alert("Preencha e-mail e senha.");
-  try {
-    await createUserWithEmailAndPassword(auth, email, password);
-    alert("Conta criada com sucesso!");
-    showLogin();
-  } catch (error) {
-    alert("Erro no registro: " + error.message);
-  }
-};
-
-window.logout = async () => {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    alert("Erro ao sair: " + error.message);
-  }
-};
-
-// ==================== CONTROLE DE AUTENTICAÇÃO ====================
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    hideElement(loginSection);
-    hideElement(registerSection);
-    hideElement(projectForm);
-    showElement(postProjectBtn);
-    showElement(logoutBtn);
-    loadProjects();
-  } else {
-    showLogin();
-    hideElement(postProjectBtn);
-    hideElement(logoutBtn);
-    projectsContainer.innerHTML = "";
-  }
-});
-
-// ==================== UPLOAD COM PROGRESSO E MENSAGEM AMIGÁVEL ====================
-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB
-
-async function uploadFileWithProgress(file, path) {
-  return new Promise((resolve, reject) => {
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      reject(new Error(`O arquivo "${file.name}" excede o limite máximo de 5GB.`));
-      return;
-    }
-
-    const fileRef = ref(storage, path);
-    const task = uploadBytesResumable(fileRef, file);
-
-    showElement(uploadProgress);
-    uploadProgress.value = 0;
-
-    uploadMessage.textContent = `Enviando "${file.name}" (${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
-    showElement(uploadMessage);
-
-    task.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        uploadProgress.value = progress;
-      },
-      (error) => {
-        hideElement(uploadProgress);
-        hideElement(uploadMessage);
-        reject(error);
-      },
-      async () => {
-        hideElement(uploadProgress);
-        hideElement(uploadMessage);
-        try {
-          const downloadURL = await getDownloadURL(task.snapshot.ref);
-          resolve(downloadURL);
-        } catch (err) {
-          reject(err);
-        }
-      }
-    );
-  });
-}
-
-// ==================== ENVIO DE PROJETO ====================
-window.submitProject = async () => {
-  const title = document.getElementById("project-title").value.trim();
-  const description = document.getElementById("project-desc").value.trim();
-  const imageFile = document.getElementById("project-image").files[0];
-  const videoFile = document.getElementById("project-video").files[0];
-
-  if (!title || !description || !imageFile) {
-    alert("Preencha todos os campos obrigatórios.");
-    return;
-  }
-
-  try {
-    // Faz upload da imagem
-    const imageUrl = await uploadFileWithProgress(imageFile, `images/${Date.now()}-${imageFile.name}`);
-
-    // Faz upload do vídeo, se houver
-    let videoUrl = "";
-    if (videoFile) {
-      videoUrl = await uploadFileWithProgress(videoFile, `videos/${Date.now()}-${videoFile.name}`);
-    }
-
-    // Salva projeto no Firestore
-    await addDoc(collection(db, "projects"), {
-      title,
-      description,
-      imageUrl,
-      videoUrl,
-      createdAt: new Date(),
-      userId: auth.currentUser.uid,
-      comments: []
-    });
-
-    alert("Projeto enviado com sucesso!");
-    hideElement(projectForm);
-    loadProjects();
-    resetProjectForm();
-
-  } catch (error) {
-    alert("Erro ao enviar projeto: " + error.message);
-  }
-};
-
-// ==================== CARREGA PROJETOS ====================
-function loadProjects() {
-  const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
-  onSnapshot(q, (snapshot) => {
-    projectsContainer.innerHTML = "";
-    if (snapshot.empty) {
-      projectsContainer.innerHTML = "<p>Nenhum projeto postado ainda.</p>";
-      return;
-    }
-    snapshot.docs.forEach((docSnap) => {
-      const project = { id: docSnap.id, ...docSnap.data() };
-      projectsContainer.appendChild(createProjectCard(project));
-    });
-  });
-}
-
-// ==================== CRIAÇÃO DE CARD DO PROJETO ====================
-function createProjectCard(project) {
-  const card = document.createElement("div");
-  card.classList.add("project-card");
-
-  card.innerHTML = `
-    <h3>${project.title}</h3>
-    <p>${project.description}</p>
-    ${project.imageUrl ? `<img src="${project.imageUrl}" alt="${project.title}"/>` : ""}
-    ${project.videoUrl ? `<video src="${project.videoUrl}" controls></video>` : ""}
-    <div class="comments-section">
-      <h4>Comentários</h4>
-      <div class="comments-list"></div>
-      <div class="new-comment">
-        <input type="text" placeholder="Escreva um comentário..." />
-        <button class="btn-comment">Enviar</button>
-      </div>
-    </div>
-  `;
-
-  const list = card.querySelector(".comments-list");
-  (project.comments || []).forEach((c) => addCommentToList(list, c));
-
-  const btnComment = card.querySelector(".btn-comment");
-  const inputComment = card.querySelector(".new-comment input");
-
-  btnComment.addEventListener("click", async () => {
-    const text = inputComment.value.trim();
-    if (!text) return;
-
-    const commentData = {
-      userId: auth.currentUser.uid,
-      userEmail: auth.currentUser.email,
-      text,
-      createdAt: new Date(),
+    const firebaseConfig = {
+      apiKey: "AIzaSyBdWzf45GmW58N7sy7WMT9MG9G4Jy3wjsg",
+      authDomain: "planeta-projeto.firebaseapp.com",
+      projectId: "planeta-projeto",
+      storageBucket: "planeta-projeto.appspot.com",
+      messagingSenderId: "1060342659751",
+      appId: "1:1060342659751:web:fbd4c421de3a02db8cb982"
     };
+    const app = initializeApp(firebaseConfig);
+    window.firebaseAuth = getAuth(app);
+  </script>
+</head>
 
-    try {
-      const projectRef = doc(db, "projects", project.id);
-      await updateDoc(projectRef, { comments: arrayUnion(commentData) });
-      addCommentToList(list, commentData);
-      inputComment.value = "";
-    } catch (error) {
-      alert("Erro ao enviar comentário: " + error.message);
-    }
-  });
+<body>
+  <!-- CABEÇALHO -->
+  <header>
+    <nav class="navbar" role="navigation">
+      <h1>🌱 Planeta Projeto</h1>
+      <div class="right-buttons">
+        <button id="post-project-btn" onclick="showProjectForm()" style="display:none;">Postar meu projeto</button>
+        <button id="logout-btn" onclick="logout()" style="display:none;">Sair</button>
+      </div>
+    </nav>
+  </header>
 
-  return card;
-}
+  <!-- CONTEÚDO CENTRAL -->
+  <main class="center-wrapper">
+    <!-- FORMULÁRIO DE LOGIN -->
+    <section id="login-section" class="auth-section" role="region" aria-label="Login">
+      <h2>Entre para continuar</h2>
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="Digite seu e-mail" required />
 
-// ==================== ADICIONA COMENTÁRIO À LISTA ====================
-function addCommentToList(container, comment) {
-  const commentDiv = document.createElement("div");
-  commentDiv.classList.add("comment");
+      <label for="password">Senha</label>
+      <input type="password" id="password" placeholder="Digite sua senha" required />
 
-  const dateStr = new Date(
-    comment.createdAt.seconds ? comment.createdAt.seconds * 1000 : comment.createdAt
-  ).toLocaleString();
+      <button onclick="login()">Entrar</button>
+      <p>Não tem conta? 
+        <button type="button" class="link-btn" onclick="showRegister()">Registrar</button>
+      </p>
+    </section>
 
-  commentDiv.innerHTML = `
-    <p><strong>${comment.userEmail}</strong> <em>(${dateStr})</em></p>
-    <p>${comment.text}</p>
-  `;
+    <!-- FORMULÁRIO DE REGISTRO -->
+    <section id="register-section" class="auth-section" style="display:none;" role="region" aria-label="Registro">
+      <h2>Crie sua conta</h2>
+      <label for="reg-email">E-mail</label>
+      <input type="email" id="reg-email" placeholder="Seu e-mail" required />
 
-  container.appendChild(commentDiv);
-}
+      <label for="reg-password">Senha</label>
+      <input type="password" id="reg-password" placeholder="Crie uma senha" required />
 
-// ==================== INICIALIZAÇÃO ====================
-document.addEventListener("DOMContentLoaded", () => showLogin());
+      <button onclick="register()">Registrar</button>
+      <p>Já tem conta? 
+        <button type="button" class="link-btn" onclick="showLogin()">Entrar</button>
+      </p>
+    </section>
+
+    <!-- FORMULÁRIO DE PROJETO -->
+    <section id="project-form" class="project-form-section" style="display:none;" role="region" aria-label="Postar Projeto">
+      <h2>Enviar Projeto Sustentável</h2>
+
+      <label for="project-title">Título do Projeto</label>
+      <input type="text" id="project-title" placeholder="Título do Projeto" required />
+
+      <label for="project-desc">Descrição</label>
+      <textarea id="project-desc" placeholder="Descreva o projeto..." rows="5"></textarea>
+
+      <label for="project-image">Imagem (máx 5 GB)</label>
+      <input type="file" id="project-image" accept="image/*" required />
+
+      <label for="project-video">Vídeo (máx 5 GB)</label>
+      <input type="file" id="project-video" accept="video/*" />
+
+      <progress id="upload-progress" value="0" max="100" style="width: 100%; display:none;"></progress>
+      <small id="upload-message" class="upload-message" style="color: #d32f2f; display:none;"></small>
+
+      <button onclick="submitProject()">Enviar Projeto</button>
+    </section>
+
+    <!-- LISTA DE PROJETOS -->
+    <section id="project-list" class="projects-section" role="region" aria-label="Projetos da Comunidade">
+      <h2>Projetos da Comunidade</h2>
+      <div id="projects" class="projects-grid"></div>
+    </section>
+  </main>
+
+  <!-- RODAPÉ -->
+  <footer>
+    <p>&copy; 2025 Planeta Projeto. Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- SCRIPT JS -->
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
