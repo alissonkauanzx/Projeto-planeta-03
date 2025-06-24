@@ -60,21 +60,18 @@
     <section id="project-form" class="project-form-section" style="display:none;">
       <h2>Enviar Projeto Sustentável</h2>
       <input type="text" id="project-title" placeholder="Título do Projeto" required />
-      <textarea id="project-desc" placeholder="Descrição"></textarea>
+      <textarea id="project-desc" placeholder="Descrição" rows="5"></textarea>
 
-      <!-- INPUT DE IMAGEM -->
       <label for="project-image">Imagem (máx 5 GB):</label>
       <input type="file" id="project-image" accept="image/*" required />
 
-      <!-- INPUT DE VÍDEO -->
       <label for="project-video">Vídeo (máx 5 GB):</label>
       <input type="file" id="project-video" accept="video/*" />
 
-      <!-- BARRA DE PROGRESSO -->
-      <progress id="upload-progress" value="0" max="100" style="width:100%; display:none;"></progress>
-      <small id="upload-message" class="upload-message" style="color:#d32f2f; display:none;"></small>
+      <!-- Barra de progresso e mensagem de upload -->
+      <progress id="upload-progress" value="0" max="100" style="width: 100%; display:none;"></progress>
+      <small id="upload-message" class="upload-message" style="color: #d32f2f; display:none; margin-top: 8px;"></small>
 
-      <!-- BOTÃO ENVIAR -->
       <button onclick="submitProject()">Enviar Projeto</button>
     </section>
 
