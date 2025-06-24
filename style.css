@@ -10,9 +10,9 @@ html, body {
   background: linear-gradient(135deg, #e1f5e1, #c7e8c7);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #2e3a2e;
+  scroll-behavior: smooth;
   display: flex;
   flex-direction: column;
-  scroll-behavior: smooth;
 }
 
 body {
@@ -87,24 +87,25 @@ main.center-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Centralização vertical */
-  gap: 32px;
+  justify-content: center;
   width: 100%;
-  min-height: 100vh; /* Para ocupar altura total da tela */
+  min-height: 100vh;
+  gap: 32px;
 }
 
 /* ==================== Formulários ==================== */
 .auth-section,
 .project-form-section {
-  background: #ffffffcc;
+  background: rgba(255, 255, 255, 0.85);
   padding: 40px 32px;
   border-radius: 14px;
   box-shadow: 0 8px 24px rgba(46, 125, 50, 0.2);
   width: 100%;
   max-width: 480px;
   text-align: center;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
   animation: fadeIn 0.4s ease forwards;
+  transition: all 0.3s ease;
 }
 
 .auth-section h2,
@@ -115,12 +116,22 @@ main.center-wrapper {
   font-weight: 800;
 }
 
+.auth-section label,
+.project-form-section label {
+  display: block;
+  font-weight: 600;
+  margin: 8px 0 4px;
+  text-align: left;
+  color: #2e7d32;
+  font-size: 0.95rem;
+}
+
 .auth-section input,
 .project-form-section input,
 .project-form-section textarea {
   width: 100%;
   padding: 14px 16px;
-  margin: 10px 0;
+  margin-bottom: 10px;
   border: 2px solid #a3c293;
   border-radius: 8px;
   font-size: 1rem;
@@ -196,7 +207,7 @@ main.center-wrapper {
   gap: 24px;
 }
 .projects-grid .project-card {
-  background: #ffffffdd;
+  background: rgba(255, 255, 255, 0.9);
   padding: 16px;
   border-radius: 14px;
   box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
@@ -289,7 +300,7 @@ main.center-wrapper {
   background: #1b5e20;
 }
 
-/* ==================== Upload e Progresso ==================== */
+/* ==================== Upload ==================== */
 .upload-message {
   display: block;
   margin-top: 8px;
