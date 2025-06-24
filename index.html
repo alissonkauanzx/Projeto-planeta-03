@@ -5,7 +5,7 @@
   <title>🌱 Planeta Projeto</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase App -->
+  <!-- Firebase App e Auth -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getAuth } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
@@ -58,14 +58,14 @@
       <p>Já tem conta? <button type="button" class="link-btn" onclick="showLogin()">Entrar</button></p>
     </section>
 
-    <!-- Postar Projeto -->
+    <!-- Formulário para Postar Projeto -->
     <section id="project-form" class="project-form-section" style="display:none;" aria-label="Postar Projeto">
       <h2>Enviar Projeto Sustentável</h2>
       <label for="project-title">Título do Projeto</label>
       <input type="text" id="project-title" placeholder="Título do Projeto" required />
 
       <label for="project-desc">Descrição</label>
-      <textarea id="project-desc" placeholder="Descreva o projeto..." rows="5"></textarea>
+      <textarea id="project-desc" placeholder="Descreva o projeto..." rows="5" required></textarea>
 
       <label for="project-image">Imagem (máx 5 GB)</label>
       <input type="file" id="project-image" accept="image/*" required />
