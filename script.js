@@ -34,7 +34,7 @@ const db = getFirestore();
 const storage = getStorage();
 
 const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB
-const MAX_FILE_SIZE_BYTES = MAX_DAILY_BYTES; // Usado para limitar por arquivo individual
+const MAX_FILE_SIZE_BYTES = MAX_DAILY_BYTES; // Limite por arquivo individual
 
 // ==================== SELETORES ====================
 const loginSection = document.getElementById("login-section");
@@ -55,8 +55,7 @@ function resetProjectForm() {
   document.getElementById("project-desc").value = "";
   document.getElementById("project-image").value = "";
   document.getElementById("project-video").value = "";
-  hideElement(uploadProgress);
-  hideElement(uploadMessage);
+  hideElement(uploadProgress); hideElement(uploadMessage);
 }
 
 // ==================== SEÇÕES ====================
@@ -100,7 +99,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// ==================== FUNÇÃO PARA LIMITAR 5 GB/DIA ====================
+// ==================== LIMITE DE 5 GB POR DIA ====================
 async function canUpload(newBytes) {
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   const dailyRef = doc(db, "dailyUsage", today);
@@ -109,12 +108,11 @@ async function canUpload(newBytes) {
 
   if (usedBytes + newBytes > MAX_DAILY_BYTES) {
     alert(
-      "⚠️ O limite diário de envios foi atingido (5 GB). Por favor, volte amanhã para enviar novos projetos. 🌱"
+      "⚠️ O limite diário de envios (5 GB) foi atingido. Por favor, volte amanhã para enviar novos projetos. 🌱"
     );
     return false;
   }
 
-  // Atualiza consumo
   if (snap.exists()) {
     await updateDoc(dailyRef, { totalBytes: increment(newBytes) });
   } else {
@@ -149,19 +147,18 @@ window.submitProject = async () => {
   const description = document.getElementById("project-desc").value.trim();
   const imageFile = document.getElementById("project-image").files[0];
   const videoFile = document.getElementById("project-video").files[0];
+  const uid = auth.currentUser.uid;
 
   if (!title || !description || !imageFile) return alert("Preencha todos os campos obrigatórios.");
 
   const totalBytesToUpload = imageFile.size + (videoFile ? videoFile.size : 0);
-
-  // ✅ Verifica o limite global antes de enviar
   if (!(await canUpload(totalBytesToUpload))) return;
 
   try {
-    const imageUrl = await uploadFileWithProgress(imageFile, `images/${Date.now()}-${imageFile.name}`);
+    const imageUrl = await uploadFileWithProgress(imageFile, `images/${uid}/${Date.now()}-${imageFile.name}`);
     let videoUrl = "";
     if (videoFile) {
-      videoUrl = await uploadFileWithProgress(videoFile, `videos/${Date.now()}-${videoFile.name}`);
+      videoUrl = await uploadFileWithProgress(videoFile, `videos/${uid}/${Date.now()}-${videoFile.name}`);
     }
 
     await addDoc(collection(db, "projects"), {
@@ -170,7 +167,7 @@ window.submitProject = async () => {
       imageUrl,
       videoUrl,
       createdAt: new Date(),
-      userId: auth.currentUser.uid,
+      userId: uid,
       comments: []
     });
 
@@ -223,10 +220,14 @@ function createProjectCard(project) {
     const text = inputComment.value.trim();
     if (!text) return;
 
-    const commentData = { userId: auth.currentUser.uid, userEmail: auth.currentUser.email, text, createdAt: new Date() };
+    const commentData = {
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email,
+      text,
+      createdAt: new Date()
+    };
     await updateDoc(doc(db, "projects", project.id), { comments: arrayUnion(commentData) });
-    addCommentToList(list, commentData);
-    inputComment.value = "";
+    addCommentToList(list, commentData); inputComment.value = "";
   });
 
   return card;
