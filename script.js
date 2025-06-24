@@ -15,7 +15,10 @@ import {
   onSnapshot,
   doc,
   updateDoc,
-  arrayUnion
+  arrayUnion,
+  getDoc,
+  setDoc,
+  increment
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 import {
@@ -29,7 +32,9 @@ import {
 const auth = window.firebaseAuth;
 const db = getFirestore();
 const storage = getStorage();
-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB
+
+const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB
+const MAX_FILE_SIZE_BYTES = MAX_DAILY_BYTES; // Usado para limitar por arquivo individual
 
 // ==================== SELETORES ====================
 const loginSection = document.getElementById("login-section");
@@ -64,7 +69,7 @@ window.login = async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   if (!email || !password) return alert("Preencha e-mail e senha.");
-  try { await signInWithEmailAndPassword(auth, email, password); } 
+  try { await signInWithEmailAndPassword(auth, email, password); }
   catch (error) { alert("Erro no login: " + error.message); }
 };
 
@@ -95,6 +100,29 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+// ==================== FUNÇÃO PARA LIMITAR 5 GB/DIA ====================
+async function canUpload(newBytes) {
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const dailyRef = doc(db, "dailyUsage", today);
+  const snap = await getDoc(dailyRef);
+  const usedBytes = snap.exists() ? snap.data().totalBytes : 0;
+
+  if (usedBytes + newBytes > MAX_DAILY_BYTES) {
+    alert(
+      "⚠️ O limite diário de envios foi atingido (5 GB). Por favor, volte amanhã para enviar novos projetos. 🌱"
+    );
+    return false;
+  }
+
+  // Atualiza consumo
+  if (snap.exists()) {
+    await updateDoc(dailyRef, { totalBytes: increment(newBytes) });
+  } else {
+    await setDoc(dailyRef, { totalBytes: newBytes });
+  }
+  return true;
+}
+
 // ==================== UPLOAD ====================
 function uploadFileWithProgress(file, path) {
   return new Promise((resolve, reject) => {
@@ -124,6 +152,11 @@ window.submitProject = async () => {
 
   if (!title || !description || !imageFile) return alert("Preencha todos os campos obrigatórios.");
 
+  const totalBytesToUpload = imageFile.size + (videoFile ? videoFile.size : 0);
+
+  // ✅ Verifica o limite global antes de enviar
+  if (!(await canUpload(totalBytesToUpload))) return;
+
   try {
     const imageUrl = await uploadFileWithProgress(imageFile, `images/${Date.now()}-${imageFile.name}`);
     let videoUrl = "";
@@ -131,9 +164,17 @@ window.submitProject = async () => {
       videoUrl = await uploadFileWithProgress(videoFile, `videos/${Date.now()}-${videoFile.name}`);
     }
 
-    await addDoc(collection(db, "projects"), { title, description, imageUrl, videoUrl, createdAt: new Date(), userId: auth.currentUser.uid, comments: [] });
+    await addDoc(collection(db, "projects"), {
+      title,
+      description,
+      imageUrl,
+      videoUrl,
+      createdAt: new Date(),
+      userId: auth.currentUser.uid,
+      comments: []
+    });
 
-    alert("Projeto enviado com sucesso!");
+    alert("🎉 Projeto enviado com sucesso!");
     hideElement(projectForm); loadProjects(); resetProjectForm();
   } catch (error) {
     alert(`Erro ao enviar projeto: ${error.message}`);
