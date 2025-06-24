@@ -1,5 +1,3 @@
-Claro, aqui está o conteúdo pronto para você copiar e colar direto no seu README.md:
-
 # 🌱 Planeta Projeto
 
 Projeto web para apoiar alunos a criarem e compartilharem projetos sustentáveis que ajudam o meio ambiente. Possui cadastro/login, postagem de projetos com imagens e vídeos, comentários, e controle de permissões para edição e exclusão.
