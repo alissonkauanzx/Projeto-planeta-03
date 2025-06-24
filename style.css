@@ -12,6 +12,7 @@ html, body {
   color: #2e3a2e;
   display: flex;
   flex-direction: column;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -23,21 +24,19 @@ body {
   opacity: 0;
   animation: fadeIn 0.4s forwards;
 }
-
 @keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
+  to { opacity: 1; }
 }
 
 /* ==================== Cabeçalho ==================== */
 header {
   background: #d1e7dd;
   padding: 14px 24px;
-  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.2);
+  box-shadow: 0 2px 12px rgba(46, 125, 50, 0.2);
   position: sticky;
   top: 0;
   z-index: 1000;
+  backdrop-filter: blur(8px);
 }
 
 nav.navbar {
@@ -56,6 +55,7 @@ nav.navbar h1 {
   text-align: center;
   font-weight: 800;
   letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 nav.navbar .right-buttons {
@@ -87,9 +87,8 @@ main.center-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 100%;
   gap: 32px;
+  width: 100%;
 }
 
 /* ==================== Formulários ==================== */
@@ -163,12 +162,15 @@ main.center-wrapper {
   margin-top: 16px;
   color: #496849;
 }
-.auth-section a {
+.auth-section a,
+.link-btn {
   color: #2e7d32;
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
 }
-.auth-section a:hover {
+.auth-section a:hover,
+.link-btn:hover {
   color: #1b5e20;
   text-decoration: underline;
 }
@@ -177,6 +179,7 @@ main.center-wrapper {
 .projects-section {
   width: 100%;
   max-width: 1200px;
+  padding: 0 8px;
 }
 .projects-section h2 {
   text-align: center;
@@ -221,6 +224,7 @@ main.center-wrapper {
   font-size: 1rem;
   margin-top: 8px;
   color: #4a594a;
+  line-height: 1.4;
 }
 
 /* ==================== Comentários ==================== */
@@ -283,7 +287,7 @@ main.center-wrapper {
   background: #1b5e20;
 }
 
-/* ==================== Upload e progresso ==================== */
+/* ==================== Upload e Progresso ==================== */
 .upload-message {
   display: block;
   margin-top: 8px;
@@ -316,6 +320,7 @@ footer {
   font-size: 1rem;
   color: #496849;
   box-shadow: inset 0 1px 2px #b3ccb3;
+  margin-top: auto;
 }
 
 /* ==================== Responsividade ==================== */
