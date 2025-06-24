@@ -48,9 +48,9 @@ const projectsContainer = document.getElementById("projects");
 const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
 
-// ==================== FUNÇÕES ÚTEIS ====================
-function showElement(el) { el.style.display = "block"; }
-function hideElement(el) { el.style.display = "none"; }
+// ==================== FUNÇÕES AUXILIARES ====================
+const showElement = el => el.style.display = "block";
+const hideElement = el => el.style.display = "none";
 
 function resetProjectForm() {
   document.getElementById("project-title").value = "";
@@ -62,15 +62,23 @@ function resetProjectForm() {
   delete window.currentProjectId;
 }
 
-// ==================== NAVEGAÇÃO ENTRE SEÇÕES ====================
+// ==================== NAVEGAÇÃO ====================
 window.showLogin = () => {
-  showElement(loginSection); hideElement(registerSection); hideElement(projectForm);
+  showElement(loginSection);
+  hideElement(registerSection);
+  hideElement(projectForm);
 };
+
 window.showRegister = () => {
-  hideElement(loginSection); showElement(registerSection); hideElement(projectForm);
+  hideElement(loginSection);
+  showElement(registerSection);
+  hideElement(projectForm);
 };
+
 window.showProjectForm = () => {
-  hideElement(loginSection); hideElement(registerSection); showElement(projectForm);
+  hideElement(loginSection);
+  hideElement(registerSection);
+  showElement(projectForm);
 };
 
 // ==================== AUTENTICAÇÃO ====================
@@ -81,7 +89,7 @@ window.login = async () => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (error) {
-    alert(`Erro ao entrar: ${error.message}`);
+    alert("Erro no login: " + error.message);
   }
 };
 
@@ -94,7 +102,7 @@ window.register = async () => {
     alert("Conta criada com sucesso!");
     showLogin();
   } catch (error) {
-    alert(`Erro ao registrar: ${error.message}`);
+    alert("Erro no registro: " + error.message);
   }
 };
 
@@ -102,18 +110,23 @@ window.logout = async () => {
   try {
     await signOut(auth);
   } catch (error) {
-    alert(`Erro ao sair: ${error.message}`);
+    alert("Erro ao sair: " + error.message);
   }
 };
 
-// Atualização da UI quando autenticar
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    hideElement(loginSection); hideElement(registerSection); hideElement(projectForm);
-    showElement(postProjectBtn); showElement(logoutBtn); loadProjects();
+    hideElement(loginSection);
+    hideElement(registerSection);
+    hideElement(projectForm);
+    showElement(postProjectBtn);
+    showElement(logoutBtn);
+    loadProjects();
   } else {
     showLogin();
-    hideElement(postProjectBtn); hideElement(logoutBtn); projectsContainer.innerHTML = "";
+    hideElement(postProjectBtn);
+    hideElement(logoutBtn);
+    projectsContainer.innerHTML = "";
   }
 });
 
@@ -137,22 +150,34 @@ async function canUpload(newBytes) {
   return true;
 }
 
-// ==================== UPLOAD COM PROGRESSO ====================
+// ==================== UPLOAD DE ARQUIVOS COM PROGRESSO ====================
 function uploadFileWithProgress(file, path) {
   return new Promise((resolve, reject) => {
     if (file.size > MAX_FILE_SIZE_BYTES) return reject(new Error(`"${file.name}" excede 5 GB.`));
+
     const fileRef = ref(storage, path);
-    const task = uploadBytesResumable(fileRef, file);
+    const uploadTask = uploadBytesResumable(fileRef, file);
 
-    showElement(uploadProgress); showElement(uploadMessage); uploadProgress.value = 0;
-    uploadMessage.textContent = `Enviando ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
+    showElement(uploadProgress);
+    showElement(uploadMessage);
+    uploadProgress.value = 0;
+    uploadMessage.textContent = `Enviando "${file.name}" (${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
 
-    task.on(
+    uploadTask.on(
       "state_changed",
-      (snap) => { uploadProgress.value = (snap.bytesTransferred / snap.totalBytes) * 100; },
-      (error) => { hideElement(uploadProgress); hideElement(uploadMessage); reject(error); },
+      (snapshot) => {
+        uploadProgress.value = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      },
+      (error) => {
+        hideElement(uploadProgress);
+        hideElement(uploadMessage);
+        reject(error);
+      },
       async () => {
-        hideElement(uploadProgress); hideElement(uploadMessage); resolve(await getDownloadURL(task.snapshot.ref));
+        hideElement(uploadProgress);
+        hideElement(uploadMessage);
+        const url = await getDownloadURL(uploadTask.snapshot.ref);
+        resolve(url);
       }
     );
   });
@@ -166,28 +191,35 @@ window.submitProject = async () => {
   const videoFile = document.getElementById("project-video").files[0];
   const uid = auth.currentUser.uid;
 
-  if (!title || !description) return alert("Preencha os campos obrigatórios.");
-  if (!imageFile) return alert("Adicione uma imagem para o projeto.");
+  if (!title || !description) return alert("Preencha todos os campos obrigatórios.");
 
   const totalBytesToUpload = (imageFile ? imageFile.size : 0) + (videoFile ? videoFile.size : 0);
+
   if (!(await canUpload(totalBytesToUpload))) return;
 
   try {
     let imageUrl, videoUrl;
-    if (imageFile) imageUrl = await uploadFileWithProgress(imageFile, `images/${uid}/${Date.now()}-${imageFile.name}`);
-    if (videoFile) videoUrl = await uploadFileWithProgress(videoFile, `videos/${uid}/${Date.now()}-${videoFile.name}`);
+
+    if (imageFile) {
+      imageUrl = await uploadFileWithProgress(imageFile, `images/${uid}/${Date.now()}-${imageFile.name}`);
+    }
+    if (videoFile) {
+      videoUrl = await uploadFileWithProgress(videoFile, `videos/${uid}/${Date.now()}-${videoFile.name}`);
+    }
 
     if (window.currentProjectId) {
       const updateData = { title, description };
       if (imageUrl) updateData.imageUrl = imageUrl;
       if (videoUrl) updateData.videoUrl = videoUrl;
-
       await updateDoc(doc(db, "projects", window.currentProjectId), updateData);
       delete window.currentProjectId;
       alert("Projeto atualizado com sucesso!");
     } else {
       await addDoc(collection(db, "projects"), {
-        title, description, imageUrl, videoUrl,
+        title,
+        description,
+        imageUrl,
+        videoUrl,
         createdAt: new Date(),
         userId: uid,
         comments: []
@@ -195,18 +227,23 @@ window.submitProject = async () => {
       alert("Projeto enviado com sucesso!");
     }
 
-    hideElement(projectForm); resetProjectForm(); loadProjects();
+    hideElement(projectForm);
+    loadProjects();
+    resetProjectForm();
   } catch (error) {
     alert(`Erro ao salvar projeto: ${error.message}`);
   }
 };
 
-// ==================== LISTAGEM DE PROJETOS ====================
+// ==================== CARREGAR PROJETOS ====================
 function loadProjects() {
   const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
   onSnapshot(q, (snapshot) => {
     projectsContainer.innerHTML = "";
-    if (snapshot.empty) { projectsContainer.innerHTML = "<p>Nenhum projeto postado.</p>"; return; }
+    if (snapshot.empty) {
+      projectsContainer.innerHTML = "<p>Nenhum projeto postado.</p>";
+      return;
+    }
     snapshot.docs.forEach((docSnap) => {
       const project = { id: docSnap.id, ...docSnap.data() };
       projectsContainer.appendChild(createProjectCard(project));
@@ -214,10 +251,11 @@ function loadProjects() {
   });
 }
 
-// ==================== CRIAÇÃO DO CARD DE PROJETO ====================
+// ==================== CRIAR CARD DE PROJETO ====================
 function createProjectCard(project) {
   const card = document.createElement("div");
   card.classList.add("project-card", "fade-in");
+
   card.innerHTML = `
     <h3>${project.title}</h3>
     <p>${project.description}</p>
@@ -234,7 +272,7 @@ function createProjectCard(project) {
     </div>
   `;
 
-  // Botões editar/apagar
+  // Botões editar e apagar, somente para criador ou admin
   const actions = card.querySelector(".actions");
   if (auth.currentUser && (auth.currentUser.uid === project.userId || auth.currentUser.uid === ADMIN_UID)) {
     const editButton = document.createElement("button");
@@ -248,21 +286,35 @@ function createProjectCard(project) {
     actions.appendChild(deleteButton);
   }
 
-  // Comentários
+  // Renderizar comentários
   const list = card.querySelector(".comments-list");
-  (project.comments || []).forEach((c) => addCommentToList(list, c));
+  (project.comments || []).forEach(comment => addCommentToList(list, comment));
+
+  // Enviar novo comentário
   card.querySelector(".btn-comment").addEventListener("click", async () => {
-    const inputComment = card.querySelector(".new-comment input"); const text = inputComment.value.trim();
+    const inputComment = card.querySelector(".new-comment input");
+    const text = inputComment.value.trim();
     if (!text) return;
-    const commentData = { userId: auth.currentUser.uid, userEmail: auth.currentUser.email, text, createdAt: new Date() };
-    await updateDoc(doc(db, "projects", project.id), { comments: arrayUnion(commentData) });
-    addCommentToList(list, commentData); inputComment.value = "";
+
+    const commentData = {
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email,
+      text,
+      createdAt: new Date()
+    };
+
+    await updateDoc(doc(db, "projects", project.id), {
+      comments: arrayUnion(commentData)
+    });
+
+    addCommentToList(list, commentData);
+    inputComment.value = "";
   });
 
   return card;
 }
 
-// ==================== EDIÇÃO E EXCLUSÃO ====================
+// ==================== EDITAR PROJETO ====================
 function editProject(project) {
   showProjectForm();
   document.getElementById("project-title").value = project.title;
@@ -270,6 +322,7 @@ function editProject(project) {
   window.currentProjectId = project.id;
 }
 
+// ==================== DELETAR PROJETO ====================
 async function deleteProject(projectId) {
   if (!confirm("Você realmente deseja apagar este projeto?")) return;
   try {
@@ -280,10 +333,15 @@ async function deleteProject(projectId) {
   }
 }
 
-// ==================== COMENTÁRIOS ====================
+// ==================== ADICIONAR COMENTÁRIO NA LISTA ====================
 function addCommentToList(container, comment) {
-  const div = document.createElement("div"); div.classList.add("comment");
-  const dateStr = new Date(comment.createdAt.seconds ? comment.createdAt.seconds * 1000 : comment.createdAt).toLocaleString();
+  const div = document.createElement("div");
+  div.classList.add("comment");
+
+  const dateStr = new Date(
+    comment.createdAt.seconds ? comment.createdAt.seconds * 1000 : comment.createdAt
+  ).toLocaleString();
+
   div.innerHTML = `
     <p><strong>${comment.userEmail}</strong> <em>(${dateStr})</em></p>
     <p>${comment.text}</p>
