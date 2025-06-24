@@ -2,7 +2,17 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>🌱 Planeta Projeto</title>
+  <!-- Melhorias para SEO e responsividade -->
+  <title>🌱 Planeta Projeto - Projetos Sustentáveis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Planeta Projeto: compartilhe e descubra projetos sustentáveis para ajudar o meio ambiente. Poste imagens, vídeos e inspire outras pessoas." />
+  <meta name="keywords" content="projetos sustentáveis, meio ambiente, educação ambiental, reciclagem, planeta projeto" />
+  <meta name="author" content="Planeta Projeto" />
+
+  <!-- Ícone da página -->
+  <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 
   <!-- Firebase App e Auth -->
@@ -25,11 +35,11 @@
 <body>
   <!-- CABEÇALHO -->
   <header>
-    <nav class="navbar" role="navigation">
+    <nav class="navbar" role="navigation" aria-label="Menu Principal">
       <h1>🌱 Planeta Projeto</h1>
       <div class="right-buttons">
-        <button id="post-project-btn" onclick="showProjectForm()" style="display:none;">Postar meu projeto</button>
-        <button id="logout-btn" onclick="logout()" style="display:none;">Sair</button>
+        <button id="post-project-btn" onclick="showProjectForm()" style="display:none;" aria-label="Postar meu projeto">Postar meu projeto</button>
+        <button id="logout-btn" onclick="logout()" style="display:none;" aria-label="Sair da conta">Sair</button>
       </div>
     </nav>
   </header>
@@ -37,35 +47,35 @@
   <!-- CONTEÚDO CENTRAL -->
   <main class="center-wrapper">
     <!-- Login -->
-    <section id="login-section" class="auth-section" aria-label="Login">
+    <section id="login-section" class="auth-section" aria-label="Área de Login">
       <h2>Entre para continuar</h2>
-      <input type="email" id="email" placeholder="Digite seu e-mail" required aria-label="E-mail" />
-      <input type="password" id="password" placeholder="Digite sua senha" required aria-label="Senha" />
-      <button onclick="login()">Entrar</button>
-      <p>Não tem conta? <button type="button" class="link-btn" onclick="showRegister()">Registrar</button></p>
+      <input type="email" id="email" placeholder="Digite seu e-mail" required aria-label="E-mail para login" autocomplete="username" />
+      <input type="password" id="password" placeholder="Digite sua senha" required aria-label="Senha para login" autocomplete="current-password" />
+      <button onclick="login()" aria-label="Botão de Entrar">Entrar</button>
+      <p>Não tem conta? <button type="button" class="link-btn" onclick="showRegister()" aria-label="Ir para o registro">Registrar</button></p>
     </section>
 
     <!-- Registro -->
-    <section id="register-section" class="auth-section" style="display:none;" aria-label="Registro">
+    <section id="register-section" class="auth-section" style="display:none;" aria-label="Área de Registro">
       <h2>Crie sua conta</h2>
-      <input type="email" id="reg-email" placeholder="Seu e-mail" required aria-label="E-mail" />
-      <input type="password" id="reg-password" placeholder="Crie uma senha" required aria-label="Senha" />
-      <button onclick="register()">Registrar</button>
-      <p>Já tem conta? <button type="button" class="link-btn" onclick="showLogin()">Entrar</button></p>
+      <input type="email" id="reg-email" placeholder="Seu e-mail" required aria-label="E-mail para registro" autocomplete="username" />
+      <input type="password" id="reg-password" placeholder="Crie uma senha" required aria-label="Senha para registro" autocomplete="new-password" />
+      <button onclick="register()" aria-label="Botão de Registrar">Registrar</button>
+      <p>Já tem conta? <button type="button" class="link-btn" onclick="showLogin()" aria-label="Ir para o login">Entrar</button></p>
     </section>
 
     <!-- Formulário para Postar Projeto -->
-    <section id="project-form" class="project-form-section" style="display:none;" aria-label="Postar Projeto">
+    <section id="project-form" class="project-form-section" style="display:none;" aria-label="Área para Enviar Projeto">
       <h2>Enviar Projeto Sustentável</h2>
-      <input type="text" id="project-title" placeholder="Título do Projeto" required aria-label="Título do Projeto" />
+      <input type="text" id="project-title" placeholder="Título do Projeto" required aria-label="Título do Projeto" maxlength="100" />
       <textarea id="project-desc" placeholder="Descreva o projeto..." rows="5" required aria-label="Descrição do Projeto"></textarea>
-      <input type="file" id="project-image" accept="image/*" required aria-label="Imagem (máx 5 GB)" />
-      <input type="file" id="project-video" accept="video/*" aria-label="Vídeo (máx 5 GB, opcional)" />
+      <input type="file" id="project-image" accept="image/*" required aria-label="Imagem do Projeto (máx 5 GB)" />
+      <input type="file" id="project-video" accept="video/*" aria-label="Vídeo do Projeto (máx 5 GB, opcional)" />
 
-      <progress id="upload-progress" value="0" max="100" style="display:none;"></progress>
-      <small id="upload-message" class="upload-message" style="display:none;"></small>
+      <progress id="upload-progress" value="0" max="100" style="display:none;" aria-label="Progresso do envio"></progress>
+      <small id="upload-message" class="upload-message" style="display:none;" aria-label="Mensagem do progresso de envio"></small>
 
-      <button onclick="submitProject()">Enviar Projeto</button>
+      <button onclick="submitProject()" aria-label="Botão de enviar o projeto">Enviar Projeto</button>
     </section>
 
     <!-- Lista de projetos -->
