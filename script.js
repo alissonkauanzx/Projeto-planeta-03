@@ -29,7 +29,6 @@ import {
 const auth = window.firebaseAuth;
 const db = getFirestore();
 const storage = getStorage();
-
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB
 
 // ==================== SELETORES ====================
@@ -42,7 +41,7 @@ const projectsContainer = document.getElementById("projects");
 const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
 
-// ==================== HELPERS ====================
+// ==================== FUNÇÕES ÚTEIS ====================
 function showElement(el) { el.style.display = "block"; }
 function hideElement(el) { el.style.display = "none"; }
 
@@ -55,35 +54,18 @@ function resetProjectForm() {
   hideElement(uploadMessage);
 }
 
-// ==================== VISIBILIDADE DE SEÇÕES ====================
-window.showLogin = () => {
-  showElement(loginSection);
-  hideElement(registerSection);
-  hideElement(projectForm);
-};
-
-window.showRegister = () => {
-  hideElement(loginSection);
-  showElement(registerSection);
-  hideElement(projectForm);
-};
-
-window.showProjectForm = () => {
-  hideElement(loginSection);
-  hideElement(registerSection);
-  showElement(projectForm);
-};
+// ==================== SEÇÕES ====================
+window.showLogin = () => { showElement(loginSection); hideElement(registerSection); hideElement(projectForm); };
+window.showRegister = () => { hideElement(loginSection); showElement(registerSection); hideElement(projectForm); };
+window.showProjectForm = () => { hideElement(loginSection); hideElement(registerSection); showElement(projectForm); };
 
 // ==================== AUTENTICAÇÃO ====================
 window.login = async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   if (!email || !password) return alert("Preencha e-mail e senha.");
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (error) {
-    alert("Erro no login: " + error.message);
-  }
+  try { await signInWithEmailAndPassword(auth, email, password); } 
+  catch (error) { alert("Erro no login: " + error.message); }
 };
 
 window.register = async () => {
@@ -100,62 +82,35 @@ window.register = async () => {
 };
 
 window.logout = async () => {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    alert("Erro ao sair: " + error.message);
-  }
+  try { await signOut(auth); } catch (error) { alert("Erro ao sair: " + error.message); }
 };
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    hideElement(loginSection);
-    hideElement(registerSection);
-    hideElement(projectForm);
-    showElement(postProjectBtn);
-    showElement(logoutBtn);
-    loadProjects();
+    hideElement(loginSection); hideElement(registerSection); hideElement(projectForm);
+    showElement(postProjectBtn); showElement(logoutBtn); loadProjects();
   } else {
     showLogin();
-    hideElement(postProjectBtn);
-    hideElement(logoutBtn);
-    projectsContainer.innerHTML = "";
+    hideElement(postProjectBtn); hideElement(logoutBtn); projectsContainer.innerHTML = "";
   }
 });
 
-// ==================== UPLOAD COM PROGRESSO ====================
+// ==================== UPLOAD ====================
 function uploadFileWithProgress(file, path) {
   return new Promise((resolve, reject) => {
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      return reject(
-        new Error(`O arquivo "${file.name}" excede o limite de 5 GB.`)
-      );
-    }
-
+    if (file.size > MAX_FILE_SIZE_BYTES) return reject(new Error(`"${file.name}" excede o limite de 5 GB.`));
     const fileRef = ref(storage, path);
     const task = uploadBytesResumable(fileRef, file);
 
-    showElement(uploadProgress);
+    showElement(uploadProgress); showElement(uploadMessage);
     uploadProgress.value = 0;
     uploadMessage.textContent = `Enviando "${file.name}" (${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
-    showElement(uploadMessage);
 
     task.on(
       "state_changed",
-      (snap) => {
-        const progress = (snap.bytesTransferred / snap.totalBytes) * 100;
-        uploadProgress.value = progress;
-      },
-      (error) => {
-        hideElement(uploadProgress);
-        hideElement(uploadMessage);
-        reject(error);
-      },
-      async () => {
-        hideElement(uploadProgress);
-        hideElement(uploadMessage);
-        resolve(await getDownloadURL(task.snapshot.ref));
-      }
+      (snap) => { uploadProgress.value = (snap.bytesTransferred / snap.totalBytes) * 100; },
+      (error) => { hideElement(uploadProgress); hideElement(uploadMessage); reject(error); },
+      async () => { hideElement(uploadProgress); hideElement(uploadMessage); resolve(await getDownloadURL(task.snapshot.ref)); }
     );
   });
 }
@@ -167,9 +122,7 @@ window.submitProject = async () => {
   const imageFile = document.getElementById("project-image").files[0];
   const videoFile = document.getElementById("project-video").files[0];
 
-  if (!title || !description || !imageFile) {
-    return alert("Preencha todos os campos obrigatórios.");
-  }
+  if (!title || !description || !imageFile) return alert("Preencha todos os campos obrigatórios.");
 
   try {
     const imageUrl = await uploadFileWithProgress(imageFile, `images/${Date.now()}-${imageFile.name}`);
@@ -178,26 +131,16 @@ window.submitProject = async () => {
       videoUrl = await uploadFileWithProgress(videoFile, `videos/${Date.now()}-${videoFile.name}`);
     }
 
-    await addDoc(collection(db, "projects"), {
-      title,
-      description,
-      imageUrl,
-      videoUrl,
-      createdAt: new Date(),
-      userId: auth.currentUser.uid,
-      comments: []
-    });
+    await addDoc(collection(db, "projects"), { title, description, imageUrl, videoUrl, createdAt: new Date(), userId: auth.currentUser.uid, comments: [] });
 
     alert("Projeto enviado com sucesso!");
-    hideElement(projectForm);
-    loadProjects();
-    resetProjectForm();
+    hideElement(projectForm); loadProjects(); resetProjectForm();
   } catch (error) {
     alert(`Erro ao enviar projeto: ${error.message}`);
   }
 };
 
-// ==================== CARREGAMENTO DE PROJETOS ====================
+// ==================== PROJETOS ====================
 function loadProjects() {
   const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
   onSnapshot(q, (snapshot) => {
@@ -213,7 +156,6 @@ function loadProjects() {
   });
 }
 
-// ==================== CRIA CARD DO PROJETO ====================
 function createProjectCard(project) {
   const card = document.createElement("div");
   card.classList.add("project-card", "fade-in");
@@ -235,46 +177,26 @@ function createProjectCard(project) {
 
   const list = card.querySelector(".comments-list");
   (project.comments || []).forEach((c) => addCommentToList(list, c));
-
-  const btnComment = card.querySelector(".btn-comment");
-  const inputComment = card.querySelector(".new-comment input");
-
-  btnComment.addEventListener("click", async () => {
+  card.querySelector(".btn-comment").addEventListener("click", async () => {
+    const inputComment = card.querySelector(".new-comment input");
     const text = inputComment.value.trim();
     if (!text) return;
 
-    const commentData = {
-      userId: auth.currentUser.uid,
-      userEmail: auth.currentUser.email,
-      text,
-      createdAt: new Date(),
-    };
-    try {
-      const projectRef = doc(db, "projects", project.id);
-      await updateDoc(projectRef, { comments: arrayUnion(commentData) });
-      addCommentToList(list, commentData);
-      inputComment.value = "";
-    } catch (error) {
-      alert("Erro ao enviar comentário: " + error.message);
-    }
+    const commentData = { userId: auth.currentUser.uid, userEmail: auth.currentUser.email, text, createdAt: new Date() };
+    await updateDoc(doc(db, "projects", project.id), { comments: arrayUnion(commentData) });
+    addCommentToList(list, commentData);
+    inputComment.value = "";
   });
 
   return card;
 }
 
-// ==================== ADICIONA COMENTÁRIO ====================
 function addCommentToList(container, comment) {
-  const commentDiv = document.createElement("div");
-  commentDiv.classList.add("comment");
-  const dateStr = new Date(
-    comment.createdAt.seconds ? comment.createdAt.seconds * 1000 : comment.createdAt
-  ).toLocaleString();
-
-  commentDiv.innerHTML = `
-    <p><strong>${comment.userEmail}</strong> <em>(${dateStr})</em></p>
-    <p>${comment.text}</p>
-  `;
-  container.appendChild(commentDiv);
+  const div = document.createElement("div");
+  div.classList.add("comment");
+  const dateStr = new Date(comment.createdAt.seconds ? comment.createdAt.seconds * 1000 : comment.createdAt).toLocaleString();
+  div.innerHTML = `<p><strong>${comment.userEmail}</strong> <em>(${dateStr})</em></p><p>${comment.text}</p>`;
+  container.appendChild(div);
 }
 
 // ==================== INICIALIZAÇÃO ====================
