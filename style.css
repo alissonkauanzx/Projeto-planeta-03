@@ -72,12 +72,25 @@ nav.navbar button {
   cursor: pointer;
   font-weight: 600;
   box-shadow: 0 2px 6px rgba(46, 125, 50, 0.3);
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
+
+/* Foco visível para acessibilidade */
+nav.navbar button:focus-visible {
+  outline: 3px solid #1b5e20;
+  outline-offset: 2px;
+}
+
 nav.navbar button:hover {
   background: #1b5e20;
   box-shadow: 0 4px 10px rgba(46, 125, 50, 0.35);
   transform: translateY(-2px);
+}
+
+/* Cursor 'não permitido' para botões desabilitados */
+nav.navbar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* ==================== Área Central ==================== */
@@ -137,8 +150,9 @@ main.center-wrapper {
   font-size: 1rem;
   color: #2e3a2e;
   background: #f5fff5;
-  transition: all 0.3s;
+  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
+
 .auth-section input:focus,
 .project-form-section input:focus,
 .project-form-section textarea:focus {
@@ -161,8 +175,16 @@ main.center-wrapper {
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 6px 10px rgba(46, 125, 50, 0.3);
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
+
+/* Foco visível para botões */
+.auth-section button:focus-visible,
+.project-form-section button:focus-visible {
+  outline: 3px solid #1b5e20;
+  outline-offset: 2px;
+}
+
 .auth-section button:hover,
 .project-form-section button:hover {
   background: #1b5e20;
@@ -175,12 +197,15 @@ main.center-wrapper {
   margin-top: 16px;
   color: #496849;
 }
+
+/* Contraste melhorado para links */
 .auth-section a,
 .link-btn {
   color: #2e7d32;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
+  transition: color 0.3s ease;
 }
 .auth-section a:hover,
 .link-btn:hover {
@@ -211,7 +236,7 @@ main.center-wrapper {
   padding: 16px;
   border-radius: 14px;
   box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
-  transition: all 0.3s ease;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
   overflow: hidden;
 }
 .projects-grid .project-card:hover {
@@ -236,7 +261,7 @@ main.center-wrapper {
 .projects-grid p {
   font-size: 1rem;
   margin-top: 8px;
-  color: #4a594a;
+  color: #3c4a3c; /* contraste ligeiramente melhor */
   line-height: 1.4;
 }
 
@@ -259,6 +284,20 @@ main.center-wrapper {
   max-height: 180px;
   overflow-y: auto;
   padding-right: 8px;
+
+  /* Scroll mais suave e menos intrusivo */
+  scrollbar-width: thin;
+  scrollbar-color: #2e7d32 transparent;
+}
+.comments-list::-webkit-scrollbar {
+  width: 8px;
+}
+.comments-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.comments-list::-webkit-scrollbar-thumb {
+  background-color: #2e7d32;
+  border-radius: 4px;
 }
 .comment {
   padding: 8px 0;
@@ -348,5 +387,16 @@ footer {
   }
   .projects-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Ajuste para telas muito pequenas */
+@media (max-width: 360px) {
+  main.center-wrapper {
+    padding: 16px 8px;
+  }
+  .auth-section,
+  .project-form-section {
+    padding: 16px 12px;
   }
 }
