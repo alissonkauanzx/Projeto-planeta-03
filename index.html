@@ -26,7 +26,7 @@
 <body>
   <!-- CABEÇALHO -->
   <header>
-    <nav class="navbar">
+    <nav class="navbar" role="navigation">
       <h1>🌱 Planeta Projeto</h1>
       <div class="right-buttons">
         <button id="post-project-btn" onclick="showProjectForm()" style="display:none;">Postar meu projeto</button>
@@ -37,50 +37,63 @@
 
   <!-- CONTEÚDO CENTRAL -->
   <main class="center-wrapper">
-
     <!-- FORMULÁRIO DE LOGIN -->
-    <section id="login-section" class="auth-section">
+    <section id="login-section" class="auth-section" role="region" aria-label="Login">
       <h2>Entre para continuar</h2>
-      <input type="email" id="email" placeholder="E-mail" />
-      <input type="password" id="password" placeholder="Senha" />
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="Digite seu e-mail" required />
+
+      <label for="password">Senha</label>
+      <input type="password" id="password" placeholder="Digite sua senha" required />
+
       <button onclick="login()">Entrar</button>
-      <p>Não tem conta? <a href="#" onclick="showRegister()">Registrar</a></p>
+      <p>Não tem conta? 
+        <button type="button" class="link-btn" onclick="showRegister()">Registrar</button>
+      </p>
     </section>
 
     <!-- FORMULÁRIO DE REGISTRO -->
-    <section id="register-section" class="auth-section" style="display:none;">
+    <section id="register-section" class="auth-section" style="display:none;" role="region" aria-label="Registro">
       <h2>Crie sua conta</h2>
-      <input type="email" id="reg-email" placeholder="E-mail" />
-      <input type="password" id="reg-password" placeholder="Senha" />
+      <label for="reg-email">E-mail</label>
+      <input type="email" id="reg-email" placeholder="Seu e-mail" required />
+
+      <label for="reg-password">Senha</label>
+      <input type="password" id="reg-password" placeholder="Crie uma senha" required />
+
       <button onclick="register()">Registrar</button>
-      <p>Já tem conta? <a href="#" onclick="showLogin()">Entrar</a></p>
+      <p>Já tem conta? 
+        <button type="button" class="link-btn" onclick="showLogin()">Entrar</button>
+      </p>
     </section>
 
     <!-- FORMULÁRIO DE PROJETO -->
-    <section id="project-form" class="project-form-section" style="display:none;">
+    <section id="project-form" class="project-form-section" style="display:none;" role="region" aria-label="Postar Projeto">
       <h2>Enviar Projeto Sustentável</h2>
-      <input type="text" id="project-title" placeholder="Título do Projeto" required />
-      <textarea id="project-desc" placeholder="Descrição" rows="5"></textarea>
 
-      <label for="project-image">Imagem (máx 5 GB):</label>
+      <label for="project-title">Título do Projeto</label>
+      <input type="text" id="project-title" placeholder="Título do Projeto" required />
+
+      <label for="project-desc">Descrição</label>
+      <textarea id="project-desc" placeholder="Descreva o projeto..." rows="5"></textarea>
+
+      <label for="project-image">Imagem (máx 5 GB)</label>
       <input type="file" id="project-image" accept="image/*" required />
 
-      <label for="project-video">Vídeo (máx 5 GB):</label>
+      <label for="project-video">Vídeo (máx 5 GB)</label>
       <input type="file" id="project-video" accept="video/*" />
 
-      <!-- Barra de progresso e mensagem de upload -->
       <progress id="upload-progress" value="0" max="100" style="width: 100%; display:none;"></progress>
-      <small id="upload-message" class="upload-message" style="color: #d32f2f; display:none; margin-top: 8px;"></small>
+      <small id="upload-message" class="upload-message" style="color: #d32f2f; display:none;"></small>
 
       <button onclick="submitProject()">Enviar Projeto</button>
     </section>
 
     <!-- LISTA DE PROJETOS -->
-    <section id="project-list" class="projects-section">
+    <section id="project-list" class="projects-section" role="region" aria-label="Projetos da Comunidade">
       <h2>Projetos da Comunidade</h2>
       <div id="projects" class="projects-grid"></div>
     </section>
-
   </main>
 
   <!-- RODAPÉ -->
