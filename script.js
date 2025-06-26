@@ -27,7 +27,7 @@ const auth = window.firebaseAuth;
 const db = getFirestore();
 
 const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2";
-const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB
+const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024;
 const MAX_FILE_SIZE_BYTES = MAX_DAILY_BYTES;
 
 // ==================== SELETORES ====================
@@ -59,7 +59,6 @@ function resetProjectForm() {
   if (descInput) descInput.value = "";
   if (imageInput) imageInput.value = "";
   if (videoInput) videoInput.value = "";
-
   hideElement(uploadProgress);
   hideElement(uploadMessage);
   delete window.currentProjectId;
@@ -94,7 +93,7 @@ window.login = async () => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (error) {
-    console.error("Erro no login:", error);
+    console.error(error);
     alert("Erro no login: " + error.message);
   }
 };
@@ -110,7 +109,7 @@ window.register = async () => {
     alert("Conta criada com sucesso!");
     showLogin();
   } catch (error) {
-    console.error("Erro no registro:", error);
+    console.error(error);
     alert("Erro no registro: " + error.message);
   }
 };
@@ -119,7 +118,6 @@ window.logout = async () => {
   try {
     await signOut(auth);
   } catch (error) {
-    console.error("Erro ao sair:", error);
     alert("Erro ao sair: " + error.message);
   }
 };
@@ -150,7 +148,7 @@ async function canUpload(newBytes) {
     const usedBytes = snap.exists() ? snap.data().totalBytes : 0;
 
     if (usedBytes + newBytes > MAX_DAILY_BYTES) {
-      alert("⚠️ Limite diário de 5 GB atingido. Tente novamente amanhã.");
+      alert("⚠️ Limite diário de 5 GB atingido.");
       return false;
     }
 
@@ -161,22 +159,16 @@ async function canUpload(newBytes) {
     }
     return true;
   } catch (error) {
-    console.error("Erro no canUpload:", error);
-    alert("Erro ao verificar limite de upload. Tente novamente.");
+    alert("Erro ao verificar limite de upload.");
     return false;
   }
 }
 
-// ==================== UPLOAD PARA CLOUDINARY COM PROGRESSO ====================
+// ==================== UPLOAD PARA CLOUDINARY ====================
 async function uploadToCloudinary(file) {
   return new Promise((resolve, reject) => {
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      reject(new Error(`"${file.name}" excede 5 GB.`));
-      return;
-    }
-
+    if (file.size > MAX_FILE_SIZE_BYTES) return reject(new Error(`"${file.name}" excede 5 GB.`));
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
-
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
 
@@ -185,34 +177,26 @@ async function uploadToCloudinary(file) {
 
     xhr.open("POST", url, true);
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = (event.loaded / event.total) * 100;
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const percent = (e.loaded / e.total) * 100;
         showElement(uploadProgress);
-        uploadProgress.value = percentComplete;
+        uploadProgress.value = percent;
         showElement(uploadMessage);
-        uploadMessage.textContent = `Enviando "${file.name}" - ${percentComplete.toFixed(0)}%`;
+        uploadMessage.textContent = `Enviando "${file.name}" - ${percent.toFixed(0)}%`;
       }
     };
-
     xhr.onload = () => {
       hideElement(uploadProgress);
       hideElement(uploadMessage);
-
-      if (xhr.status === 200) {
-        const response = JSON.parse(xhr.responseText);
-        resolve(response.secure_url);
-      } else {
-        reject(new Error(`Erro no upload: ${xhr.statusText}`));
-      }
+      if (xhr.status === 200) resolve(JSON.parse(xhr.responseText).secure_url);
+      else reject(new Error(`Erro no upload: ${xhr.statusText}`));
     };
-
     xhr.onerror = () => {
       hideElement(uploadProgress);
       hideElement(uploadMessage);
       reject(new Error("Erro na requisição de upload."));
     };
-
     xhr.send(formData);
   });
 }
@@ -221,44 +205,28 @@ async function uploadToCloudinary(file) {
 window.submitProject = async () => {
   const title = document.getElementById("project-title")?.value.trim();
   const description = document.getElementById("project-desc")?.value.trim();
-
-  // Aqui pega os arquivos de imagem, vídeo e pdf do input de imagem e vídeo
   const imageFileInput = document.getElementById("project-image");
   const videoFileInput = document.getElementById("project-video");
 
   const uid = auth.currentUser?.uid;
-
   if (!title || !description) return alert("Preencha todos os campos obrigatórios.");
   if (!uid) return alert("Usuário não autenticado.");
 
-  // Agora vamos identificar arquivos imagem e pdf no campo de imagem (pode conter PDF)
-  let imageFile = null;
-  let pdfFile = null;
-  if (imageFileInput && imageFileInput.files.length > 0) {
-    for (const file of imageFileInput.files) {
-      if (file.type === "application/pdf") pdfFile = file;
-      else if (file.type.startsWith("image/")) imageFile = file;
-    }
+  let imageFile, pdfFile;
+  for (const file of imageFileInput.files) {
+    if (file.type === "application/pdf") pdfFile = file;
+    else if (file.type.startsWith("image/")) imageFile = file;
   }
-
   const videoFile = videoFileInput?.files[0];
 
-  const totalBytesToUpload = (imageFile?.size || 0) + (videoFile?.size || 0) + (pdfFile?.size || 0);
-
-  if (!(await canUpload(totalBytesToUpload))) return;
+  const totalBytes = (imageFile?.size || 0) + (pdfFile?.size || 0) + (videoFile?.size || 0);
+  if (!(await canUpload(totalBytes))) return;
 
   try {
-    let imageUrl, videoUrl, pdfUrl;
-
-    if (imageFile) {
-      imageUrl = await uploadToCloudinary(imageFile);
-    }
-    if (pdfFile) {
-      pdfUrl = await uploadToCloudinary(pdfFile);
-    }
-    if (videoFile) {
-      videoUrl = await uploadToCloudinary(videoFile);
-    }
+    let imageUrl, pdfUrl, videoUrl;
+    if (imageFile) imageUrl = await uploadToCloudinary(imageFile);
+    if (pdfFile) pdfUrl = await uploadToCloudinary(pdfFile);
+    if (videoFile) videoUrl = await uploadToCloudinary(videoFile);
 
     if (window.currentProjectId) {
       const updateData = { title, description };
@@ -281,12 +249,10 @@ window.submitProject = async () => {
       });
       alert("Projeto enviado com sucesso!");
     }
-
     hideElement(projectForm);
     loadProjects();
     resetProjectForm();
   } catch (error) {
-    console.error("Erro ao salvar projeto:", error);
     alert(`Erro ao salvar projeto: ${error.message}`);
   }
 };
@@ -310,7 +276,7 @@ function loadProjects() {
 // ==================== CRIAR CARD DE PROJETO ====================
 function createProjectCard(project) {
   const card = document.createElement("div");
-  card.classList.add("project-card", "fade-in");
+  card.classList.add("project-card");
 
   card.innerHTML = `
     <h3>${project.title}</h3>
@@ -329,36 +295,28 @@ function createProjectCard(project) {
     </div>
   `;
 
-  // Botões editar e apagar, somente para criador ou admin
   const actions = card.querySelector(".actions");
   if (auth.currentUser && (auth.currentUser.uid === project.userId || auth.currentUser.uid === ADMIN_UID)) {
     const editButton = document.createElement("button");
     editButton.textContent = "Editar";
-    editButton.addEventListener("click", () => editProject(project));
+    editButton.onclick = () => editProject(project);
     actions.appendChild(editButton);
 
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "Apagar";
-    deleteButton.addEventListener("click", () => deleteProject(project.id));
+    deleteButton.onclick = () => deleteProject(project.id);
     actions.appendChild(deleteButton);
   }
 
-  // Renderizar comentários
   const list = card.querySelector(".comments-list");
   (project.comments || []).forEach(comment => addCommentToList(list, comment));
 
-  // Enviar novo comentário
   const commentBtn = card.querySelector(".btn-comment");
   const inputComment = card.querySelector(".new-comment input");
-
-  commentBtn.addEventListener("click", async () => {
+  commentBtn.onclick = async () => {
     const text = inputComment.value.trim();
     if (!text) return;
-
-    if (!auth.currentUser) {
-      alert("Você precisa estar logado para comentar.");
-      return;
-    }
+    if (!auth.currentUser) return alert("Você precisa estar logado para comentar.");
 
     const commentData = {
       userId: auth.currentUser.uid,
@@ -366,20 +324,16 @@ function createProjectCard(project) {
       text,
       createdAt: new Date()
     };
-
     try {
       await updateDoc(doc(db, "projects", project.id), {
         comments: arrayUnion(commentData)
       });
-
       addCommentToList(list, commentData);
       inputComment.value = "";
     } catch (error) {
-      console.error("Erro ao enviar comentário:", error);
-      alert("Erro ao enviar comentário. Tente novamente.");
+      alert("Erro ao enviar comentário.");
     }
-  });
-
+  };
   return card;
 }
 
@@ -398,7 +352,6 @@ async function deleteProject(projectId) {
     await deleteDoc(doc(db, "projects", projectId));
     alert("Projeto apagado com sucesso!");
   } catch (error) {
-    console.error("Erro ao apagar projeto:", error);
     alert(`Erro ao apagar: ${error.message}`);
   }
 }
@@ -407,12 +360,9 @@ async function deleteProject(projectId) {
 function addCommentToList(container, comment) {
   const div = document.createElement("div");
   div.classList.add("comment");
-
   const dateObj = comment.createdAt.seconds ? new Date(comment.createdAt.seconds * 1000) : new Date(comment.createdAt);
-  const dateStr = dateObj.toLocaleString();
-
   div.innerHTML = `
-    <p><strong>${comment.userEmail}</strong> <em>(${dateStr})</em></p>
+    <p><strong>${comment.userEmail}</strong> (${dateObj.toLocaleString()})</p>
     <p>${comment.text}</p>
   `;
   container.appendChild(div);
