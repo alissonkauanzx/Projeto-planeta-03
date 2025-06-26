@@ -22,18 +22,9 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-// NOTE: Removi importações do Firebase Storage pois vamos usar Cloudinary
-// import {
-//   getStorage,
-//   ref,
-//   uploadBytesResumable,
-//   getDownloadURL
-// } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js";
-
 // ==================== CONFIGURAÇÃO ====================
 const auth = window.firebaseAuth;
 const db = getFirestore();
-// const storage = getStorage(); // Removido pois não será usado
 
 const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2";
 const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB
@@ -50,7 +41,6 @@ const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
 
 // ==================== CONFIGURAÇÃO CLOUDINARY ====================
-// Pegando os dados da meta tag no HTML
 const configMeta = document.querySelector('meta[name="cloudinary-config"]');
 const cloudName = configMeta.dataset.cloudName;
 const uploadPreset = configMeta.dataset.uploadPreset;
@@ -231,22 +221,40 @@ async function uploadToCloudinary(file) {
 window.submitProject = async () => {
   const title = document.getElementById("project-title")?.value.trim();
   const description = document.getElementById("project-desc")?.value.trim();
-  const imageFile = document.getElementById("project-image")?.files[0];
-  const videoFile = document.getElementById("project-video")?.files[0];
+
+  // Aqui pega os arquivos de imagem, vídeo e pdf do input de imagem e vídeo
+  const imageFileInput = document.getElementById("project-image");
+  const videoFileInput = document.getElementById("project-video");
+
   const uid = auth.currentUser?.uid;
 
   if (!title || !description) return alert("Preencha todos os campos obrigatórios.");
   if (!uid) return alert("Usuário não autenticado.");
 
-  const totalBytesToUpload = (imageFile?.size || 0) + (videoFile?.size || 0);
+  // Agora vamos identificar arquivos imagem e pdf no campo de imagem (pode conter PDF)
+  let imageFile = null;
+  let pdfFile = null;
+  if (imageFileInput && imageFileInput.files.length > 0) {
+    for (const file of imageFileInput.files) {
+      if (file.type === "application/pdf") pdfFile = file;
+      else if (file.type.startsWith("image/")) imageFile = file;
+    }
+  }
+
+  const videoFile = videoFileInput?.files[0];
+
+  const totalBytesToUpload = (imageFile?.size || 0) + (videoFile?.size || 0) + (pdfFile?.size || 0);
 
   if (!(await canUpload(totalBytesToUpload))) return;
 
   try {
-    let imageUrl, videoUrl;
+    let imageUrl, videoUrl, pdfUrl;
 
     if (imageFile) {
       imageUrl = await uploadToCloudinary(imageFile);
+    }
+    if (pdfFile) {
+      pdfUrl = await uploadToCloudinary(pdfFile);
     }
     if (videoFile) {
       videoUrl = await uploadToCloudinary(videoFile);
@@ -255,6 +263,7 @@ window.submitProject = async () => {
     if (window.currentProjectId) {
       const updateData = { title, description };
       if (imageUrl) updateData.imageUrl = imageUrl;
+      if (pdfUrl) updateData.pdfUrl = pdfUrl;
       if (videoUrl) updateData.videoUrl = videoUrl;
       await updateDoc(doc(db, "projects", window.currentProjectId), updateData);
       delete window.currentProjectId;
@@ -264,6 +273,7 @@ window.submitProject = async () => {
         title,
         description,
         imageUrl,
+        pdfUrl,
         videoUrl,
         createdAt: new Date(),
         userId: uid,
@@ -306,6 +316,7 @@ function createProjectCard(project) {
     <h3>${project.title}</h3>
     <p>${project.description}</p>
     ${project.imageUrl ? `<img src="${project.imageUrl}" alt="${project.title}">` : ""}
+    ${project.pdfUrl ? `<iframe src="${project.pdfUrl}" width="100%" height="400" frameborder="0"></iframe>` : ""}
     ${project.videoUrl ? `<video src="${project.videoUrl}" controls></video>` : ""}
     <div class="actions"></div>
     <div class="comments-section">
