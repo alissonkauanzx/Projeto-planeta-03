@@ -22,17 +22,18 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js";
+// NOTE: Removi importações do Firebase Storage pois vamos usar Cloudinary
+// import {
+//   getStorage,
+//   ref,
+//   uploadBytesResumable,
+//   getDownloadURL
+// } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js";
 
 // ==================== CONFIGURAÇÃO ====================
 const auth = window.firebaseAuth;
 const db = getFirestore();
-const storage = getStorage();
+// const storage = getStorage(); // Removido pois não será usado
 
 const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2";
 const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB
@@ -47,6 +48,12 @@ const logoutBtn = document.getElementById("logout-btn");
 const projectsContainer = document.getElementById("projects");
 const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
+
+// ==================== CONFIGURAÇÃO CLOUDINARY ====================
+// Pegando os dados da meta tag no HTML
+const configMeta = document.querySelector('meta[name="cloudinary-config"]');
+const cloudName = configMeta.dataset.cloudName;
+const uploadPreset = configMeta.dataset.uploadPreset;
 
 // ==================== FUNÇÕES AUXILIARES ====================
 const showElement = el => { if (el) el.style.display = "block"; };
@@ -170,45 +177,53 @@ async function canUpload(newBytes) {
   }
 }
 
-// ==================== UPLOAD DE ARQUIVOS COM PROGRESSO ====================
-function uploadFileWithProgress(file, path) {
+// ==================== UPLOAD PARA CLOUDINARY COM PROGRESSO ====================
+async function uploadToCloudinary(file) {
   return new Promise((resolve, reject) => {
     if (file.size > MAX_FILE_SIZE_BYTES) {
       reject(new Error(`"${file.name}" excede 5 GB.`));
       return;
     }
 
-    const fileRef = ref(storage, path);
-    const uploadTask = uploadBytesResumable(fileRef, file);
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
 
-    showElement(uploadProgress);
-    showElement(uploadMessage);
-    uploadProgress.value = 0;
-    uploadMessage.textContent = `Enviando "${file.name}" (${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
 
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        uploadProgress.value = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      },
-      (error) => {
-        hideElement(uploadProgress);
-        hideElement(uploadMessage);
-        console.error("Erro no upload:", error);
-        reject(error);
-      },
-      async () => {
-        hideElement(uploadProgress);
-        hideElement(uploadMessage);
-        try {
-          const url = await getDownloadURL(uploadTask.snapshot.ref);
-          resolve(url);
-        } catch (error) {
-          console.error("Erro ao obter URL do arquivo:", error);
-          reject(error);
-        }
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+
+    xhr.open("POST", url, true);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = (event.loaded / event.total) * 100;
+        showElement(uploadProgress);
+        uploadProgress.value = percentComplete;
+        showElement(uploadMessage);
+        uploadMessage.textContent = `Enviando "${file.name}" - ${percentComplete.toFixed(0)}%`;
       }
-    );
+    };
+
+    xhr.onload = () => {
+      hideElement(uploadProgress);
+      hideElement(uploadMessage);
+
+      if (xhr.status === 200) {
+        const response = JSON.parse(xhr.responseText);
+        resolve(response.secure_url);
+      } else {
+        reject(new Error(`Erro no upload: ${xhr.statusText}`));
+      }
+    };
+
+    xhr.onerror = () => {
+      hideElement(uploadProgress);
+      hideElement(uploadMessage);
+      reject(new Error("Erro na requisição de upload."));
+    };
+
+    xhr.send(formData);
   });
 }
 
@@ -231,10 +246,10 @@ window.submitProject = async () => {
     let imageUrl, videoUrl;
 
     if (imageFile) {
-      imageUrl = await uploadFileWithProgress(imageFile, `images/${uid}/${Date.now()}-${imageFile.name}`);
+      imageUrl = await uploadToCloudinary(imageFile);
     }
     if (videoFile) {
-      videoUrl = await uploadFileWithProgress(videoFile, `videos/${uid}/${Date.now()}-${videoFile.name}`);
+      videoUrl = await uploadToCloudinary(videoFile);
     }
 
     if (window.currentProjectId) {
