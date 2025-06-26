@@ -17,6 +17,8 @@ html, body {
 
 body {
   background-attachment: fixed;
+  -webkit-font-smoothing: antialiased; /* Deixa a fonte mais suave */
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ==================== Animação Fade-in ==================== */
@@ -36,7 +38,7 @@ header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  backdrop-filter: blur(8px);
+  backdrop-filter: saturate(180%) blur(8px); /* efeito mais moderno */
 }
 
 nav.navbar {
@@ -55,7 +57,8 @@ nav.navbar h1 {
   text-align: center;
   font-weight: 800;
   letter-spacing: 0.5px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
+  user-select: none; /* evita seleção do título */
 }
 
 nav.navbar .right-buttons {
@@ -71,8 +74,9 @@ nav.navbar button {
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.3);
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.35);
   transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  font-family: inherit;
 }
 
 /* Foco visível para acessibilidade */
@@ -81,9 +85,9 @@ nav.navbar button:focus-visible {
   outline-offset: 2px;
 }
 
-nav.navbar button:hover {
+nav.navbar button:hover:not(:disabled) {
   background: #1b5e20;
-  box-shadow: 0 4px 10px rgba(46, 125, 50, 0.35);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.45);
   transform: translateY(-2px);
 }
 
@@ -104,19 +108,25 @@ main.center-wrapper {
   width: 100%;
   min-height: 100vh;
   gap: 32px;
+  background: rgba(255 255 255 / 0.5);
+  backdrop-filter: saturate(180%) blur(10px);
+  box-shadow: inset 0 0 30px rgb(46 125 50 / 0.15);
+  border-radius: 14px;
+  margin: 24px auto;
+  max-width: 1200px;
 }
 
 /* ==================== Formulários ==================== */
 .auth-section,
 .project-form-section {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.95);
   padding: 40px 32px;
   border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.2);
+  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.25);
   width: 100%;
   max-width: 480px;
   text-align: center;
-  backdrop-filter: blur(4px);
+  backdrop-filter: saturate(180%) blur(8px);
   animation: fadeIn 0.4s ease forwards;
   transition: all 0.3s ease;
 }
@@ -127,16 +137,7 @@ main.center-wrapper {
   margin-bottom: 24px;
   font-size: 1.8rem;
   font-weight: 800;
-}
-
-.auth-section label,
-.project-form-section label {
-  display: block;
-  font-weight: 600;
-  margin: 8px 0 4px;
-  text-align: left;
-  color: #2e7d32;
-  font-size: 0.95rem;
+  user-select: none;
 }
 
 .auth-section input,
@@ -144,13 +145,14 @@ main.center-wrapper {
 .project-form-section textarea {
   width: 100%;
   padding: 14px 16px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   border: 2px solid #a3c293;
   border-radius: 8px;
   font-size: 1rem;
   color: #2e3a2e;
   background: #f5fff5;
   transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  font-family: inherit;
 }
 
 .auth-section input:focus,
@@ -158,7 +160,7 @@ main.center-wrapper {
 .project-form-section textarea:focus {
   border-color: #2e7d32;
   background: #ffffff;
-  box-shadow: 0 0 8px rgba(46, 125, 50, 0.3);
+  box-shadow: 0 0 10px rgba(46, 125, 50, 0.4);
   outline: none;
 }
 
@@ -174,8 +176,9 @@ main.center-wrapper {
   font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 6px 10px rgba(46, 125, 50, 0.3);
+  box-shadow: 0 6px 14px rgba(46, 125, 50, 0.4);
   transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  font-family: inherit;
 }
 
 /* Foco visível para botões */
@@ -188,7 +191,7 @@ main.center-wrapper {
 .auth-section button:hover,
 .project-form-section button:hover {
   background: #1b5e20;
-  box-shadow: 0 8px 14px rgba(46, 125, 50, 0.35);
+  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.45);
   transform: translateY(-2px);
 }
 
@@ -206,6 +209,7 @@ main.center-wrapper {
   text-decoration: none;
   cursor: pointer;
   transition: color 0.3s ease;
+  font-family: inherit;
 }
 .auth-section a:hover,
 .link-btn:hover {
@@ -225,6 +229,7 @@ main.center-wrapper {
   font-size: 2rem;
   color: #2e7d32;
   font-weight: 800;
+  user-select: none;
 }
 .projects-grid {
   display: grid;
@@ -232,37 +237,41 @@ main.center-wrapper {
   gap: 24px;
 }
 .projects-grid .project-card {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 18px;
   border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
+  box-shadow: 0 6px 16px rgba(46, 125, 50, 0.18);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .projects-grid .project-card:hover {
-  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.3);
-  transform: scale(1.02);
+  box-shadow: 0 10px 22px rgba(46, 125, 50, 0.32);
+  transform: scale(1.03);
 }
 .projects-grid .project-card img,
 .projects-grid .project-card video {
   width: 100%;
-  border-radius: 8px;
-  margin-top: 12px;
+  border-radius: 10px;
+  margin-top: 14px;
   max-height: 200px;
   object-fit: cover;
   background: #e1f5e1;
+  user-select: none;
 }
 .projects-grid h3 {
   color: #2e7d32;
-  margin-top: 12px;
+  margin-top: 14px;
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
 }
 .projects-grid p {
   font-size: 1rem;
-  margin-top: 8px;
-  color: #3c4a3c; /* contraste ligeiramente melhor */
-  line-height: 1.4;
+  margin-top: 10px;
+  color: #3c4a3c;
+  line-height: 1.5;
 }
 
 /* ==================== Comentários ==================== */
@@ -272,20 +281,20 @@ main.center-wrapper {
   margin-top: 16px;
 }
 .comments-section h4 {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: #2e7d32;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-weight: 700;
+  user-select: none;
 }
 .comments-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 12px 0;
+  margin: 0 0 14px 0;
   max-height: 180px;
   overflow-y: auto;
   padding-right: 8px;
 
-  /* Scroll mais suave e menos intrusivo */
   scrollbar-width: thin;
   scrollbar-color: #2e7d32 transparent;
 }
@@ -310,30 +319,34 @@ main.center-wrapper {
 }
 .new-comment {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  align-items: center;
 }
 .new-comment input {
   flex: 1;
-  padding: 8px;
+  padding: 10px 12px;
   border: 1px solid #a3c293;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.3s;
+  font-family: inherit;
 }
 .new-comment input:focus {
   border-color: #2e7d32;
-  box-shadow: 0 0 4px rgba(46, 125, 50, 0.3);
+  box-shadow: 0 0 6px rgba(46, 125, 50, 0.4);
   outline: none;
 }
 .new-comment button {
   background: #2e7d32;
   color: #fff;
-  padding: 8px 12px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
+  font-weight: 600;
   transition: background 0.3s;
+  font-family: inherit;
 }
 .new-comment button:hover {
   background: #1b5e20;
@@ -343,36 +356,38 @@ main.center-wrapper {
 .upload-message {
   display: block;
   margin-top: 8px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #d32f2f;
   font-weight: 600;
   text-align: center;
+  user-select: none;
 }
 progress#upload-progress {
   width: 100%;
   height: 8px;
-  border-radius: 4px;
+  border-radius: 5px;
   overflow: hidden;
   background: #e0e0e0;
-  margin: 10px 0;
+  margin: 12px 0;
 }
 progress#upload-progress::-webkit-progress-bar {
   background: #e0e0e0;
 }
 progress#upload-progress::-webkit-progress-value {
   background: #2e7d32;
-  transition: width 0.3s;
+  transition: width 0.3s ease;
 }
 
 /* ==================== Rodapé ==================== */
 footer {
   background: #d1e7dd;
-  padding: 12px;
+  padding: 14px;
   text-align: center;
   font-size: 1rem;
   color: #496849;
   box-shadow: inset 0 1px 2px #b3ccb3;
   margin-top: auto;
+  user-select: none;
 }
 
 /* ==================== Responsividade ==================== */
