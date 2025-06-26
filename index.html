@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="style.css" />
 
   <!-- 🔵 NOVO: Informações do Cloudinary para o JS -->
-  <meta name="cloudinary-config" data-cloud-name="dz0kjpcoa" data-upload-preset="projeto planeta">
+  <meta name="cloudinary-config" data-cloud-name="dz0kjpcoa" data-upload-preset="projeto_planeta">
 
   <!-- 🔵 NOVO: Favicon -->
   <link rel="icon" href="./favicon.ico" type="image/x-icon" />
@@ -71,7 +71,7 @@
       <h2>Enviar Projeto Sustentável</h2>
       <input type="text" id="project-title" placeholder="Título do Projeto" required aria-label="Título do Projeto" />
       <textarea id="project-desc" placeholder="Descreva o projeto..." rows="5" required aria-label="Descrição do Projeto"></textarea>
-      <input type="file" id="project-image" accept="image/*" required aria-label="Imagem (máx 5 GB)" />
+      <input type="file" id="project-image" accept="image/*,application/pdf" required aria-label="Imagem ou PDF (máx 5 GB)" />
       <input type="file" id="project-video" accept="video/*" aria-label="Vídeo (máx 5 GB, opcional)" />
 
       <progress id="upload-progress" value="0" max="100" style="display:none;"></progress>
