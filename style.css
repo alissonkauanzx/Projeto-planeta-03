@@ -1,318 +1,182 @@
-/* ==================== Reset e Base ==================== */
+/* ========== Reset e base ========== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
 html, body {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #e1f5e1, #c7e8c7);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #e0ffe0, #c8e6c9);
   color: #2e3a2e;
   scroll-behavior: smooth;
+  min-height: 100vh;
+}
+body {
   display: flex;
   flex-direction: column;
 }
 
-body {
-  background-attachment: fixed;
-  -webkit-font-smoothing: antialiased; /* Deixa a fonte mais suave */
-  -moz-osx-font-smoothing: grayscale;
+/* ========== Animações ========== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+.float-title {
+  animation: float 2.5s ease-in-out infinite;
 }
 
-/* ==================== Animação Fade-in ==================== */
-.fade-in {
-  opacity: 0;
-  animation: fadeIn 0.4s forwards;
-}
-@keyframes fadeIn {
-  to { opacity: 1; }
-}
-
-/* ==================== Cabeçalho ==================== */
+/* ========== Cabeçalho ========== */
 header {
-  background: #d1e7dd;
-  padding: 14px 24px;
-  box-shadow: 0 2px 12px rgba(46, 125, 50, 0.2);
+  background: #d1f7d1;
+  padding: 20px 30px;
+  box-shadow: 0 2px 12px rgba(0, 100, 0, 0.2);
   position: sticky;
   top: 0;
-  z-index: 1000;
-  backdrop-filter: saturate(180%) blur(8px); /* efeito mais moderno */
+  z-index: 999;
 }
-
-nav.navbar {
+.navbar {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  align-items: center;
 }
-
-nav.navbar h1 {
-  flex: 1;
+.navbar h1 {
   font-size: 2rem;
   color: #2e7d32;
-  text-align: center;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
-  user-select: none; /* evita seleção do título */
+  font-weight: bold;
+  user-select: none;
+  text-shadow: 0 2px 3px rgba(0,0,0,0.1);
 }
-
-nav.navbar .right-buttons {
-  display: flex;
-  gap: 12px;
+.navbar h1.float-title {
+  display: inline-block;
 }
-
-nav.navbar button {
-  background: #2e7d32;
-  color: #fff;
-  padding: 10px 18px;
+.right-buttons button {
+  background-color: #2e7d32;
+  color: white;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.35);
-  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-  font-family: inherit;
-}
-
-/* Foco visível para acessibilidade */
-nav.navbar button:focus-visible {
-  outline: 3px solid #1b5e20;
-  outline-offset: 2px;
-}
-
-nav.navbar button:hover:not(:disabled) {
-  background: #1b5e20;
-  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.45);
-  transform: translateY(-2px);
-}
-
-/* Cursor 'não permitido' para botões desabilitados */
-nav.navbar button:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* ==================== Área Central ==================== */
-main.center-wrapper {
-  flex: 1;
-  padding: 32px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 100vh;
-  gap: 32px;
-  background: rgba(255 255 255 / 0.5);
-  backdrop-filter: saturate(180%) blur(10px);
-  box-shadow: inset 0 0 30px rgb(46 125 50 / 0.15);
-  border-radius: 14px;
-  margin: 24px auto;
-  max-width: 1200px;
-}
-
-/* ==================== Formulários ==================== */
-.auth-section,
-.project-form-section {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 40px 32px;
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.25);
-  width: 100%;
-  max-width: 480px;
-  text-align: center;
-  backdrop-filter: saturate(180%) blur(8px);
-  animation: fadeIn 0.4s ease forwards;
+  padding: 10px 18px;
+  margin-left: 10px;
+  border-radius: 8px;
+  font-weight: bold;
   transition: all 0.3s ease;
 }
-
-.auth-section h2,
-.project-form-section h2 {
-  color: #2e7d32;
-  margin-bottom: 24px;
-  font-size: 1.8rem;
-  font-weight: 800;
-  user-select: none;
+.right-buttons button:hover {
+  background-color: #1b5e20;
+  transform: scale(1.05);
 }
 
-.auth-section input,
-.project-form-section input,
-.project-form-section textarea {
+/* ========== Área Central ========== */
+main.center-wrapper {
+  padding: 40px 16px;
+  max-width: 1200px;
+  margin: auto;
   width: 100%;
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  border: 2px solid #a3c293;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  animation: fadeInUp 0.7s ease-out;
+}
+
+/* ========== Formulários ========== */
+.auth-section, .project-form-section {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.25);
+  padding: 40px 30px;
+  max-width: 500px;
+  margin: auto;
+}
+.auth-section h2, .project-form-section h2 {
+  color: #2e7d32;
+  margin-bottom: 20px;
+}
+.auth-section input, .project-form-section input, .project-form-section textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 2px solid #a5d6a7;
   border-radius: 8px;
   font-size: 1rem;
-  color: #2e3a2e;
-  background: #f5fff5;
-  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
-  font-family: inherit;
+  transition: 0.3s;
 }
-
-.auth-section input:focus,
-.project-form-section input:focus,
-.project-form-section textarea:focus {
+.auth-section input:focus, .project-form-section input:focus, .project-form-section textarea:focus {
   border-color: #2e7d32;
-  background: #ffffff;
-  box-shadow: 0 0 10px rgba(46, 125, 50, 0.4);
+  box-shadow: 0 0 8px rgba(46, 125, 50, 0.3);
   outline: none;
 }
-
-.auth-section button,
-.project-form-section button {
+.auth-section button, .project-form-section button {
   width: 100%;
-  padding: 14px;
-  margin-top: 18px;
-  background: #2e7d32;
-  color: #fff;
+  padding: 12px;
   border: none;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 6px 14px rgba(46, 125, 50, 0.4);
-  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-  font-family: inherit;
+  background: #2e7d32;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
 }
-
-/* Foco visível para botões */
-.auth-section button:focus-visible,
-.project-form-section button:focus-visible {
-  outline: 3px solid #1b5e20;
-  outline-offset: 2px;
-}
-
-.auth-section button:hover,
-.project-form-section button:hover {
+.auth-section button:hover, .project-form-section button:hover {
   background: #1b5e20;
-  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.45);
-  transform: translateY(-2px);
+  transform: scale(1.02);
 }
 
-.auth-section p {
-  font-size: 0.9rem;
-  margin-top: 16px;
-  color: #496849;
-}
-
-/* Contraste melhorado para links */
-.auth-section a,
-.link-btn {
-  color: #2e7d32;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  font-family: inherit;
-}
-.auth-section a:hover,
-.link-btn:hover {
-  color: #1b5e20;
-  text-decoration: underline;
-}
-
-/* ==================== Projetos ==================== */
-.projects-section {
-  width: 100%;
-  max-width: 1200px;
-  padding: 0 8px;
-}
+/* ========== Projetos ========== */
 .projects-section h2 {
   text-align: center;
-  margin-bottom: 32px;
-  font-size: 2rem;
   color: #2e7d32;
-  font-weight: 800;
-  user-select: none;
+  font-size: 2rem;
+  margin-bottom: 30px;
 }
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
-.projects-grid .project-card {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 18px;
-  border-radius: 14px;
-  box-shadow: 0 6px 16px rgba(46, 125, 50, 0.18);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-  overflow: hidden;
+.project-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+  padding: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
-.projects-grid .project-card:hover {
-  box-shadow: 0 10px 22px rgba(46, 125, 50, 0.32);
+.project-card:hover {
   transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);
 }
-.projects-grid .project-card img,
-.projects-grid .project-card video {
+.project-card img, .project-card video, .project-card iframe {
   width: 100%;
-  border-radius: 10px;
-  margin-top: 14px;
   max-height: 200px;
   object-fit: cover;
-  background: #e1f5e1;
-  user-select: none;
-}
-.projects-grid h3 {
-  color: #2e7d32;
-  margin-top: 14px;
-  font-weight: 700;
-  font-size: 1.3rem;
-}
-.projects-grid p {
-  font-size: 1rem;
-  margin-top: 10px;
-  color: #3c4a3c;
-  line-height: 1.5;
+  border-radius: 10px;
+  margin-top: 12px;
 }
 
-/* ==================== Comentários ==================== */
+/* ========== Comentários ========== */
 .comments-section {
-  border-top: 2px solid #a3c293;
+  border-top: 1px solid #cce0cc;
+  margin-top: 20px;
   padding-top: 16px;
-  margin-top: 16px;
-}
-.comments-section h4 {
-  font-size: 1.15rem;
-  color: #2e7d32;
-  margin-bottom: 10px;
-  font-weight: 700;
-  user-select: none;
 }
 .comments-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 14px 0;
   max-height: 180px;
   overflow-y: auto;
-  padding-right: 8px;
-
-  scrollbar-width: thin;
-  scrollbar-color: #2e7d32 transparent;
-}
-.comments-list::-webkit-scrollbar {
-  width: 8px;
-}
-.comments-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-.comments-list::-webkit-scrollbar-thumb {
-  background-color: #2e7d32;
-  border-radius: 4px;
+  margin-bottom: 10px;
 }
 .comment {
-  padding: 8px 0;
-  border-bottom: 1px solid #cce5cc;
-  font-size: 0.9rem;
-  color: #2e3a2e;
+  padding: 8px;
+  border-bottom: 1px solid #d9eeda;
 }
 .comment:last-child {
   border-bottom: none;
@@ -320,98 +184,42 @@ main.center-wrapper {
 .new-comment {
   display: flex;
   gap: 10px;
-  align-items: center;
 }
 .new-comment input {
   flex: 1;
-  padding: 10px 12px;
-  border: 1px solid #a3c293;
+  padding: 10px;
   border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-  font-family: inherit;
-}
-.new-comment input:focus {
-  border-color: #2e7d32;
-  box-shadow: 0 0 6px rgba(46, 125, 50, 0.4);
-  outline: none;
+  border: 1px solid #a5d6a7;
 }
 .new-comment button {
   background: #2e7d32;
-  color: #fff;
-  padding: 10px 16px;
+  color: white;
   border: none;
+  padding: 10px 16px;
   border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: background 0.3s;
-  font-family: inherit;
+  transition: 0.3s ease;
 }
 .new-comment button:hover {
   background: #1b5e20;
 }
 
-/* ==================== Upload ==================== */
-.upload-message {
-  display: block;
-  margin-top: 8px;
-  font-size: 0.95rem;
-  color: #d32f2f;
-  font-weight: 600;
-  text-align: center;
-  user-select: none;
-}
-progress#upload-progress {
-  width: 100%;
-  height: 8px;
-  border-radius: 5px;
-  overflow: hidden;
-  background: #e0e0e0;
-  margin: 12px 0;
-}
-progress#upload-progress::-webkit-progress-bar {
-  background: #e0e0e0;
-}
-progress#upload-progress::-webkit-progress-value {
-  background: #2e7d32;
-  transition: width 0.3s ease;
-}
-
-/* ==================== Rodapé ==================== */
+/* ========== Rodapé ========== */
 footer {
-  background: #d1e7dd;
-  padding: 14px;
+  background: #d1f7d1;
+  padding: 16px;
   text-align: center;
-  font-size: 1rem;
-  color: #496849;
-  box-shadow: inset 0 1px 2px #b3ccb3;
+  font-size: 0.95rem;
+  color: #4c674c;
   margin-top: auto;
-  user-select: none;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
 }
 
-/* ==================== Responsividade ==================== */
+/* ========== Responsivo ========== */
 @media (max-width: 600px) {
-  nav.navbar h1 {
-    font-size: 1.6rem;
-  }
-  .auth-section,
-  .project-form-section {
-    padding: 24px;
-    max-width: 95%;
+  .navbar h1 {
+    font-size: 1.5rem;
   }
   .projects-grid {
     grid-template-columns: 1fr;
-  }
-}
-
-/* Ajuste para telas muito pequenas */
-@media (max-width: 360px) {
-  main.center-wrapper {
-    padding: 16px 8px;
-  }
-  .auth-section,
-  .project-form-section {
-    padding: 16px 12px;
   }
 }
