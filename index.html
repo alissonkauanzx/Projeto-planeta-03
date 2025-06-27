@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🌱 Planeta Projeto</title>
   <link rel="stylesheet" href="style.css" />
 
@@ -16,22 +17,6 @@
   <meta property="og:description" content="Descubra e compartilhe projetos sustentáveis que ajudam o meio ambiente." />
   <meta property="og:image" content="./images/preview.png" />
   <meta property="og:type" content="website" />
-
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
-    const firebaseConfig = {
-      apiKey: "AIzaSyBdWzf45GmW58N7sy7WMT9MG9G4Jy3wjsg",
-      authDomain: "planeta-projeto.firebaseapp.com",
-      projectId: "planeta-projeto",
-      storageBucket: "planeta-projeto.appspot.com",
-      messagingSenderId: "1060342659751",
-      appId: "1:1060342659751:web:fbd4c421de3a02db8cb982"
-    };
-    const app = initializeApp(firebaseConfig);
-    window.firebaseAuth = getAuth(app); 
-  </script>
 </head>
 
 <body>
@@ -48,6 +33,7 @@
 
   <!-- CONTEÚDO CENTRAL -->
   <main class="center-wrapper">
+    
     <!-- LOGIN -->
     <section id="login-section" class="auth-section">
       <h2>Entre para continuar</h2>
@@ -73,7 +59,7 @@
       <textarea id="project-desc" placeholder="Descreva o projeto..." rows="5" required></textarea>
       <input type="file" id="project-image" accept="image/*,application/pdf" required />
       <input type="file" id="project-video" accept="video/*" />
-
+      
       <progress id="upload-progress" value="0" max="100" style="display:none;"></progress>
       <small id="upload-message" class="upload-message" style="display:none;"></small>
 
@@ -96,7 +82,9 @@
   </main>
 
   <!-- RODAPÉ -->
-  <footer>&copy; 2025 Planeta Projeto. Todos os direitos reservados.</footer>
+  <footer>
+    &copy; 2025 Planeta Projeto. Todos os direitos reservados.
+  </footer>
 
   <!-- SCRIPT PRINCIPAL -->
   <script type="module" src="./script.js"></script>
