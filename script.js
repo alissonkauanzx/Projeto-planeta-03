@@ -400,45 +400,4 @@ function openProjectModal(project) {
     if (!auth.currentUser) return alert("Você precisa estar logado para comentar.");
 
     const commentData = {
-      userId: auth.currentUser.uid,
-      userEmail: auth.currentUser.email,
-      text,
-      createdAt: new Date()
-    };
-    try {
-      await updateDoc(doc(db, "projects", project.id), {
-        comments: arrayUnion(commentData)
-      });
-      addCommentToList(commentsList, commentData);
-      input.value = "";
-      // Atualizar comentário no card também
-      loadProjects();
-    } catch (error) {
-      alert("Erro ao enviar comentário.");
-    }
-  };
-}
-
-function closeProjectModal() {
-  expandedProjectModal.style.opacity = "0";
-  setTimeout(() => {
-    expandedProjectModal.style.display = "none";
-    expandedProjectModal.innerHTML = "";
-  }, 300);
-}
-
-// ==================== EDIÇÃO E EXCLUSÃO ====================
-function editProject(project) {
-  showProjectForm();
-  document.getElementById("project-title").value = project.title;
-  document.getElementById("project-desc").value = project.description;
-  window.currentProjectId = project.id;
-}
-
-async function deleteProject(projectId) {
-  if (!confirm("Você realmente deseja apagar este projeto?")) return;
-  try {
-    await deleteDoc(doc(db, "projects", projectId));
-    alert("Projeto apagado com sucesso!");
-  } catch (error) {
-    alert
+      userId:
