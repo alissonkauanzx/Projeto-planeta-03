@@ -27,7 +27,7 @@ const auth = window.firebaseAuth;
 const db = getFirestore();
 
 const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2";
-const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024;
+const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024; // 5GB limite diário
 const MAX_FILE_SIZE_BYTES = MAX_DAILY_BYTES;
 
 // ==================== SELETORES ====================
@@ -39,6 +39,11 @@ const logoutBtn = document.getElementById("logout-btn");
 const projectsContainer = document.getElementById("projects");
 const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
+
+// Container para o modal de projeto expandido
+const expandedProjectModal = document.createElement("div");
+expandedProjectModal.id = "expanded-project-modal";
+document.body.appendChild(expandedProjectModal);
 
 // ==================== CONFIGURAÇÃO CLOUDINARY ====================
 const configMeta = document.querySelector('meta[name="cloudinary-config"]');
@@ -267,11 +272,13 @@ function loadProjects() {
 function createProjectCard(project) {
   const card = document.createElement("div");
   card.classList.add("project-card");
+  card.style.cursor = "pointer"; // Indica clicável
+
   card.innerHTML = `
     <h3>${project.title}</h3>
     <p>${project.description}</p>
     ${project.imageUrl ? `<img src="${project.imageUrl}" alt="${project.title}">` : ""}
-    ${project.pdfUrl ? `<iframe src="${project.pdfUrl}" width="100%" height="400" frameborder="0"></iframe>` : ""}
+    ${project.pdfUrl ? `<iframe src="${project.pdfUrl}" width="100%" height="300" frameborder="0"></iframe>` : ""}
     ${project.videoUrl ? `<video src="${project.videoUrl}" controls></video>` : ""}
     <div class="actions"></div>
     <div class="comments-section">
@@ -284,25 +291,35 @@ function createProjectCard(project) {
     </div>
   `;
 
+  // Botões editar/apagar só para dono ou admin
   const actions = card.querySelector(".actions");
   if (auth.currentUser && (auth.currentUser.uid === project.userId || auth.currentUser.uid === ADMIN_UID)) {
     const editButton = document.createElement("button");
     editButton.textContent = "Editar";
-    editButton.onclick = () => editProject(project);
+    editButton.onclick = (e) => {
+      e.stopPropagation();
+      editProject(project);
+    };
     actions.appendChild(editButton);
 
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "Apagar";
-    deleteButton.onclick = () => deleteProject(project.id);
+    deleteButton.onclick = async (e) => {
+      e.stopPropagation();
+      await deleteProject(project.id);
+    };
     actions.appendChild(deleteButton);
   }
 
+  // Exibir comentários
   const list = card.querySelector(".comments-list");
   (project.comments || []).forEach(comment => addCommentToList(list, comment));
 
+  // Enviar comentário
   const commentBtn = card.querySelector(".btn-comment");
   const inputComment = card.querySelector(".new-comment input");
-  commentBtn.onclick = async () => {
+  commentBtn.onclick = async (e) => {
+    e.stopPropagation();
     const text = inputComment.value.trim();
     if (!text) return;
     if (!auth.currentUser) return alert("Você precisa estar logado para comentar.");
@@ -323,9 +340,94 @@ function createProjectCard(project) {
       alert("Erro ao enviar comentário.");
     }
   };
+
+  // Clique no card expande para modal tela cheia
+  card.onclick = () => openProjectModal(project);
+
+  // Animação suave na entrada do card
+  card.style.opacity = 0;
+  card.style.transform = "translateY(20px)";
+  setTimeout(() => {
+    card.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+    card.style.opacity = 1;
+    card.style.transform = "translateY(0)";
+  }, 50);
+
   return card;
 }
 
+// ==================== MODAL DE PROJETO EXPANDIDO ====================
+function openProjectModal(project) {
+  expandedProjectModal.innerHTML = `
+    <div class="modal-content">
+      <button id="close-modal-btn" aria-label="Fechar modal">&times;</button>
+      <h2>${project.title}</h2>
+      <p>${project.description}</p>
+      ${project.imageUrl ? `<img src="${project.imageUrl}" alt="${project.title}" class="modal-image">` : ""}
+      ${project.pdfUrl ? `<iframe src="${project.pdfUrl}" width="100%" height="600" frameborder="0"></iframe>` : ""}
+      ${project.videoUrl ? `<video src="${project.videoUrl}" controls autoplay class="modal-video"></video>` : ""}
+      <div class="modal-comments-section">
+        <h3>Comentários</h3>
+        <div class="modal-comments-list"></div>
+        <div class="modal-new-comment">
+          <input type="text" placeholder="Escreva um comentário..." />
+          <button id="modal-send-comment-btn">Enviar</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  expandedProjectModal.style.display = "flex";
+  setTimeout(() => {
+    expandedProjectModal.style.opacity = "1"; // transição fade-in
+  }, 50);
+
+  // Carregar comentários
+  const commentsList = expandedProjectModal.querySelector(".modal-comments-list");
+  commentsList.innerHTML = "";
+  (project.comments || []).forEach(comment => addCommentToList(commentsList, comment));
+
+  // Botão fechar modal
+  const closeBtn = document.getElementById("close-modal-btn");
+  closeBtn.onclick = closeProjectModal;
+
+  // Enviar comentário no modal
+  const input = expandedProjectModal.querySelector(".modal-new-comment input");
+  const sendBtn = document.getElementById("modal-send-comment-btn");
+  sendBtn.onclick = async () => {
+    const text = input.value.trim();
+    if (!text) return;
+    if (!auth.currentUser) return alert("Você precisa estar logado para comentar.");
+
+    const commentData = {
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email,
+      text,
+      createdAt: new Date()
+    };
+    try {
+      await updateDoc(doc(db, "projects", project.id), {
+        comments: arrayUnion(commentData)
+      });
+      addCommentToList(commentsList, commentData);
+      input.value = "";
+      // Atualizar comentário no card também
+      loadProjects();
+    } catch (error) {
+      alert("Erro ao enviar comentário.");
+    }
+  };
+}
+
+function closeProjectModal() {
+  expandedProjectModal.style.opacity = "0";
+  setTimeout(() => {
+    expandedProjectModal.style.display = "none";
+    expandedProjectModal.innerHTML = "";
+  }, 300);
+}
+
+// ==================== EDIÇÃO E EXCLUSÃO ====================
 function editProject(project) {
   showProjectForm();
   document.getElementById("project-title").value = project.title;
@@ -343,10 +445,13 @@ async function deleteProject(projectId) {
   }
 }
 
+// ==================== COMENTÁRIOS ====================
 function addCommentToList(container, comment) {
   const div = document.createElement("div");
   div.classList.add("comment");
-  const dateObj = comment.createdAt.seconds ? new Date(comment.createdAt.seconds * 1000) : new Date(comment.createdAt);
+  const dateObj = comment.createdAt?.seconds
+    ? new Date(comment.createdAt.seconds * 1000)
+    : new Date(comment.createdAt);
   div.innerHTML = `
     <p><strong>${comment.userEmail}</strong> (${dateObj.toLocaleString()})</p>
     <p>${comment.text}</p>
@@ -354,4 +459,37 @@ function addCommentToList(container, comment) {
   container.appendChild(div);
 }
 
-document.addEventListener("DOMContentLoaded", showLogin);
+// ==================== FUNÇÃO DE FUNDO ANIMADO ====================
+function createAnimatedBackground() {
+  const canvas = document.createElement("canvas");
+  canvas.id = "background-canvas";
+  canvas.style.position = "fixed";
+  canvas.style.top = 0;
+  canvas.style.left = 0;
+  canvas.style.width = "100%";
+  canvas.style.height = "100%";
+  canvas.style.zIndex = "-1";
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext("2d");
+  let width, height;
+  let points = [];
+
+  function resize() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    points = [];
+    const spacing = 50;
+    for (let x = 0; x < width; x += spacing) {
+      for (let y = 0; y < height; y += spacing) {
+        points.push({ x, y, originX: x, originY: y, vx: (Math.random() - 0.5) / 2, vy: (Math.random() - 0.5) / 2 });
+      }
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = "#2e7d32"; // verde
