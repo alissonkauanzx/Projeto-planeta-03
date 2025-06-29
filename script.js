@@ -342,3 +342,12 @@ function openProjectView(p) {
     show(projectsContainer);
   };
 }
+
+// ==================== EVENT LISTENERS ====================
+document.getElementById("login-btn").onclick = () => window.login();
+document.getElementById("register-btn").onclick = () => window.register();
+document.getElementById("logout-btn").onclick = () => window.logout();
+document.getElementById("post-project-btn").onclick = () => window.showProjectForm();
+document.getElementById("submit-project-btn").onclick = () => window.submitProject();
+document.getElementById("to-register").onclick = (e) => { e.preventDefault(); window.showRegister(); };
+document.getElementById("to-login").onclick = (e) => { e.preventDefault(); window.showLogin(); };
