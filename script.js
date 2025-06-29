@@ -53,26 +53,26 @@ function resetForm() {
 }
 
 // ==================== AUTENTICAÇÃO ====================
-window.showLogin = function () {
+function showLogin() {
   show(loginSection);
   hide(registerSection);
   hide(projectForm);
-};
+}
 
-window.showRegister = function () {
+function showRegister() {
   hide(loginSection);
   show(registerSection);
   hide(projectForm);
-};
+}
 
-window.showProjectForm = function () {
+function showProjectForm() {
   hide(loginSection);
   hide(registerSection);
   show(projectForm);
   resetForm();
-};
+}
 
-window.login = async function () {
+async function login() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   if (!email || !password) {
@@ -85,9 +85,9 @@ window.login = async function () {
     alert("Erro no login: " + e.message);
     console.error(e);
   }
-};
+}
 
-window.register = async function () {
+async function register() {
   const email = document.getElementById("reg-email").value.trim();
   const password = document.getElementById("reg-password").value.trim();
   if (!email || !password) {
@@ -97,21 +97,21 @@ window.register = async function () {
   try {
     await createUserWithEmailAndPassword(auth, email, password);
     alert("Conta criada com sucesso!");
-    window.showLogin();
+    showLogin();
   } catch (e) {
     alert("Erro no registro: " + e.message);
     console.error(e);
   }
-};
+}
 
-window.logout = async function () {
+async function logout() {
   try {
     await signOut(auth);
   } catch (e) {
     alert("Erro ao sair: " + e.message);
     console.error(e);
   }
-};
+}
 
 onAuthStateChanged(auth, user => {
   if (user) {
@@ -122,7 +122,7 @@ onAuthStateChanged(auth, user => {
     show(logoutBtn);
     loadProjects();
   } else {
-    window.showLogin();
+    showLogin();
     hide(postProjectBtn);
     hide(logoutBtn);
     projectsContainer.innerHTML = "";
@@ -193,7 +193,7 @@ async function uploadToCloudinary(file) {
 }
 
 // ==================== SUBMISSÃO DO PROJETO ====================
-window.submitProject = async function () {
+async function submitProject() {
   const title = document.getElementById("project-title").value.trim();
   const description = document.getElementById("project-desc").value.trim();
   const imageInput = document.getElementById("project-image");
@@ -205,7 +205,6 @@ window.submitProject = async function () {
     return;
   }
 
-  // Separar arquivos de imagem e PDF (apenas 1 de cada)
   let imageFile = null;
   let pdfFile = null;
   for (const f of imageInput.files) {
@@ -215,7 +214,6 @@ window.submitProject = async function () {
   const videoFile = videoInput?.files[0] || null;
 
   const totalBytes = (imageFile?.size || 0) + (pdfFile?.size || 0) + (videoFile?.size || 0);
-
   if (!(await canUpload(totalBytes))) return;
 
   try {
@@ -245,7 +243,7 @@ window.submitProject = async function () {
     alert("Erro ao enviar projeto: " + e.message);
     console.error("Erro no envio:", e);
   }
-};
+}
 
 // ==================== LISTAGEM DE PROJETOS ====================
 function loadProjects() {
@@ -299,14 +297,12 @@ function openProjectView(p) {
 
   const list = fullscreenContent.querySelector(".modal-comments-list");
 
-  // Renderizar comentários
   (p.comments || []).forEach(c => {
     const el = document.createElement("p");
     el.textContent = `${c.userEmail || "Anônimo"}: ${c.text}`;
     list.appendChild(el);
   });
 
-  // Enviar comentário
   document.getElementById("modal-comment-btn").onclick = async () => {
     const text = document.getElementById("modal-comment-input").value.trim();
     if (!text) return;
@@ -335,7 +331,6 @@ function openProjectView(p) {
     }
   };
 
-  // Botão fechar modal
   fullscreenContent.querySelector(".close-btn").onclick = () => {
     hide(fullscreenOverlay);
     fullscreenContent.innerHTML = "";
@@ -343,11 +338,19 @@ function openProjectView(p) {
   };
 }
 
-// ==================== EVENT LISTENERS ====================
-document.getElementById("login-btn").onclick = () => window.login();
-document.getElementById("register-btn").onclick = () => window.register();
-document.getElementById("logout-btn").onclick = () => window.logout();
-document.getElementById("post-project-btn").onclick = () => window.showProjectForm();
-document.getElementById("submit-project-btn").onclick = () => window.submitProject();
-document.getElementById("to-register").onclick = (e) => { e.preventDefault(); window.showRegister(); };
-document.getElementById("to-login").onclick = (e) => { e.preventDefault(); window.showLogin(); };
+// ==================== EVENTOS ====================
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("login-btn").addEventListener("click", login);
+  document.getElementById("register-btn").addEventListener("click", register);
+  document.getElementById("logout-btn").addEventListener("click", logout);
+  document.getElementById("post-project-btn").addEventListener("click", showProjectForm);
+  document.getElementById("submit-project-btn").addEventListener("click", submitProject);
+  document.getElementById("to-register").addEventListener("click", e => {
+    e.preventDefault();
+    showRegister();
+  });
+  document.getElementById("to-login").addEventListener("click", e => {
+    e.preventDefault();
+    showLogin();
+  });
+});
