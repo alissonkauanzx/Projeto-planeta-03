@@ -13,7 +13,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase JS + App -->
+  <!-- Firebase JS + App (defer + type module para evitar erros de referência) -->
   <script type="module" src="app.js" defer></script>
 </head>
 <body>
@@ -23,8 +23,8 @@
     <div class="navbar">
       <h1 class="float-title">Planeta Projeto 🌎</h1>
       <div class="right-buttons">
-        <button id="post-project-btn" onclick="showProjectForm()" style="display:none">Postar Projeto</button>
-        <button id="logout-btn" onclick="logout()" style="display:none">Sair</button>
+        <button id="post-project-btn" onclick="window.showProjectForm()" style="display:none">Postar Projeto</button>
+        <button id="logout-btn" onclick="window.logout()" style="display:none">Sair</button>
       </div>
     </div>
   </header>
@@ -37,8 +37,8 @@
       <h2>Entrar</h2>
       <input type="email" id="email" placeholder="Email" />
       <input type="password" id="password" placeholder="Senha" />
-      <button onclick="login()">Entrar</button>
-      <p>Não tem conta? <a href="#" onclick="showRegister()">Criar conta</a></p>
+      <button onclick="window.login()">Entrar</button>
+      <p>Não tem conta? <a href="#" onclick="window.showRegister()">Criar conta</a></p>
     </section>
 
     <!-- Cadastro -->
@@ -46,8 +46,8 @@
       <h2>Criar Conta</h2>
       <input type="email" id="reg-email" placeholder="Email" />
       <input type="password" id="reg-password" placeholder="Senha" />
-      <button onclick="register()">Cadastrar</button>
-      <p>Já tem conta? <a href="#" onclick="showLogin()">Entrar</a></p>
+      <button onclick="window.register()">Cadastrar</button>
+      <p>Já tem conta? <a href="#" onclick="window.showLogin()">Entrar</a></p>
     </section>
 
     <!-- Formulário de projeto -->
@@ -59,7 +59,7 @@
       <input type="file" id="project-video" accept="video/*" />
       <progress id="upload-progress" value="0" max="100" style="display:none"></progress>
       <p id="upload-message" style="display:none">Enviando...</p>
-      <button onclick="submitProject()">Enviar Projeto</button>
+      <button onclick="window.submitProject()">Enviar Projeto</button>
     </section>
 
     <!-- Lista de projetos -->
