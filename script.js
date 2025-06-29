@@ -1,11 +1,12 @@
 // ==================== IMPORTS ====================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
 import {
-  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged
+  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 import {
-  getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion,
-  getDoc, setDoc, increment
+  getFirestore, collection, addDoc, query, orderBy, onSnapshot,
+  doc, updateDoc, arrayUnion, getDoc, setDoc, increment
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 // ==================== FIREBASE CONFIG ====================
@@ -25,7 +26,7 @@ const db = getFirestore(app);
 const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2";
 const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024;
 
-// ==================== SELETORES ====================
+// ==================== ELEMENTOS ====================
 const loginSection = document.getElementById("login-section");
 const registerSection = document.getElementById("register-section");
 const projectForm = document.getElementById("project-form");
@@ -37,7 +38,7 @@ const uploadMessage = document.getElementById("upload-message");
 const fullscreenOverlay = document.getElementById("fullscreen-project");
 const fullscreenContent = document.getElementById("fullscreen-data");
 
-// ==================== CLOUDINARY ====================
+// ==================== CLOUDINARY CONFIG ====================
 const configMeta = document.querySelector('meta[name="cloudinary-config"]');
 const cloudName = configMeta?.dataset.cloudName || "";
 const uploadPreset = configMeta?.dataset.uploadPreset || "";
@@ -52,11 +53,24 @@ function resetForm() {
 }
 
 // ==================== AUTENTICAÇÃO ====================
-window.showLogin = () => { show(loginSection); hide(registerSection); hide(projectForm); };
-window.showRegister = () => { hide(loginSection); show(registerSection); hide(projectForm); };
-window.showProjectForm = () => { hide(loginSection); hide(registerSection); show(projectForm); resetForm(); };
+window.showLogin = function () {
+  show(loginSection);
+  hide(registerSection);
+  hide(projectForm);
+};
+window.showRegister = function () {
+  hide(loginSection);
+  show(registerSection);
+  hide(projectForm);
+};
+window.showProjectForm = function () {
+  hide(loginSection);
+  hide(registerSection);
+  show(projectForm);
+  resetForm();
+};
 
-window.login = async () => {
+window.login = async function () {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   if (!email || !password) return alert("Preencha e-mail e senha.");
@@ -64,11 +78,11 @@ window.login = async () => {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (e) {
     alert("Erro no login: " + e.message);
-    console.error("Erro no login:", e);
+    console.error(e);
   }
 };
 
-window.register = async () => {
+window.register = async function () {
   const email = document.getElementById("reg-email").value.trim();
   const password = document.getElementById("reg-password").value.trim();
   if (!email || !password) return alert("Preencha e-mail e senha.");
@@ -78,16 +92,16 @@ window.register = async () => {
     window.showLogin();
   } catch (e) {
     alert("Erro no registro: " + e.message);
-    console.error("Erro no registro:", e);
+    console.error(e);
   }
 };
 
-window.logout = async () => {
+window.logout = async function () {
   try {
     await signOut(auth);
   } catch (e) {
     alert("Erro ao sair: " + e.message);
-    console.error("Erro ao sair:", e);
+    console.error(e);
   }
 };
 
@@ -110,22 +124,23 @@ onAuthStateChanged(auth, user => {
 
 // ==================== LIMITE DIÁRIO ====================
 async function canUpload(newBytes) {
-  const today = new Date().toISOString().split('T')[0];
-  const dailyRef = doc(db, "dailyUsage", today);
+  const today = new Date().toISOString().split("T")[0];
+  const ref = doc(db, "dailyUsage", today);
   try {
-    const snap = await getDoc(dailyRef);
+    const snap = await getDoc(ref);
     const used = snap.exists() ? snap.data().totalBytes : 0;
     if (used + newBytes > MAX_DAILY_BYTES) {
       alert("🚫 Limite diário de 5 GB atingido.");
       return false;
     }
     if (snap.exists()) {
-      await updateDoc(dailyRef, { totalBytes: increment(newBytes) });
+      await updateDoc(ref, { totalBytes: increment(newBytes) });
     } else {
-      await setDoc(dailyRef, { totalBytes: newBytes });
+      await setDoc(ref, { totalBytes: newBytes });
     }
     return true;
-  } catch {
+  } catch (e) {
+    console.error("Erro ao verificar limite:", e);
     alert("Erro ao verificar limite de upload.");
     return false;
   }
@@ -140,6 +155,7 @@ async function uploadToCloudinary(file) {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", uploadPreset);
+
     xhr.open("POST", url, true);
     xhr.upload.onprogress = e => {
       if (e.lengthComputable) {
@@ -157,28 +173,27 @@ async function uploadToCloudinary(file) {
           const res = JSON.parse(xhr.responseText);
           resolve(res.secure_url);
         } catch {
-          reject(new Error("Resposta inválida do Cloudinary"));
+          reject(new Error("Erro ao interpretar resposta do Cloudinary"));
         }
       } else {
-        reject(new Error("Falha no upload para Cloudinary"));
+        reject(new Error("Erro no upload para Cloudinary"));
       }
     };
-    xhr.onerror = () => reject(new Error("Erro na requisição de upload"));
+    xhr.onerror = () => reject(new Error("Erro de rede no upload"));
     xhr.send(formData);
   });
 }
 
-// ==================== ENVIAR PROJETO ====================
-window.submitProject = async () => {
+// ==================== SUBMISSÃO DO PROJETO ====================
+window.submitProject = async function () {
   const title = document.getElementById("project-title").value.trim();
   const description = document.getElementById("project-desc").value.trim();
   const imageInput = document.getElementById("project-image");
   const videoInput = document.getElementById("project-video");
   const uid = auth.currentUser?.uid;
 
-  if (!uid || !title || !description) return alert("Preencha todos os campos.");
+  if (!uid || !title || !description) return alert("Preencha todos os campos obrigatórios.");
 
-  // Detectar arquivos para upload
   let imageFile = null;
   let pdfFile = null;
   for (const f of imageInput.files) {
@@ -186,8 +201,8 @@ window.submitProject = async () => {
     else if (f.type.startsWith("image/")) imageFile = f;
   }
   const videoFile = videoInput?.files[0] || null;
-
   const totalBytes = (imageFile?.size || 0) + (pdfFile?.size || 0) + (videoFile?.size || 0);
+
   if (!(await canUpload(totalBytes))) return;
 
   try {
@@ -196,6 +211,7 @@ window.submitProject = async () => {
       uploadToCloudinary(pdfFile),
       uploadToCloudinary(videoFile)
     ]);
+
     const data = {
       title,
       description,
@@ -206,6 +222,7 @@ window.submitProject = async () => {
       ...(pdfUrl && { pdfUrl }),
       ...(videoUrl && { videoUrl })
     };
+
     await addDoc(collection(db, "projects"), data);
     alert("Projeto enviado com sucesso!");
     hide(projectForm);
@@ -213,24 +230,27 @@ window.submitProject = async () => {
     loadProjects();
   } catch (e) {
     alert("Erro ao enviar projeto: " + e.message);
-    console.error("Erro no envio do projeto:", e);
+    console.error("Erro no envio:", e);
   }
 };
 
-// ==================== CARREGAR PROJETOS ====================
+// ==================== LISTAGEM DE PROJETOS ====================
 function loadProjects() {
   const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
-  onSnapshot(q, snap => {
+  onSnapshot(q, snapshot => {
     projectsContainer.innerHTML = "";
-    if (snap.empty) return (projectsContainer.innerHTML = "<p>Nenhum projeto encontrado.</p>");
-    snap.forEach(docSnap => {
+    if (snapshot.empty) {
+      projectsContainer.innerHTML = "<p>Nenhum projeto encontrado.</p>";
+      return;
+    }
+    snapshot.forEach(docSnap => {
       const p = { id: docSnap.id, ...docSnap.data() };
       projectsContainer.appendChild(renderCard(p));
     });
   });
 }
 
-// ==================== RENDER CARD ====================
+// ==================== RENDERIZAÇÃO DE CARD ====================
 function renderCard(p) {
   const el = document.createElement("div");
   el.className = "project-card";
@@ -249,6 +269,7 @@ function renderCard(p) {
 function openProjectView(p) {
   hide(projectsContainer);
   show(fullscreenOverlay);
+
   fullscreenContent.innerHTML = `
     <h2>${p.title}</h2>
     <div class="media-container">
@@ -288,7 +309,7 @@ function openProjectView(p) {
       list.appendChild(el);
       document.getElementById("modal-comment-input").value = "";
     } catch (e) {
-      alert("Erro ao enviar comentário: " + e.message);
+      alert("Erro ao comentar: " + e.message);
       console.error(e);
     }
   };
