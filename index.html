@@ -10,10 +10,10 @@
         data-cloud-name="dz0kjpcoa"
         data-upload-preset="projeto_planeta" />
 
-  <!-- CSS -->
+  <!-- Estilo -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase JS + App (defer + type module para evitar erros de referência) -->
+  <!-- Script principal -->
   <script type="module" src="app.js" defer></script>
 </head>
 <body>
@@ -23,13 +23,13 @@
     <div class="navbar">
       <h1 class="float-title">Planeta Projeto 🌎</h1>
       <div class="right-buttons">
-        <button id="post-project-btn" onclick="window.showProjectForm()" style="display:none">Postar Projeto</button>
-        <button id="logout-btn" onclick="window.logout()" style="display:none">Sair</button>
+        <button id="post-project-btn" style="display: none;">Postar Projeto</button>
+        <button id="logout-btn" style="display: none;">Sair</button>
       </div>
     </div>
   </header>
 
-  <!-- Área principal -->
+  <!-- Conteúdo principal -->
   <main class="center-wrapper">
 
     <!-- Login -->
@@ -37,29 +37,29 @@
       <h2>Entrar</h2>
       <input type="email" id="email" placeholder="Email" />
       <input type="password" id="password" placeholder="Senha" />
-      <button onclick="window.login()">Entrar</button>
-      <p>Não tem conta? <a href="#" onclick="window.showRegister()">Criar conta</a></p>
+      <button id="login-btn">Entrar</button>
+      <p>Não tem conta? <a href="#" id="to-register">Criar conta</a></p>
     </section>
 
     <!-- Cadastro -->
-    <section class="auth-section" id="register-section" style="display:none">
+    <section class="auth-section" id="register-section" style="display: none;">
       <h2>Criar Conta</h2>
       <input type="email" id="reg-email" placeholder="Email" />
       <input type="password" id="reg-password" placeholder="Senha" />
-      <button onclick="window.register()">Cadastrar</button>
-      <p>Já tem conta? <a href="#" onclick="window.showLogin()">Entrar</a></p>
+      <button id="register-btn">Cadastrar</button>
+      <p>Já tem conta? <a href="#" id="to-login">Entrar</a></p>
     </section>
 
     <!-- Formulário de projeto -->
-    <section class="project-form-section" id="project-form" style="display:none">
+    <section class="project-form-section" id="project-form" style="display: none;">
       <h2>Postar Projeto</h2>
       <input type="text" id="project-title" placeholder="Título do Projeto" required />
       <textarea id="project-desc" placeholder="Descrição do Projeto" required></textarea>
       <input type="file" id="project-image" accept="image/*,application/pdf" multiple />
       <input type="file" id="project-video" accept="video/*" />
-      <progress id="upload-progress" value="0" max="100" style="display:none"></progress>
-      <p id="upload-message" style="display:none">Enviando...</p>
-      <button onclick="window.submitProject()">Enviar Projeto</button>
+      <progress id="upload-progress" value="0" max="100" style="display: none;"></progress>
+      <p id="upload-message" style="display: none;">Enviando...</p>
+      <button id="submit-project-btn">Enviar Projeto</button>
     </section>
 
     <!-- Lista de projetos -->
@@ -70,8 +70,8 @@
 
   </main>
 
-  <!-- Modal fullscreen do projeto -->
-  <div id="fullscreen-project" class="fullscreen-overlay" style="display:none">
+  <!-- Modal de projeto em tela cheia -->
+  <div id="fullscreen-project" class="fullscreen-overlay" style="display: none;">
     <div id="fullscreen-data" class="fullscreen-content"></div>
   </div>
 
