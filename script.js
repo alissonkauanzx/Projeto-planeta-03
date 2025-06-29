@@ -188,7 +188,6 @@ window.submitProject = async () => {
   const videoFile = videoInput?.files[0] || null;
 
   const totalBytes = (imageFile?.size || 0) + (pdfFile?.size || 0) + (videoFile?.size || 0);
-
   if (!(await canUpload(totalBytes))) return;
 
   try {
@@ -246,11 +245,10 @@ function renderCard(p) {
   return el;
 }
 
-// ==================== VISUALIZAR PROJETO NA MESMA PÁGINA ====================
+// ==================== VISUALIZAÇÃO EM TELA CHEIA ====================
 function openProjectView(p) {
   hide(projectsContainer);
   show(fullscreenOverlay);
-
   fullscreenContent.innerHTML = `
     <h2>${p.title}</h2>
     <div class="media-container">
