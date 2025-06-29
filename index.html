@@ -2,15 +2,15 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Planeta Projeto 🌱</title>
 
-  <!-- Cloudinary Config -->
+  <!-- Configuração Cloudinary -->
   <meta name="cloudinary-config"
         data-cloud-name="dz0kjpcoa"
         data-upload-preset="projeto_planeta" />
 
-  <!-- Estilo -->
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 
   <!-- Script principal -->
@@ -32,30 +32,32 @@
   <!-- Conteúdo principal -->
   <main class="center-wrapper">
 
-    <!-- Login -->
+    <!-- Seção Login -->
     <section class="auth-section" id="login-section">
       <h2>Entrar</h2>
-      <input type="email" id="email" placeholder="Email" />
-      <input type="password" id="password" placeholder="Senha" />
+      <input type="email" id="email" placeholder="Email" autocomplete="username" />
+      <input type="password" id="password" placeholder="Senha" autocomplete="current-password" />
       <button id="login-btn">Entrar</button>
       <p>Não tem conta? <a href="#" id="to-register">Criar conta</a></p>
     </section>
 
-    <!-- Cadastro -->
+    <!-- Seção Cadastro -->
     <section class="auth-section" id="register-section" style="display: none;">
       <h2>Criar Conta</h2>
-      <input type="email" id="reg-email" placeholder="Email" />
-      <input type="password" id="reg-password" placeholder="Senha" />
+      <input type="email" id="reg-email" placeholder="Email" autocomplete="username" />
+      <input type="password" id="reg-password" placeholder="Senha" autocomplete="new-password" />
       <button id="register-btn">Cadastrar</button>
       <p>Já tem conta? <a href="#" id="to-login">Entrar</a></p>
     </section>
 
-    <!-- Formulário de projeto -->
+    <!-- Formulário para postar projeto -->
     <section class="project-form-section" id="project-form" style="display: none;">
       <h2>Postar Projeto</h2>
       <input type="text" id="project-title" placeholder="Título do Projeto" required />
       <textarea id="project-desc" placeholder="Descrição do Projeto" required></textarea>
+      <label for="project-image">Imagens e PDFs (pode selecionar múltiplos):</label>
       <input type="file" id="project-image" accept="image/*,application/pdf" multiple />
+      <label for="project-video">Vídeo:</label>
       <input type="file" id="project-video" accept="video/*" />
       <progress id="upload-progress" value="0" max="100" style="display: none;"></progress>
       <p id="upload-message" style="display: none;">Enviando...</p>
@@ -70,7 +72,7 @@
 
   </main>
 
-  <!-- Modal de projeto em tela cheia -->
+  <!-- Modal fullscreen para projeto -->
   <div id="fullscreen-project" class="fullscreen-overlay" style="display: none;">
     <div id="fullscreen-data" class="fullscreen-content"></div>
   </div>
