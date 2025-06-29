@@ -24,7 +24,7 @@ const db = getFirestore(app);
 
 // ==================== CONSTANTES ====================
 const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2";
-const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024;
+const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024; // 5GB
 
 // ==================== ELEMENTOS ====================
 const loginSection = document.getElementById("login-section");
@@ -58,11 +58,13 @@ window.showLogin = function () {
   hide(registerSection);
   hide(projectForm);
 };
+
 window.showRegister = function () {
   hide(loginSection);
   show(registerSection);
   hide(projectForm);
 };
+
 window.showProjectForm = function () {
   hide(loginSection);
   hide(registerSection);
@@ -73,7 +75,10 @@ window.showProjectForm = function () {
 window.login = async function () {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
-  if (!email || !password) return alert("Preencha e-mail e senha.");
+  if (!email || !password) {
+    alert("Preencha e-mail e senha.");
+    return;
+  }
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (e) {
@@ -85,7 +90,10 @@ window.login = async function () {
 window.register = async function () {
   const email = document.getElementById("reg-email").value.trim();
   const password = document.getElementById("reg-password").value.trim();
-  if (!email || !password) return alert("Preencha e-mail e senha.");
+  if (!email || !password) {
+    alert("Preencha e-mail e senha.");
+    return;
+  }
   try {
     await createUserWithEmailAndPassword(auth, email, password);
     alert("Conta criada com sucesso!");
@@ -192,8 +200,12 @@ window.submitProject = async function () {
   const videoInput = document.getElementById("project-video");
   const uid = auth.currentUser?.uid;
 
-  if (!uid || !title || !description) return alert("Preencha todos os campos obrigatórios.");
+  if (!uid || !title || !description) {
+    alert("Preencha todos os campos obrigatórios.");
+    return;
+  }
 
+  // Separar arquivos de imagem e PDF (apenas 1 de cada)
   let imageFile = null;
   let pdfFile = null;
   for (const f of imageInput.files) {
@@ -201,6 +213,7 @@ window.submitProject = async function () {
     else if (f.type.startsWith("image/")) imageFile = f;
   }
   const videoFile = videoInput?.files[0] || null;
+
   const totalBytes = (imageFile?.size || 0) + (pdfFile?.size || 0) + (videoFile?.size || 0);
 
   if (!(await canUpload(totalBytes))) return;
@@ -285,18 +298,26 @@ function openProjectView(p) {
   `;
 
   const list = fullscreenContent.querySelector(".modal-comments-list");
+
+  // Renderizar comentários
   (p.comments || []).forEach(c => {
     const el = document.createElement("p");
-    el.textContent = `${c.userEmail}: ${c.text}`;
+    el.textContent = `${c.userEmail || "Anônimo"}: ${c.text}`;
     list.appendChild(el);
   });
 
+  // Enviar comentário
   document.getElementById("modal-comment-btn").onclick = async () => {
     const text = document.getElementById("modal-comment-input").value.trim();
     if (!text) return;
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Você precisa estar logado para comentar.");
+      return;
+    }
     const comment = {
-      userId: auth.currentUser.uid,
-      userEmail: auth.currentUser.email,
+      userId: user.uid,
+      userEmail: user.email,
       text,
       createdAt: new Date()
     };
@@ -314,6 +335,7 @@ function openProjectView(p) {
     }
   };
 
+  // Botão fechar modal
   fullscreenContent.querySelector(".close-btn").onclick = () => {
     hide(fullscreenOverlay);
     fullscreenContent.innerHTML = "";
