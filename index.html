@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planeta Projeto 🌱</title>
 
-  <!-- Cloudinary config -->
+  <!-- Cloudinary Config -->
   <meta name="cloudinary-config"
         data-cloud-name="dz0kjpcoa"
         data-upload-preset="projeto_planeta" />
 
-  <title>Planeta Projeto 🌱</title>
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase SDK -->
+  <!-- Firebase JS + App -->
   <script type="module" src="app.js" defer></script>
 </head>
 <body>
@@ -61,7 +62,7 @@
       <button onclick="submitProject()">Enviar Projeto</button>
     </section>
 
-    <!-- Seção de projetos -->
+    <!-- Lista de projetos -->
     <section class="projects-section">
       <h2>Projetos Postados</h2>
       <div id="projects" class="projects-grid"></div>
@@ -69,7 +70,7 @@
 
   </main>
 
-  <!-- Modal fullscreen -->
+  <!-- Modal fullscreen do projeto -->
   <div id="fullscreen-project" class="fullscreen-overlay" style="display:none">
     <div id="fullscreen-data" class="fullscreen-content"></div>
   </div>
