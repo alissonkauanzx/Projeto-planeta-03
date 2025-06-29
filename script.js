@@ -64,6 +64,7 @@ window.login = async () => {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (e) {
     alert("Erro no login: " + e.message);
+    console.error("Erro no login:", e);
   }
 };
 
@@ -77,6 +78,7 @@ window.register = async () => {
     window.showLogin();
   } catch (e) {
     alert("Erro no registro: " + e.message);
+    console.error("Erro no registro:", e);
   }
 };
 
@@ -85,16 +87,22 @@ window.logout = async () => {
     await signOut(auth);
   } catch (e) {
     alert("Erro ao sair: " + e.message);
+    console.error("Erro ao sair:", e);
   }
 };
 
 onAuthStateChanged(auth, user => {
   if (user) {
-    hide(loginSection); hide(registerSection); hide(projectForm);
-    show(postProjectBtn); show(logoutBtn); loadProjects();
+    hide(loginSection);
+    hide(registerSection);
+    hide(projectForm);
+    show(postProjectBtn);
+    show(logoutBtn);
+    loadProjects();
   } else {
     window.showLogin();
-    hide(postProjectBtn); hide(logoutBtn);
+    hide(postProjectBtn);
+    hide(logoutBtn);
     projectsContainer.innerHTML = "";
     hide(fullscreenOverlay);
   }
@@ -137,16 +145,25 @@ async function uploadToCloudinary(file) {
       if (e.lengthComputable) {
         uploadProgress.value = (e.loaded / e.total) * 100;
         uploadMessage.textContent = `Enviando "${file.name}"`;
-        show(uploadProgress); show(uploadMessage);
+        show(uploadProgress);
+        show(uploadMessage);
       }
     };
     xhr.onload = () => {
-      hide(uploadProgress); hide(uploadMessage);
-      xhr.status === 200
-        ? resolve(JSON.parse(xhr.responseText).secure_url)
-        : reject(new Error("Falha no upload"));
+      hide(uploadProgress);
+      hide(uploadMessage);
+      if (xhr.status === 200) {
+        try {
+          const res = JSON.parse(xhr.responseText);
+          resolve(res.secure_url);
+        } catch {
+          reject(new Error("Resposta inválida do Cloudinary"));
+        }
+      } else {
+        reject(new Error("Falha no upload para Cloudinary"));
+      }
     };
-    xhr.onerror = () => reject(new Error("Erro de requisição"));
+    xhr.onerror = () => reject(new Error("Erro na requisição de upload"));
     xhr.send(formData);
   });
 }
@@ -161,12 +178,15 @@ window.submitProject = async () => {
 
   if (!uid || !title || !description) return alert("Preencha todos os campos.");
 
-  let imageFile, pdfFile;
+  // Detectar arquivos para upload
+  let imageFile = null;
+  let pdfFile = null;
   for (const f of imageInput.files) {
     if (f.type === "application/pdf") pdfFile = f;
     else if (f.type.startsWith("image/")) imageFile = f;
   }
-  const videoFile = videoInput?.files[0];
+  const videoFile = videoInput?.files[0] || null;
+
   const totalBytes = (imageFile?.size || 0) + (pdfFile?.size || 0) + (videoFile?.size || 0);
 
   if (!(await canUpload(totalBytes))) return;
@@ -194,6 +214,7 @@ window.submitProject = async () => {
     loadProjects();
   } catch (e) {
     alert("Erro ao enviar projeto: " + e.message);
+    console.error("Erro no envio do projeto:", e);
   }
 };
 
@@ -217,9 +238,9 @@ function renderCard(p) {
   el.innerHTML = `
     <h3>${p.title}</h3>
     <p>${p.description}</p>
-    ${p.imageUrl ? `<img src="${p.imageUrl}" />` : ""}
-    ${p.videoUrl ? `<video src="${p.videoUrl}" muted autoplay loop></video>` : ""}
-    ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
+    ${p.imageUrl ? `<img src="${p.imageUrl}" alt="Imagem do projeto" />` : ""}
+    ${p.videoUrl ? `<video src="${p.videoUrl}" controls muted preload="metadata" class="project-video"></video>` : ""}
+    ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view" title="PDF do projeto"></iframe>` : ""}
   `;
   el.onclick = () => openProjectView(p);
   return el;
@@ -229,14 +250,17 @@ function renderCard(p) {
 function openProjectView(p) {
   hide(projectsContainer);
   show(fullscreenOverlay);
+
   fullscreenContent.innerHTML = `
     <h2>${p.title}</h2>
-    ${p.imageUrl ? `<img src="${p.imageUrl}" class="modal-image" />` : ""}
-    ${p.videoUrl ? `<video src="${p.videoUrl}" controls class="modal-video"></video>` : ""}
-    ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
+    <div class="media-container">
+      ${p.imageUrl ? `<img src="${p.imageUrl}" alt="Imagem do projeto" class="modal-image" />` : ""}
+      ${p.videoUrl ? `<video src="${p.videoUrl}" controls class="modal-video"></video>` : ""}
+      ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view" title="PDF do projeto"></iframe>` : ""}
+    </div>
     <p>${p.description}</p>
     <div class="modal-comments-list"></div>
-    <input type="text" id="modal-comment-input" placeholder="Comente..."/>
+    <input type="text" id="modal-comment-input" placeholder="Comente..." />
     <button id="modal-comment-btn">Enviar</button>
     <button class="close-btn">Voltar</button>
   `;
@@ -257,17 +281,22 @@ function openProjectView(p) {
       text,
       createdAt: new Date()
     };
-    await updateDoc(doc(db, "projects", p.id), {
-      comments: arrayUnion(comment)
-    });
-    const el = document.createElement("p");
-    el.textContent = `${comment.userEmail}: ${comment.text}`;
-    list.appendChild(el);
-    document.getElementById("modal-comment-input").value = "";
+    try {
+      await updateDoc(doc(db, "projects", p.id), {
+        comments: arrayUnion(comment)
+      });
+      const el = document.createElement("p");
+      el.textContent = `${comment.userEmail}: ${comment.text}`;
+      list.appendChild(el);
+      document.getElementById("modal-comment-input").value = "";
+    } catch (e) {
+      alert("Erro ao enviar comentário: " + e.message);
+      console.error(e);
+    }
   };
 
   fullscreenContent.querySelector(".close-btn").onclick = () => {
-    fullscreenOverlay.style.display = "none";
+    hide(fullscreenOverlay);
     fullscreenContent.innerHTML = "";
     show(projectsContainer);
   };
