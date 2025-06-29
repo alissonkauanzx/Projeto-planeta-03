@@ -2,91 +2,82 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌱 Planeta Projeto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Cloudinary config -->
+  <meta name="cloudinary-config"
+        data-cloud-name="dz0kjpcoa"
+        data-upload-preset="projeto_planeta" />
+
+  <title>Planeta Projeto 🌱</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Cloudinary -->
-  <meta name="cloudinary-config" data-cloud-name="dz0kjpcoa" data-upload-preset="projeto_planeta">
-
-  <!-- Favicon -->
-  <link rel="icon" href="./favicon.ico" type="image/x-icon" />
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="🌱 Planeta Projeto" />
-  <meta property="og:description" content="Descubra e compartilhe projetos sustentáveis que ajudam o meio ambiente." />
-  <meta property="og:image" content="./images/preview.png" />
-  <meta property="og:type" content="website" />
+  <!-- Firebase SDK -->
+  <script type="module" src="app.js" defer></script>
 </head>
-
 <body>
-  <!-- CABEÇALHO -->
+
+  <!-- Cabeçalho -->
   <header>
-    <nav class="navbar">
-      <h1 class="animated-title">🌱 Planeta Projeto</h1>
+    <div class="navbar">
+      <h1 class="float-title">Planeta Projeto 🌎</h1>
       <div class="right-buttons">
-        <button id="post-project-btn" onclick="showProjectForm()" style="display:none;">Postar projeto</button>
-        <button id="logout-btn" onclick="logout()" style="display:none;">Sair</button>
+        <button id="post-project-btn" onclick="showProjectForm()" style="display:none">Postar Projeto</button>
+        <button id="logout-btn" onclick="logout()" style="display:none">Sair</button>
       </div>
-    </nav>
+    </div>
   </header>
 
-  <!-- CONTEÚDO CENTRAL -->
+  <!-- Área principal -->
   <main class="center-wrapper">
-    
-    <!-- LOGIN -->
-    <section id="login-section" class="auth-section">
-      <h2>Entre para continuar</h2>
-      <input type="email" id="email" placeholder="Digite seu e-mail" required />
-      <input type="password" id="password" placeholder="Digite sua senha" required />
+
+    <!-- Login -->
+    <section class="auth-section" id="login-section">
+      <h2>Entrar</h2>
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Senha" />
       <button onclick="login()">Entrar</button>
-      <p>Não tem conta? <button class="link-btn" onclick="showRegister()">Registrar</button></p>
+      <p>Não tem conta? <a href="#" onclick="showRegister()">Criar conta</a></p>
     </section>
 
-    <!-- REGISTRO -->
-    <section id="register-section" class="auth-section" style="display:none;">
-      <h2>Crie sua conta</h2>
-      <input type="email" id="reg-email" placeholder="Seu e-mail" required />
-      <input type="password" id="reg-password" placeholder="Crie uma senha" required />
-      <button onclick="register()">Registrar</button>
-      <p>Já tem conta? <button class="link-btn" onclick="showLogin()">Entrar</button></p>
+    <!-- Cadastro -->
+    <section class="auth-section" id="register-section" style="display:none">
+      <h2>Criar Conta</h2>
+      <input type="email" id="reg-email" placeholder="Email" />
+      <input type="password" id="reg-password" placeholder="Senha" />
+      <button onclick="register()">Cadastrar</button>
+      <p>Já tem conta? <a href="#" onclick="showLogin()">Entrar</a></p>
     </section>
 
-    <!-- FORMULÁRIO DE PROJETO -->
-    <section id="project-form" class="project-form-section" style="display:none;">
-      <h2>Enviar Projeto Sustentável</h2>
+    <!-- Formulário de projeto -->
+    <section class="project-form-section" id="project-form" style="display:none">
+      <h2>Postar Projeto</h2>
       <input type="text" id="project-title" placeholder="Título do Projeto" required />
-      <textarea id="project-desc" placeholder="Descreva o projeto..." rows="5" required></textarea>
-      <input type="file" id="project-image" accept="image/*,application/pdf" required />
+      <textarea id="project-desc" placeholder="Descrição do Projeto" required></textarea>
+      <input type="file" id="project-image" accept="image/*,application/pdf" />
       <input type="file" id="project-video" accept="video/*" />
-      
-      <progress id="upload-progress" value="0" max="100" style="display:none;"></progress>
-      <small id="upload-message" class="upload-message" style="display:none;"></small>
-
+      <progress id="upload-progress" value="0" max="100" style="display:none"></progress>
+      <p id="upload-message" style="display:none">Enviando...</p>
       <button onclick="submitProject()">Enviar Projeto</button>
     </section>
 
-    <!-- LISTA DE PROJETOS -->
-    <section id="project-list" class="projects-section">
-      <h2>Projetos da Comunidade</h2>
+    <!-- Seção de projetos -->
+    <section class="projects-section">
+      <h2>Projetos Postados</h2>
       <div id="projects" class="projects-grid"></div>
     </section>
 
-    <!-- MODAL DE PROJETO EXPANDIDO -->
-    <div id="fullscreen-project" class="fullscreen-overlay" style="display:none;">
-      <div class="fullscreen-content">
-        <button class="close-btn" onclick="closeFullscreenProject()">⟵ Voltar</button>
-        <div id="fullscreen-data"></div>
-      </div>
-    </div>
   </main>
 
-  <!-- RODAPÉ -->
+  <!-- Modal fullscreen -->
+  <div id="fullscreen-project" class="fullscreen-overlay" style="display:none">
+    <div id="fullscreen-data" class="fullscreen-content"></div>
+  </div>
+
+  <!-- Rodapé -->
   <footer>
-    &copy; 2025 Planeta Projeto. Todos os direitos reservados.
+    © 2025 Planeta Projeto – Todos os direitos reservados.
   </footer>
 
-  <!-- SCRIPT PRINCIPAL -->
-  <script type="module" src="./script.js"></script>
 </body>
 </html>
