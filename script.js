@@ -23,7 +23,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // ==================== CONSTANTES ====================
-const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2";
 const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024; // 5GB
 
 // ==================== ELEMENTOS ====================
@@ -59,7 +58,7 @@ window.showLogin = function () {
   hide(projectForm);
   hide(postProjectBtn);
   hide(logoutBtn);
-  projectsContainer.innerHTML = "";
+  projectsContainer.style.display = 'grid';
   hideModal();
 };
 
@@ -69,7 +68,7 @@ window.showRegister = function () {
   hide(projectForm);
   hide(postProjectBtn);
   hide(logoutBtn);
-  projectsContainer.innerHTML = "";
+  projectsContainer.style.display = 'grid';
   hideModal();
 };
 
@@ -79,6 +78,11 @@ window.showProjectForm = function () {
   show(projectForm);
   resetForm();
   hideModal();
+};
+
+window.hideProjectForm = function () {
+  hide(projectForm);
+  projectsContainer.style.display = 'grid';
 };
 
 // ==================== LOGIN, REGISTRO E LOGOUT ====================
@@ -93,7 +97,6 @@ window.login = async function () {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (e) {
     alert("Erro no login: " + e.message);
-    console.error(e);
   }
 };
 
@@ -110,7 +113,6 @@ window.register = async function () {
     window.showLogin();
   } catch (e) {
     alert("Erro no registro: " + e.message);
-    console.error(e);
   }
 };
 
@@ -119,7 +121,6 @@ window.logout = async function () {
     await signOut(auth);
   } catch (e) {
     alert("Erro ao sair: " + e.message);
-    console.error(e);
   }
 };
 
@@ -137,7 +138,7 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-// ==================== LIMITE DE USO ====================
+// ==================== LIMITE DIÁRIO ====================
 async function canUpload(newBytes) {
   const today = new Date().toISOString().split("T")[0];
   const ref = doc(db, "dailyUsage", today);
@@ -155,8 +156,7 @@ async function canUpload(newBytes) {
     }
     return true;
   } catch (e) {
-    console.error("Erro ao verificar limite:", e);
-    alert("Erro ao verificar limite de upload.");
+    alert("Erro ao verificar limite.");
     return false;
   }
 }
@@ -188,10 +188,10 @@ async function uploadToCloudinary(file) {
           const res = JSON.parse(xhr.responseText);
           resolve(res.secure_url);
         } catch {
-          reject(new Error("Erro ao interpretar resposta do Cloudinary"));
+          reject(new Error("Erro ao interpretar resposta"));
         }
       } else {
-        reject(new Error("Erro no upload para Cloudinary"));
+        reject(new Error("Erro no upload"));
       }
     };
     xhr.onerror = () => reject(new Error("Erro de rede no upload"));
@@ -199,7 +199,7 @@ async function uploadToCloudinary(file) {
   });
 }
 
-// ==================== POSTAGEM DE PROJETO ====================
+// ==================== SUBMISSÃO DO PROJETO ====================
 window.submitProject = async function () {
   const title = document.getElementById("project-title").value.trim();
   const description = document.getElementById("project-desc").value.trim();
@@ -219,8 +219,8 @@ window.submitProject = async function () {
     else if (f.type.startsWith("image/")) imageFile = f;
   }
   const videoFile = videoInput?.files[0] || null;
-  const totalBytes = (imageFile?.size || 0) + (pdfFile?.size || 0) + (videoFile?.size || 0);
 
+  const totalBytes = (imageFile?.size || 0) + (pdfFile?.size || 0) + (videoFile?.size || 0);
   if (!(await canUpload(totalBytes))) return;
 
   try {
@@ -242,13 +242,12 @@ window.submitProject = async function () {
     };
 
     await addDoc(collection(db, "projects"), data);
-    alert("Projeto enviado com sucesso!");
+    alert("Projeto enviado!");
     hide(projectForm);
     resetForm();
     loadProjects();
   } catch (e) {
     alert("Erro ao enviar projeto: " + e.message);
-    console.error("Erro no envio:", e);
   }
 };
 
@@ -268,26 +267,32 @@ function loadProjects() {
   });
 }
 
+// ==================== RENDERIZAÇÃO DE CARD ====================
 function renderCard(p) {
   const el = document.createElement("div");
   el.className = "project-card";
   el.innerHTML = `
     <h3>${p.title}</h3>
     <p>${p.description}</p>
-    ${p.imageUrl ? `<img src="${p.imageUrl}" alt="Imagem do projeto" />` : ""}
-    ${p.videoUrl ? `<video src="${p.videoUrl}" controls muted preload="metadata" class="project-video"></video>` : ""}
-    ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view" title="PDF do projeto"></iframe>` : ""}
+    ${p.imageUrl ? `<img src="${p.imageUrl}" />` : ""}
+    ${p.videoUrl ? `<video src="${p.videoUrl}" controls muted></video>` : ""}
+    ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
   `;
   el.onclick = () => openProjectView(p);
   return el;
 }
 
-// ==================== MODAL DE PROJETO ====================
+// ==================== VISUALIZAÇÃO FULLSCREEN ====================
 function showModal() {
-  fullscreenOverlay.classList.add('active');
+  fullscreenOverlay.style.display = "flex";
+  setTimeout(() => fullscreenOverlay.classList.add("active"), 20);
 }
 function hideModal() {
-  fullscreenOverlay.classList.remove('active');
+  fullscreenOverlay.classList.remove("active");
+  setTimeout(() => {
+    fullscreenOverlay.style.display = "none";
+    fullscreenContent.innerHTML = "";
+  }, 300);
 }
 
 function openProjectView(p) {
@@ -297,15 +302,14 @@ function openProjectView(p) {
   fullscreenContent.innerHTML = `
     <h2>${p.title}</h2>
     <div class="media-container">
-      ${p.imageUrl ? `<img src="${p.imageUrl}" alt="Imagem do projeto" class="modal-image" />` : ""}
+      ${p.imageUrl ? `<img src="${p.imageUrl}" class="modal-image" />` : ""}
       ${p.videoUrl ? `<video src="${p.videoUrl}" controls class="modal-video"></video>` : ""}
-      ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view" title="PDF do projeto"></iframe>` : ""}
+      ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
     </div>
     <p>${p.description}</p>
     <div class="modal-comments-list"></div>
     <input type="text" id="modal-comment-input" placeholder="Comente..." />
     <button id="modal-comment-btn">Enviar</button>
-    <button class="close-btn" style="position:absolute; top:20px; right:20px;">Voltar</button>
   `;
 
   const list = fullscreenContent.querySelector(".modal-comments-list");
@@ -330,24 +334,13 @@ function openProjectView(p) {
       text,
       createdAt: new Date()
     };
-    try {
-      await updateDoc(doc(db, "projects", p.id), {
-        comments: arrayUnion(comment)
-      });
-      const el = document.createElement("p");
-      el.textContent = `${comment.userEmail}: ${comment.text}`;
-      list.appendChild(el);
-      document.getElementById("modal-comment-input").value = "";
-    } catch (e) {
-      alert("Erro ao comentar: " + e.message);
-      console.error(e);
-    }
-  };
-
-  fullscreenContent.querySelector(".close-btn").onclick = () => {
-    hideModal();
-    fullscreenContent.innerHTML = "";
-    projectsContainer.style.display = 'grid';
+    await updateDoc(doc(db, "projects", p.id), {
+      comments: arrayUnion(comment)
+    });
+    const el = document.createElement("p");
+    el.textContent = `${comment.userEmail}: ${comment.text}`;
+    list.appendChild(el);
+    document.getElementById("modal-comment-input").value = "";
   };
 }
 
@@ -358,6 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("logout-btn").addEventListener("click", window.logout);
   document.getElementById("post-project-btn").addEventListener("click", window.showProjectForm);
   document.getElementById("submit-project-btn").addEventListener("click", window.submitProject);
+  document.getElementById("cancel-project-btn").addEventListener("click", window.hideProjectForm);
   document.getElementById("to-register").addEventListener("click", e => {
     e.preventDefault();
     window.showRegister();
@@ -366,13 +360,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     window.showLogin();
   });
-
-  // Botão de cancelar projeto
-  const cancelBtn = document.getElementById("cancel-project-btn");
-  if (cancelBtn) {
-    cancelBtn.addEventListener("click", () => {
-      hide(projectForm);
-      resetForm();
-    });
-  }
+  document.getElementById("close-fullscreen").addEventListener("click", () => {
+    hideModal();
+    projectsContainer.style.display = 'grid';
+  });
 });
