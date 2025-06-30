@@ -146,6 +146,7 @@ main.center-wrapper {
 .project-form-section input,
 .project-form-section textarea {
   width: 100%;
+  max-width: 100%;
   padding: 14px 16px;
   margin-bottom: 18px;
   border: 2.5px solid #a5d6a7;
@@ -154,6 +155,7 @@ main.center-wrapper {
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   resize: vertical;
   font-family: inherit;
+  box-sizing: border-box;
 }
 .auth-section input:focus,
 .project-form-section input:focus,
@@ -177,12 +179,17 @@ main.center-wrapper {
   font-weight: 900;
   transition: background-color 0.3s ease, transform 0.3s ease;
   cursor: pointer;
+  user-select: none;
   box-shadow: 0 6px 18px rgba(0,0,0,0.2);
 }
 .auth-section button:hover,
-.project-form-section button:hover {
+.project-form-section button:hover,
+.auth-section button:focus,
+.project-form-section button:focus {
   background: #1b5e20;
   transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  outline: none;
 }
 #cancel-project-btn {
   margin-top: 14px;
@@ -196,9 +203,11 @@ main.center-wrapper {
   cursor: pointer;
   transition: all 0.3s ease;
 }
-#cancel-project-btn:hover {
+#cancel-project-btn:hover,
+#cancel-project-btn:focus {
   background-color: #e0f2f1;
   transform: scale(1.03);
+  outline: none;
 }
 
 /* ========== Projetos (Cards) ========== */
@@ -212,9 +221,8 @@ main.center-wrapper {
 }
 .projects-grid {
   display: grid;
-  gap: 32px;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  align-items: start;
+  gap: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 .project-card {
   background: white;
@@ -226,7 +234,8 @@ main.center-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
+  height: 420px;
+  overflow: hidden;
 }
 .project-card:hover {
   transform: translateY(-8px) scale(1.03);
@@ -244,12 +253,12 @@ main.center-wrapper {
   color: #466a46;
   font-size: 1rem;
   margin-bottom: 16px;
+  line-height: 1.4;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  line-height: 1.5;
-  min-height: 4.5em;
+  height: 4.2em;
 }
 .project-card img,
 .project-card video,
@@ -258,8 +267,7 @@ main.center-wrapper {
   max-height: 220px;
   object-fit: cover;
   border-radius: 14px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 16px;
   user-select: none;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));
   transition: filter 0.3s ease;
@@ -271,8 +279,8 @@ main.center-wrapper {
 }
 .project-card .edit-btn,
 .project-card .delete-btn {
-  margin-top: 10px;
-  padding: 10px 14px;
+  margin-top: 12px;
+  padding: 10px 16px;
   border: none;
   border-radius: 8px;
   font-weight: bold;
@@ -300,10 +308,19 @@ main.center-wrapper {
 }
 
 /* ========== Comentários ========== */
-.modal-comments-list {
+.comments-section, .modal-comments-list {
   border-top: 1px solid #cce0cc;
   margin-top: 22px;
   padding-top: 18px;
+}
+.comment {
+  padding: 10px 0;
+  border-bottom: 1px solid #d9eeda;
+  color: #3a5d3a;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.modal-comments-list {
   max-height: 200px;
   overflow-y: auto;
   margin-bottom: 14px;
@@ -314,6 +331,7 @@ main.center-wrapper {
   font-weight: 600;
   color: #2e7d32;
 }
+#modal-comment-input,
 #detail-comment-input {
   width: 100%;
   padding: 12px 14px;
@@ -324,11 +342,13 @@ main.center-wrapper {
   font-size: 1rem;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
+#modal-comment-input:focus,
 #detail-comment-input:focus {
   border-color: #2e7d32;
   box-shadow: 0 0 12px rgba(46, 125, 50, 0.55);
   outline: none;
 }
+#modal-comment-btn,
 #detail-comment-btn {
   background: #2e7d32;
   color: white;
@@ -343,9 +363,13 @@ main.center-wrapper {
   user-select: none;
   box-shadow: 0 6px 20px rgba(0,0,0,0.22);
 }
-#detail-comment-btn:hover {
+#modal-comment-btn:hover,
+#detail-comment-btn:hover,
+#modal-comment-btn:focus,
+#detail-comment-btn:focus {
   background: #1b5e20;
   transform: scale(1.05);
+  outline: none;
 }
 
 /* ========== Botão Voltar ========== */
@@ -366,9 +390,11 @@ main.center-wrapper {
   user-select: none;
   box-shadow: 0 6px 18px rgba(0,0,0,0.28);
 }
-.close-btn:hover {
+.close-btn:hover,
+.close-btn:focus {
   background: #1b5e20;
   transform: scale(1.05);
+  outline: none;
 }
 
 /* ========== Detalhes do Projeto ========== */
