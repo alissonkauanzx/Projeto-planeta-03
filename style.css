@@ -221,14 +221,20 @@ main.center-wrapper {
   font-weight: 900;
   letter-spacing: 0.03em;
 }
+
+/* ======= GRID DE PROJETOS ======= */
 .projects-grid {
   display: grid;
-  gap: 32px;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  align-items: stretch;
+  gap: 28px;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 0 10px;
 }
+
 .project-card {
+  width: 100%;
+  max-width: 100%;
   background: white;
   border-radius: 20px;
   box-shadow: 0 6px 22px rgba(46, 125, 50, 0.3);
@@ -239,10 +245,12 @@ main.center-wrapper {
   flex-direction: column;
   justify-content: flex-start;
 }
+
 .project-card:hover {
   transform: translateY(-8px) scale(1.04);
   box-shadow: 0 10px 32px rgba(46, 125, 50, 0.45);
 }
+
 .project-card h3 {
   color: #2e7d32;
   font-weight: 900;
@@ -353,46 +361,4 @@ main.center-wrapper {
   padding: 12px 20px;
   border-radius: 12px;
   margin-top: 10px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  font-weight: 900;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  user-select: none;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.22);
-}
-#modal-comment-btn:hover,
-#detail-comment-btn:hover,
-#modal-comment-btn:focus,
-#detail-comment-btn:focus {
-  background: #1b5e20;
-  transform: scale(1.05);
-  outline: none;
-}
-
-/* ====== Botão Voltar (menor, esquerdo, fixo) ====== */
-.close-btn {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 9999;
-  background: #2e7d32;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 900;
-  cursor: pointer;
-  transition: all 0.35s ease;
-  user-select: none;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.28);
-}
-.close-btn:hover,
-.close-btn:focus {
-  background: #1b5e20;
-  transform: scale(1.05);
-  outline: none;
-}
-
-/* ========== Detalhes do Projeto (Nova Seção) ========== */
-#project-detail
+  font-size:
