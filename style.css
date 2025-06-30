@@ -367,7 +367,7 @@ main.center-wrapper {
   outline: none;
 }
 
-/* ====== Botão Voltar (menor, esquerdo, fixo) ====== */
+/* ====== Botão Voltar ====== */
 .close-btn {
   position: fixed;
   top: 20px;
@@ -392,7 +392,7 @@ main.center-wrapper {
   outline: none;
 }
 
-/* ========== Detalhes do Projeto (Nova Seção) ========== */
+/* ========== Detalhes do Projeto ========== */
 #project-detail-section {
   animation: fadeInUp 0.5s ease;
   padding: 20px 30px;
@@ -402,7 +402,6 @@ main.center-wrapper {
   background: white;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(46,125,50,0.2);
-  border: none; /* remove borda verde se existia */
 }
 #project-detail-section .media-container {
   margin: 20px 0;
@@ -411,8 +410,12 @@ main.center-wrapper {
 #detail-media video,
 #detail-media iframe {
   width: 100%;
+  max-width: 700px;
+  height: auto;
   max-height: 420px;
   object-fit: contain;
+  margin: 0 auto;
+  display: block;
   border-radius: 14px;
   box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25);
   transition: box-shadow 0.3s ease;
@@ -443,7 +446,7 @@ footer {
     max-width: 100%;
   }
   .projects-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
   .project-card img,
