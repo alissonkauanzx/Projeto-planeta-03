@@ -146,6 +146,7 @@ main.center-wrapper {
 .project-form-section input,
 .project-form-section textarea {
   width: 100%;
+  max-width: 100%;
   padding: 14px 16px;
   margin-bottom: 18px;
   border: 2.5px solid #a5d6a7;
@@ -154,6 +155,7 @@ main.center-wrapper {
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   resize: vertical;
   font-family: inherit;
+  box-sizing: border-box;
 }
 .auth-section input:focus,
 .project-form-section input:focus,
@@ -189,6 +191,24 @@ main.center-wrapper {
   box-shadow: 0 10px 25px rgba(0,0,0,0.3);
   outline: none;
 }
+#cancel-project-btn {
+  margin-top: 14px;
+  background: transparent;
+  color: #2e7d32;
+  border: 2px solid #a5d6a7;
+  padding: 12px;
+  width: 100%;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+#cancel-project-btn:hover,
+#cancel-project-btn:focus {
+  background-color: #e0f2f1;
+  transform: scale(1.03);
+  outline: none;
+}
 
 /* ========== Projetos (Cards) ========== */
 .projects-section h2 {
@@ -200,24 +220,20 @@ main.center-wrapper {
   letter-spacing: 0.03em;
 }
 .projects-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 28px;
-  justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 .project-card {
-  width: 320px;
-  height: 320px;
   background: white;
   border-radius: 20px;
   box-shadow: 0 6px 22px rgba(46, 125, 50, 0.3);
-  padding: 20px;
+  padding: 24px 20px;
   transition: transform 0.5s ease, box-shadow 0.5s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  overflow: hidden;
   position: relative;
 }
 .project-card:hover {
@@ -225,90 +241,74 @@ main.center-wrapper {
   box-shadow: 0 10px 32px rgba(46, 125, 50, 0.45);
 }
 .project-card h3 {
-  font-size: 1.3rem;
-  font-weight: 900;
   color: #2e7d32;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: 900;
+  margin-bottom: 12px;
+  font-size: 1.35rem;
+  user-select: none;
 }
 .project-card p {
-  font-size: 1rem;
   color: #466a46;
+  font-size: 1rem;
+  flex-grow: 1;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  word-wrap: break-word;
-  text-overflow: ellipsis;
-  margin: 10px 0;
-  flex-grow: 1;
 }
 .project-card img,
 .project-card video,
 .project-card iframe {
   width: 100%;
-  height: 120px;
+  max-height: 220px;
   object-fit: cover;
   border-radius: 14px;
+  margin-top: 16px;
   user-select: none;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));
+  transition: filter 0.3s ease;
 }
+.project-card img:hover,
+.project-card video:hover,
+.project-card iframe:hover {
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+
+/* ✅ Alteração: Botões reposicionados abaixo da imagem */
 .project-card .edit-btn,
 .project-card .delete-btn {
-  padding: 8px 12px;
+  margin-top: 10px;
+  padding: 8px 14px;
   border: none;
   border-radius: 8px;
   font-weight: bold;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-  color: white;
-  user-select: none;
-  margin-top: 8px;
+  display: inline-block;
 }
 .project-card .edit-btn {
   background-color: #64b5f6;
-  margin-right: 8px;
+  color: white;
 }
 .project-card .edit-btn:hover {
   background-color: #2196f3;
+  transform: scale(1.05);
 }
 .project-card .delete-btn {
   background-color: #ef5350;
+  color: white;
+  margin-left: 8px;
 }
 .project-card .delete-btn:hover {
   background-color: #d32f2f;
-}
-
-/* ========== Botão Voltar ========== */
-.close-btn {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background: #2e7d32;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 9999;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-.close-btn:hover,
-.close-btn:focus {
-  background: #1b5e20;
   transform: scale(1.05);
-  outline: none;
 }
-
 /* ========== Comentários ========== */
-.comments-section {
+.comments-section, .modal-comments-list {
   border-top: 1px solid #cce0cc;
-  margin-top: 20px;
+  margin-top: 22px;
   padding-top: 18px;
 }
 .comment {
@@ -318,77 +318,159 @@ main.center-wrapper {
   font-weight: 600;
   font-size: 0.95rem;
 }
+.modal-comments-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 14px;
+}
+.modal-comments-list p {
+  margin: 8px 0;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #2e7d32;
+}
+#modal-comment-input,
+#detail-comment-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.8px solid #a5d6a7;
+  margin-top: 12px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+#modal-comment-input:focus,
+#detail-comment-input:focus {
+  border-color: #2e7d32;
+  box-shadow: 0 0 12px rgba(46, 125, 50, 0.55);
+  outline: none;
+}
+#modal-comment-btn,
+#detail-comment-btn {
+  background: #2e7d32;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-top: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  font-weight: 900;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  user-select: none;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+}
+#modal-comment-btn:hover,
+#detail-comment-btn:hover,
+#modal-comment-btn:focus,
+#detail-comment-btn:focus {
+  background: #1b5e20;
+  transform: scale(1.05);
+  outline: none;
+}
 
-/* ========== Seção de Detalhes do Projeto (NOVO) ========== */
+/* ========== Botão Voltar (Close) ajustado ========== */
+.close-btn {
+  position: fixed;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  z-index: 9999;
+  background: #2e7d32;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  user-select: none;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+  /* Tirar o pointer para não cobrir texto */
+  /* Não usar pointer-events: none para poder clicar */
+}
+.close-btn:hover,
+.close-btn:focus {
+  background: #1b5e20;
+  transform: translateY(-50%) scale(1.05);
+  outline: none;
+}
+
+/* ========== Detalhes do Projeto ========== */
 #project-detail-section {
+  animation: fadeInUp 0.5s ease;
+  padding: 20px 30px;
+  max-width: 900px;
+  margin: 0 auto 80px auto;
+  color: #2e3a2e;
   background: white;
   border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(46, 125, 50, 0.3);
-  padding: 36px;
-  max-width: 800px;
-  margin: auto;
-  animation: fadeInUp 0.5s ease;
+  box-shadow: 0 10px 30px rgba(46,125,50,0.2);
+  scroll-margin-top: 80px; /* Espaço ao usar scrollTo para topo */
 }
-#project-detail-section h2 {
-  color: #2e7d32;
-  margin-bottom: 20px;
-  font-size: 2rem;
-  font-weight: bold;
-}
-#detail-description {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  color: #466a46;
+#project-detail-section .media-container {
+  margin: 20px 0;
 }
 #detail-media img,
 #detail-media video,
 #detail-media iframe {
   width: 100%;
-  max-height: 400px;
+  max-width: 700px;
+  height: auto;
+  max-height: 420px;
   object-fit: contain;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  display: block;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25);
+  transition: box-shadow 0.3s ease;
 }
-.modal-comments-list {
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-.modal-comments-list p {
-  background: #f1f8f1;
-  padding: 10px 14px;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  color: #2e7d32;
-  font-weight: 500;
-}
-#detail-comment-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 2px solid #a5d6a7;
-  margin-top: 10px;
-  font-size: 1rem;
-}
-#detail-comment-btn {
-  margin-top: 10px;
-  padding: 10px 20px;
-  background-color: #2e7d32;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-#detail-comment-btn:hover {
-  background-color: #1b5e20;
+#detail-media img:hover,
+#detail-media video:hover,
+#detail-media iframe:hover {
+  box-shadow: 0 8px 28px rgba(46, 125, 50, 0.4);
 }
 
-/* ========== Responsivo ========== */
+/* ========== Rodapé ========== */
+footer {
+  background: #d1f7d1;
+  padding: 20px 0;
+  text-align: center;
+  font-size: 1rem;
+  color: #4c6740;
+  user-select: none;
+}
+
+/* ========== Responsividade ========== */
 @media (max-width: 600px) {
-  .project-card {
-    width: 100%;
-    height: auto;
+  .navbar h1 {
+    font-size: 1.8rem;
+  }
+  .auth-section, .project-form-section {
+    padding: 36px 20px;
+    max-width: 100%;
+  }
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .project-card img,
+  .project-card video,
+  .project-card iframe {
+    max-height: 180px;
+  }
+  #project-detail-section {
+    max-width: 95%;
+    margin: 20px auto 60px auto;
+    padding: 16px 20px;
+  }
+  .close-btn {
+    top: 50%;
+    left: 8px;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    transform: translateY(-50%);
   }
 }
