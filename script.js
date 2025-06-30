@@ -31,8 +31,7 @@ const logoutBtn = document.getElementById("logout-btn");
 const projectsContainer = document.getElementById("projects");
 const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
-const fullscreenOverlay = document.getElementById("fullscreen-project");
-const fullscreenContent = document.getElementById("fullscreen-data");
+const projectDetail = document.getElementById("project-detail-section");
 
 // ==================== CLOUDINARY ====================
 const configMeta = document.querySelector('meta[name="cloudinary-config"]');
@@ -116,7 +115,7 @@ onAuthStateChanged(auth, user => {
   if (user) {
     show(postProjectBtn);
     show(logoutBtn);
-    showSection(".projects-section");
+    showSection("#projects-section");
     loadProjects();
   } else {
     window.showLogin();
@@ -244,43 +243,49 @@ function renderCard(p) {
     ${p.videoUrl ? `<video src="${p.videoUrl}" controls muted preload="metadata"></video>` : ""}
     ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
   `;
-  el.onclick = () => openProjectView(p);
+  el.onclick = () => openProjectDetail(p);
   return el;
 }
 
-// ==================== MODAL DE PROJETO ====================
-function openProjectView(p) {
-  show(fullscreenOverlay);
-  fullscreenContent.innerHTML = `
-    <h2>${p.title}</h2>
-    <div class="media-container">
-      ${p.imageUrl ? `<img src="${p.imageUrl}" class="modal-image" />` : ""}
-      ${p.videoUrl ? `<video src="${p.videoUrl}" controls class="modal-video"></video>` : ""}
-      ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
-    </div>
-    <p>${p.description}</p>
-    <div class="modal-comments-list"></div>
-    <input type="text" id="modal-comment-input" placeholder="Comente aqui..." />
-    <button id="modal-comment-btn">Enviar</button>
+// ==================== SEÇÃO DETALHES DO PROJETO ====================
+function openProjectDetail(p) {
+  showSection("#project-detail-section");
+  document.getElementById("detail-title").textContent = p.title;
+  document.getElementById("detail-description").textContent = p.description;
+
+  const media = document.getElementById("detail-media");
+  media.innerHTML = `
+    ${p.imageUrl ? `<img src="${p.imageUrl}" />` : ""}
+    ${p.videoUrl ? `<video src="${p.videoUrl}" controls></video>` : ""}
+    ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
   `;
-  const list = fullscreenContent.querySelector(".modal-comments-list");
+
+  const commentList = document.getElementById("detail-comments-list");
+  commentList.innerHTML = "";
   (p.comments || []).forEach(c => {
     const el = document.createElement("p");
     el.textContent = `${c.userEmail || "Anônimo"}: ${c.text}`;
-    list.appendChild(el);
+    commentList.appendChild(el);
   });
-  document.getElementById("modal-comment-btn").onclick = async () => {
-    const text = document.getElementById("modal-comment-input").value.trim();
+
+  document.getElementById("detail-comment-input").value = "";
+  document.getElementById("detail-comment-btn").onclick = async () => {
+    const text = document.getElementById("detail-comment-input").value.trim();
     const user = auth.currentUser;
     if (!text || !user) return;
-    const comment = { userId: user.uid, userEmail: user.email, text, createdAt: new Date() };
+    const comment = {
+      userId: user.uid,
+      userEmail: user.email,
+      text,
+      createdAt: new Date()
+    };
     await updateDoc(doc(db, "projects", p.id), {
       comments: arrayUnion(comment)
     });
     const el = document.createElement("p");
     el.textContent = `${comment.userEmail}: ${comment.text}`;
-    list.appendChild(el);
-    document.getElementById("modal-comment-input").value = "";
+    commentList.appendChild(el);
+    document.getElementById("detail-comment-input").value = "";
   };
 }
 
@@ -299,8 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     window.showLogin();
   });
-  document.getElementById("close-fullscreen").addEventListener("click", () => {
-    hide(fullscreenOverlay);
-    fullscreenContent.innerHTML = "";
+  document.getElementById("back-to-projects-btn").addEventListener("click", () => {
+    showSection("#projects-section");
   });
 });
