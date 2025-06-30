@@ -252,14 +252,11 @@ main.center-wrapper {
   color: #466a46;
   font-size: 1rem;
   flex-grow: 1;
-
-  /* Limita a 3 linhas com reticências */
-  display: -webkit-box;
-  -webkit-line-clamp: 3; /* 3 linhas visíveis */
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;  /* Limita a 3 linhas */
+  -webkit-box-orient: vertical;
   text-overflow: ellipsis;
-  word-break: break-word;
 }
 .project-card img,
 .project-card video,
@@ -424,5 +421,4 @@ main.center-wrapper {
   object-fit: contain;
   margin: 0 auto;
   display: block;
-  border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(46, 125, 50, 
+  border-radius:
