@@ -46,12 +46,8 @@ const uploadPreset = configMeta?.dataset.uploadPreset || "";
 // ==================== UTILITÁRIOS ====================
 const show = el => el && (el.style.display = "block");
 const hide = el => el && (el.style.display = "none");
-
 function resetForm() {
-  document.getElementById("project-title").value = "";
-  document.getElementById("project-desc").value = "";
-  document.getElementById("project-image").value = "";
-  document.getElementById("project-video").value = "";
+  projectForm.reset();
   hide(uploadProgress);
   hide(uploadMessage);
 }
@@ -61,12 +57,20 @@ window.showLogin = function () {
   show(loginSection);
   hide(registerSection);
   hide(projectForm);
+  hide(postProjectBtn);
+  hide(logoutBtn);
+  projectsContainer.innerHTML = "";
+  hideModal();
 };
 
 window.showRegister = function () {
   hide(loginSection);
   show(registerSection);
   hide(projectForm);
+  hide(postProjectBtn);
+  hide(logoutBtn);
+  projectsContainer.innerHTML = "";
+  hideModal();
 };
 
 window.showProjectForm = function () {
@@ -74,10 +78,11 @@ window.showProjectForm = function () {
   hide(registerSection);
   show(projectForm);
   resetForm();
+  hideModal();
 };
 
+// ==================== LOGIN, REGISTRO E LOGOUT ====================
 window.login = async function () {
-  console.log("login() chamado");
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   if (!email || !password) {
@@ -93,7 +98,6 @@ window.login = async function () {
 };
 
 window.register = async function () {
-  console.log("register() chamado");
   const email = document.getElementById("reg-email").value.trim();
   const password = document.getElementById("reg-password").value.trim();
   if (!email || !password) {
@@ -121,7 +125,6 @@ window.logout = async function () {
 
 // ==================== AUTENTICAÇÃO E CONTROLE DE INTERFACE ====================
 onAuthStateChanged(auth, user => {
-  console.log("Auth state changed:", user);
   if (user) {
     hide(loginSection);
     hide(registerSection);
@@ -131,10 +134,6 @@ onAuthStateChanged(auth, user => {
     loadProjects();
   } else {
     window.showLogin();
-    hide(postProjectBtn);
-    hide(logoutBtn);
-    projectsContainer.innerHTML = "";
-    hide(fullscreenOverlay);
   }
 });
 
@@ -286,9 +285,18 @@ function renderCard(p) {
 }
 
 // ==================== VISUALIZAÇÃO EM TELA CHEIA ====================
+// Mostra modal adicionando classe 'active' para ativar transição
+function showModal() {
+  fullscreenOverlay.classList.add('active');
+}
+// Esconde modal removendo classe 'active'
+function hideModal() {
+  fullscreenOverlay.classList.remove('active');
+}
+
 function openProjectView(p) {
-  hide(projectsContainer);
-  show(fullscreenOverlay);
+  projectsContainer.style.display = 'none';
+  showModal();
 
   fullscreenContent.innerHTML = `
     <h2>${p.title}</h2>
@@ -341,20 +349,11 @@ function openProjectView(p) {
   };
 
   fullscreenContent.querySelector(".close-btn").onclick = () => {
-    hide(fullscreenOverlay);
+    hideModal();
     fullscreenContent.innerHTML = "";
-    show(projectsContainer);
+    projectsContainer.style.display = 'grid';
   };
 }
-
-// Fecha modal ao clicar fora do conteúdo
-fullscreenOverlay.onclick = (e) => {
-  if (e.target === fullscreenOverlay) {
-    hide(fullscreenOverlay);
-    fullscreenContent.innerHTML = "";
-    show(projectsContainer);
-  }
-};
 
 // ==================== EVENT LISTENERS ====================
 document.addEventListener("DOMContentLoaded", () => {
