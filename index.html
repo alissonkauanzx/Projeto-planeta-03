@@ -23,7 +23,6 @@
     <div class="navbar">
       <h1 class="float-title">Planeta Projeto 🌎</h1>
       <div class="right-buttons">
-        <!-- Esses botões serão mostrados/escondidos pelo JS conforme seção -->
         <button id="post-project-btn" style="display:none;">Postar Projeto</button>
         <button id="logout-btn" style="display:none;">Sair</button>
       </div>
@@ -74,13 +73,13 @@
     <section class="projects-section" id="projects-section">
       <h2>Projetos Postados</h2>
       <div id="projects" class="projects-grid">
-        <!-- Os cards de projeto são gerados via JS -->
+        <!-- Cards gerados dinamicamente -->
       </div>
     </section>
 
     <!-- Detalhes do Projeto clicado -->
-    <section id="project-detail-section" class="project-form-section" style="display: none;">
-      <button id="back-to-projects-btn" class="close-btn" type="button">← Voltar</button>
+    <section id="project-detail-section" class="project-detail-section" style="display: none;">
+      <button id="back-to-projects-btn" class="close-btn" type="button">←</button>
       <h2 id="detail-title">Título do Projeto</h2>
       <div class="media-container" id="detail-media"></div>
       <p id="detail-description"></p>
