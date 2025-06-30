@@ -191,6 +191,8 @@ main.center-wrapper {
   box-shadow: 0 10px 25px rgba(0,0,0,0.3);
   outline: none;
 }
+
+/* ====== Botão Cancelar Postagem ====== */
 #cancel-project-btn {
   margin-top: 14px;
   background: transparent;
@@ -250,10 +252,14 @@ main.center-wrapper {
   color: #466a46;
   font-size: 1rem;
   flex-grow: 1;
-  overflow: hidden;
+
+  /* Limita a 3 linhas com reticências */
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* Limita a 3 linhas */
+  -webkit-line-clamp: 3; /* 3 linhas visíveis */
   -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
 }
 .project-card img,
 .project-card video,
@@ -272,6 +278,8 @@ main.center-wrapper {
 .project-card iframe:hover {
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
 }
+
+/* ====== Botões Editar e Apagar Projeto ====== */
 .project-card .edit-btn,
 .project-card .delete-btn {
   margin-top: 12px;
@@ -367,7 +375,7 @@ main.center-wrapper {
   outline: none;
 }
 
-/* ========== Botão Voltar ========== */
+/* ====== Botão Voltar ====== */
 .close-btn {
   position: fixed;
   top: 20px;
@@ -417,52 +425,4 @@ main.center-wrapper {
   margin: 0 auto;
   display: block;
   border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25);
-  transition: box-shadow 0.3s ease;
-}
-#detail-media img:hover,
-#detail-media video:hover,
-#detail-media iframe:hover {
-  box-shadow: 0 8px 28px rgba(46, 125, 50, 0.4);
-}
-
-/* ========== Rodapé ========== */
-footer {
-  background: #d1f7d1;
-  padding: 20px 0;
-  text-align: center;
-  font-size: 1rem;
-  color: #4c6740;
-  user-select: none;
-}
-
-/* ========== Responsividade ========== */
-@media (max-width: 600px) {
-  .navbar h1 {
-    font-size: 1.8rem;
-  }
-  .auth-section, .project-form-section {
-    padding: 36px 20px;
-    max-width: 100%;
-  }
-  .projects-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-  .project-card img,
-  .project-card video,
-  .project-card iframe {
-    max-height: 180px;
-  }
-  #project-detail-section {
-    max-width: 95%;
-    margin: 20px auto 60px auto;
-    padding: 16px 20px;
-  }
-  .close-btn {
-    top: 12px;
-    left: 12px;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-  }
-}
+  box-shadow: 0 4px 14px rgba(46, 125, 50, 
