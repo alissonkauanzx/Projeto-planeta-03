@@ -38,11 +38,6 @@ const uploadMessage = document.getElementById("upload-message");
 const fullscreenOverlay = document.getElementById("fullscreen-project");
 const fullscreenContent = document.getElementById("fullscreen-data");
 
-// ==================== CLOUDINARY CONFIG ====================
-const configMeta = document.querySelector('meta[name="cloudinary-config"]');
-const cloudName = configMeta?.dataset.cloudName || "";
-const uploadPreset = configMeta?.dataset.uploadPreset || "";
-
 // ==================== UTILITÁRIOS ====================
 const show = el => el && (el.style.display = "block");
 const hide = el => el && (el.style.display = "none");
@@ -57,20 +52,12 @@ window.showLogin = function () {
   show(loginSection);
   hide(registerSection);
   hide(projectForm);
-  hide(postProjectBtn);
-  hide(logoutBtn);
-  projectsContainer.innerHTML = "";
-  hideModal();
 };
 
 window.showRegister = function () {
   hide(loginSection);
   show(registerSection);
   hide(projectForm);
-  hide(postProjectBtn);
-  hide(logoutBtn);
-  projectsContainer.innerHTML = "";
-  hideModal();
 };
 
 window.showProjectForm = function () {
@@ -78,10 +65,16 @@ window.showProjectForm = function () {
   hide(registerSection);
   show(projectForm);
   resetForm();
-  hideModal();
 };
 
-// ==================== LOGIN, REGISTRO E LOGOUT ====================
+// NOVA FUNÇÃO PARA FECHAR FORMULÁRIO
+window.hideProjectForm = function () {
+  hide(projectForm);
+  show(postProjectBtn);
+  show(projectsContainer);
+  resetForm();
+};
+
 window.login = async function () {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -134,6 +127,10 @@ onAuthStateChanged(auth, user => {
     loadProjects();
   } else {
     window.showLogin();
+    hide(postProjectBtn);
+    hide(logoutBtn);
+    projectsContainer.innerHTML = "";
+    hide(fullscreenOverlay);
   }
 });
 
@@ -212,6 +209,7 @@ window.submitProject = async function () {
     return;
   }
 
+  // Separar arquivos
   let imageFile = null;
   let pdfFile = null;
   for (const f of imageInput.files) {
@@ -285,20 +283,12 @@ function renderCard(p) {
 }
 
 // ==================== VISUALIZAÇÃO EM TELA CHEIA ====================
-// Mostra modal adicionando classe 'active' para ativar transição
-function showModal() {
-  fullscreenOverlay.classList.add('active');
-}
-// Esconde modal removendo classe 'active'
-function hideModal() {
-  fullscreenOverlay.classList.remove('active');
-}
-
 function openProjectView(p) {
-  projectsContainer.style.display = 'none';
-  showModal();
+  hide(projectsContainer);
+  show(fullscreenOverlay);
 
   fullscreenContent.innerHTML = `
+    <button class="close-btn" title="Voltar">← Voltar</button>
     <h2>${p.title}</h2>
     <div class="media-container">
       ${p.imageUrl ? `<img src="${p.imageUrl}" alt="Imagem do projeto" class="modal-image" />` : ""}
@@ -309,8 +299,9 @@ function openProjectView(p) {
     <div class="modal-comments-list"></div>
     <input type="text" id="modal-comment-input" placeholder="Comente..." />
     <button id="modal-comment-btn">Enviar</button>
-    <button class="close-btn">Voltar</button>
   `;
+
+  // Posicionar botão voltar no canto esquerdo (CSS já cuida disso, veja se está no seu CSS)
 
   const list = fullscreenContent.querySelector(".modal-comments-list");
 
@@ -349,9 +340,9 @@ function openProjectView(p) {
   };
 
   fullscreenContent.querySelector(".close-btn").onclick = () => {
-    hideModal();
+    hide(fullscreenOverlay);
     fullscreenContent.innerHTML = "";
-    projectsContainer.style.display = 'grid';
+    show(projectsContainer);
   };
 }
 
@@ -360,8 +351,35 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("login-btn").addEventListener("click", window.login);
   document.getElementById("register-btn").addEventListener("click", window.register);
   document.getElementById("logout-btn").addEventListener("click", window.logout);
-  document.getElementById("post-project-btn").addEventListener("click", window.showProjectForm);
+  document.getElementById("post-project-btn").addEventListener("click", () => {
+    hide(postProjectBtn);
+    window.showProjectForm();
+    hide(projectsContainer);
+  });
   document.getElementById("submit-project-btn").addEventListener("click", window.submitProject);
+  
+  // Botão cancelar no formulário (adicionar no HTML para funcionar)
+  // Vamos criar dinamicamente aqui:
+  if (!document.getElementById("cancel-project-btn")) {
+    const cancelBtn = document.createElement("button");
+    cancelBtn.id = "cancel-project-btn";
+    cancelBtn.textContent = "Cancelar";
+    cancelBtn.type = "button";
+    cancelBtn.style.marginTop = "12px";
+    cancelBtn.style.backgroundColor = "#a5d6a7";
+    cancelBtn.style.color = "#2e3a2e";
+    cancelBtn.style.border = "none";
+    cancelBtn.style.padding = "12px";
+    cancelBtn.style.borderRadius = "10px";
+    cancelBtn.style.cursor = "pointer";
+    cancelBtn.addEventListener("click", () => {
+      window.hideProjectForm();
+      show(postProjectBtn);
+      show(projectsContainer);
+    });
+    projectForm.appendChild(cancelBtn);
+  }
+
   document.getElementById("to-register").addEventListener("click", e => {
     e.preventDefault();
     window.showRegister();
