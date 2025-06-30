@@ -46,10 +46,7 @@ const show = el => el && (el.style.display = "block");
 const hide = el => el && (el.style.display = "none");
 
 function resetForm() {
-  document.getElementById("project-title").value = "";
-  document.getElementById("project-desc").value = "";
-  document.getElementById("project-image").value = "";
-  document.getElementById("project-video").value = "";
+  projectForm.querySelectorAll("input, textarea").forEach(input => input.value = "");
   hide(uploadProgress);
   hide(uploadMessage);
   projectForm.dataset.editing = "";
@@ -116,39 +113,6 @@ window.showProjectForm = () => {
   hide(logoutBtn);
   header.style.display = "none";
 };
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Botão cancelar formulário de projeto
-  document.getElementById("cancel-project-btn").addEventListener("click", () => {
-    resetForm();
-    hide(projectForm);
-    showSection("#projects-section");
-    show(postProjectBtn);
-    show(logoutBtn);
-    header.style.display = "block";
-  });
-
-  // Outros event listeners
-  document.getElementById("login-btn").addEventListener("click", window.login);
-  document.getElementById("register-btn").addEventListener("click", window.register);
-  document.getElementById("logout-btn").addEventListener("click", window.logout);
-  document.getElementById("post-project-btn").addEventListener("click", window.showProjectForm);
-  document.getElementById("submit-project-btn").addEventListener("click", window.submitProject);
-  document.getElementById("to-register").addEventListener("click", e => {
-    e.preventDefault();
-    window.showRegister();
-  });
-  document.getElementById("to-login").addEventListener("click", e => {
-    e.preventDefault();
-    window.showLogin();
-  });
-  document.getElementById("back-to-projects-btn").addEventListener("click", () => {
-    showSection("#projects-section");
-    show(postProjectBtn);
-    show(logoutBtn);
-    header.style.display = "block";
-  });
-});
 
 // ==================== VERIFICAÇÃO LOGIN ====================
 onAuthStateChanged(auth, user => {
@@ -263,11 +227,11 @@ window.submitProject = async () => {
 
     resetForm();
     hide(projectForm);
-    loadProjects();
     showSection("#projects-section");
     show(postProjectBtn);
     show(logoutBtn);
     header.style.display = "block";
+    loadProjects();
   } catch (e) {
     alert("Erro ao enviar projeto.");
     console.error(e);
@@ -377,3 +341,35 @@ function openProjectDetail(p) {
     document.getElementById("detail-comment-input").value = "";
   };
 }
+
+// ==================== EVENTOS ====================
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("login-btn").addEventListener("click", window.login);
+  document.getElementById("register-btn").addEventListener("click", window.register);
+  document.getElementById("logout-btn").addEventListener("click", window.logout);
+  document.getElementById("post-project-btn").addEventListener("click", window.showProjectForm);
+  document.getElementById("submit-project-btn").addEventListener("click", window.submitProject);
+  document.getElementById("to-register").addEventListener("click", e => {
+    e.preventDefault();
+    window.showRegister();
+  });
+  document.getElementById("to-login").addEventListener("click", e => {
+    e.preventDefault();
+    window.showLogin();
+  });
+  document.getElementById("back-to-projects-btn").addEventListener("click", () => {
+    showSection("#projects-section");
+    show(postProjectBtn);
+    show(logoutBtn);
+    header.style.display = "block";
+  });
+
+  // Botão cancelar do form - VOLTAR para a lista de projetos
+  document.getElementById("cancel-project-btn").addEventListener("click", () => {
+    resetForm();
+    showSection("#projects-section");
+    show(postProjectBtn);
+    show(logoutBtn);
+    header.style.display = "block";
+  });
+});
