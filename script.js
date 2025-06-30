@@ -267,8 +267,10 @@ function renderCard(p) {
     ${p.videoUrl ? `<video src="${p.videoUrl}" controls muted></video>` : ""}
     ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
     ${isOwner ? `
-      <button class="edit-btn">Editar</button>
-      <button class="delete-btn">Apagar</button>` : ""}
+      <div class="card-buttons">
+        <button class="edit-btn">✏️</button>
+        <button class="delete-btn">🗑️</button>
+      </div>` : ""}
   `;
 
   el.addEventListener("click", () => openProjectDetail(p));
@@ -302,6 +304,8 @@ function openProjectDetail(p) {
   hide(postProjectBtn);
   hide(logoutBtn);
   header.style.display = "none";
+
+  setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
 
   document.getElementById("detail-title").textContent = p.title;
   document.getElementById("detail-description").textContent = p.description;
@@ -363,8 +367,6 @@ document.addEventListener("DOMContentLoaded", () => {
     show(logoutBtn);
     header.style.display = "block";
   });
-
-  // Botão cancelar do form - VOLTAR para a lista de projetos
   document.getElementById("cancel-project-btn").addEventListener("click", () => {
     resetForm();
     showSection("#projects-section");
