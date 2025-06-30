@@ -13,7 +13,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Script principal com nome corrigido -->
+  <!-- Script principal -->
   <script type="module" src="script.js" defer></script>
 </head>
 <body>
@@ -23,9 +23,8 @@
     <div class="navbar">
       <h1 class="float-title">Planeta Projeto 🌎</h1>
       <div class="right-buttons">
-        <!-- Botões iniciam escondidos pelo CSS, sem inline styles -->
-        <button id="post-project-btn" style="display: none;">Postar Projeto</button>
-        <button id="logout-btn" style="display: none;">Sair</button>
+        <button id="post-project-btn">Postar Projeto</button>
+        <button id="logout-btn">Sair</button>
       </div>
     </div>
   </header>
@@ -63,21 +62,21 @@
       <progress id="upload-progress" value="0" max="100" style="display: none;"></progress>
       <p id="upload-message" style="display: none;">Enviando...</p>
       <button id="submit-project-btn">Enviar Projeto</button>
+      <button id="cancel-project-btn">Cancelar</button>
     </section>
 
     <!-- Lista de Projetos -->
     <section class="projects-section">
       <h2>Projetos Postados</h2>
-      <!-- IMPORTANTE: adicionar a classe "projects-grid" para o container dos cards -->
       <div id="projects" class="projects-grid"></div>
     </section>
 
   </main>
 
   <!-- Modal fullscreen para projeto -->
-  <!-- IMPORTANTE: remover style display:none inline e usar a classe para controlar visibilidade -->
   <div id="fullscreen-project" class="fullscreen-overlay">
     <div id="fullscreen-data" class="fullscreen-content"></div>
+    <button class="close-btn" id="close-fullscreen">Voltar</button>
   </div>
 
   <!-- Rodapé -->
