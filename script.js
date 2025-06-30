@@ -46,8 +46,12 @@ const uploadPreset = configMeta?.dataset.uploadPreset || "";
 // ==================== UTILITÁRIOS ====================
 const show = el => el && (el.style.display = "block");
 const hide = el => el && (el.style.display = "none");
+
 function resetForm() {
-  projectForm.reset();
+  document.getElementById("project-title").value = "";
+  document.getElementById("project-desc").value = "";
+  document.getElementById("project-image").value = "";
+  document.getElementById("project-video").value = "";
   hide(uploadProgress);
   hide(uploadMessage);
 }
@@ -73,6 +77,7 @@ window.showProjectForm = function () {
 };
 
 window.login = async function () {
+  console.log("login() chamado");
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   if (!email || !password) {
@@ -88,6 +93,7 @@ window.login = async function () {
 };
 
 window.register = async function () {
+  console.log("register() chamado");
   const email = document.getElementById("reg-email").value.trim();
   const password = document.getElementById("reg-password").value.trim();
   if (!email || !password) {
@@ -115,6 +121,7 @@ window.logout = async function () {
 
 // ==================== AUTENTICAÇÃO E CONTROLE DE INTERFACE ====================
 onAuthStateChanged(auth, user => {
+  console.log("Auth state changed:", user);
   if (user) {
     hide(loginSection);
     hide(registerSection);
@@ -339,6 +346,15 @@ function openProjectView(p) {
     show(projectsContainer);
   };
 }
+
+// Fecha modal ao clicar fora do conteúdo
+fullscreenOverlay.onclick = (e) => {
+  if (e.target === fullscreenOverlay) {
+    hide(fullscreenOverlay);
+    fullscreenContent.innerHTML = "";
+    show(projectsContainer);
+  }
+};
 
 // ==================== EVENT LISTENERS ====================
 document.addEventListener("DOMContentLoaded", () => {
