@@ -402,6 +402,7 @@ main.center-wrapper {
   background: white;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(46,125,50,0.2);
+  border: none; /* remove borda verde se existia */
 }
 #project-detail-section .media-container {
   margin: 20px 0;
@@ -420,14 +421,6 @@ main.center-wrapper {
 #detail-media video:hover,
 #detail-media iframe:hover {
   box-shadow: 0 8px 28px rgba(46, 125, 50, 0.4);
-}
-
-/* ====== Esconder botão "Postar projeto" na área de detalhes ====== */
-#post-project-btn {
-  display: inline-block; /* padrão visível */
-}
-#project-detail-section ~ header .right-buttons #post-project-btn {
-  display: none !important; /* esconde quando estiver em detalhes */
 }
 
 /* ========== Rodapé ========== */
