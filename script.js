@@ -22,7 +22,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2"; // Seu UID
+const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2";
 
 // ==================== ELEMENTOS ====================
 const loginSection = document.getElementById("login-section");
@@ -34,6 +34,7 @@ const projectsContainer = document.getElementById("projects");
 const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
 const projectDetail = document.getElementById("project-detail-section");
+const header = document.querySelector("header");
 
 // ==================== CLOUDINARY ====================
 const configMeta = document.querySelector('meta[name="cloudinary-config"]');
@@ -48,7 +49,7 @@ function resetForm() {
   projectForm.reset();
   hide(uploadProgress);
   hide(uploadMessage);
-  projectForm.dataset.editing = ""; // Reset edição
+  projectForm.dataset.editing = "";
 }
 
 function showSection(sectionId) {
@@ -118,6 +119,7 @@ onAuthStateChanged(auth, user => {
   if (user) {
     show(postProjectBtn);
     show(logoutBtn);
+    header.style.display = "block";
     showSection("#projects-section");
     loadProjects();
   } else {
@@ -260,33 +262,41 @@ function renderCard(p) {
     ${p.imageUrl ? `<img src="${p.imageUrl}" />` : ""}
     ${p.videoUrl ? `<video src="${p.videoUrl}" controls muted></video>` : ""}
     ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
-    <button class="view-btn">Ver Detalhes</button>
     ${isOwner ? `
       <button class="edit-btn">Editar</button>
       <button class="delete-btn">Apagar</button>` : ""}
   `;
 
-  el.querySelector(".view-btn").onclick = () => openProjectDetail(p);
+  // Clique em qualquer parte do card abre os detalhes
+  el.addEventListener("click", () => openProjectDetail(p));
+
   if (isOwner) {
-    el.querySelector(".edit-btn").onclick = () => {
+    el.querySelector(".edit-btn").onclick = (e) => {
+      e.stopPropagation();
       showSection("#project-form");
       document.getElementById("project-title").value = p.title;
       document.getElementById("project-desc").value = p.description;
       projectForm.dataset.editing = p.id;
     };
-    el.querySelector(".delete-btn").onclick = async () => {
+    el.querySelector(".delete-btn").onclick = async (e) => {
+      e.stopPropagation();
       if (confirm("Tem certeza que deseja apagar este projeto?")) {
         await deleteDoc(doc(db, "projects", p.id));
         alert("Projeto apagado.");
       }
     };
   }
+
   return el;
 }
 
 // ==================== DETALHES DO PROJETO ====================
 function openProjectDetail(p) {
   showSection("#project-detail-section");
+  hide(postProjectBtn);
+  hide(logoutBtn);
+  header.style.display = "none";
+
   document.getElementById("detail-title").textContent = p.title;
   document.getElementById("detail-description").textContent = p.description;
 
@@ -343,5 +353,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.getElementById("back-to-projects-btn").addEventListener("click", () => {
     showSection("#projects-section");
+    show(postProjectBtn);
+    show(logoutBtn);
+    header.style.display = "block";
   });
 });
