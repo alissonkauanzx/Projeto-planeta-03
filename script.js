@@ -107,11 +107,17 @@ window.showRegister = () => {
 window.showProjectForm = () => {
   showSection("#project-form");
   resetForm();
+  hide(postProjectBtn);
+  hide(logoutBtn);
+  header.style.display = "none";
 };
 
 document.getElementById("cancel-project-btn").addEventListener("click", () => {
   resetForm();
-  hide(projectForm);
+  showSection("#projects-section");
+  show(postProjectBtn);
+  show(logoutBtn);
+  header.style.display = "block";
 });
 
 // ==================== VERIFICAÇÃO LOGIN ====================
@@ -267,7 +273,6 @@ function renderCard(p) {
       <button class="delete-btn">Apagar</button>` : ""}
   `;
 
-  // Clique em qualquer parte do card abre os detalhes
   el.addEventListener("click", () => openProjectDetail(p));
 
   if (isOwner) {
@@ -277,6 +282,9 @@ function renderCard(p) {
       document.getElementById("project-title").value = p.title;
       document.getElementById("project-desc").value = p.description;
       projectForm.dataset.editing = p.id;
+      hide(postProjectBtn);
+      hide(logoutBtn);
+      header.style.display = "none";
     };
     el.querySelector(".delete-btn").onclick = async (e) => {
       e.stopPropagation();
