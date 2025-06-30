@@ -23,6 +23,7 @@
     <div class="navbar">
       <h1 class="float-title">Planeta Projeto 🌎</h1>
       <div class="right-buttons">
+        <!-- Botões iniciam escondidos pelo CSS, sem inline styles -->
         <button id="post-project-btn" style="display: none;">Postar Projeto</button>
         <button id="logout-btn" style="display: none;">Sair</button>
       </div>
@@ -67,13 +68,15 @@
     <!-- Lista de Projetos -->
     <section class="projects-section">
       <h2>Projetos Postados</h2>
+      <!-- IMPORTANTE: adicionar a classe "projects-grid" para o container dos cards -->
       <div id="projects" class="projects-grid"></div>
     </section>
 
   </main>
 
   <!-- Modal fullscreen para projeto -->
-  <div id="fullscreen-project" class="fullscreen-overlay" style="display: none;">
+  <!-- IMPORTANTE: remover style display:none inline e usar a classe para controlar visibilidade -->
+  <div id="fullscreen-project" class="fullscreen-overlay">
     <div id="fullscreen-data" class="fullscreen-content"></div>
   </div>
 
