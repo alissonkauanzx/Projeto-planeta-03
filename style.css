@@ -235,7 +235,11 @@ main.center-wrapper {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
+  height: 100%;
+  min-height: 380px;
+  max-height: 450px;
+  overflow: hidden;
 }
 .project-card:hover {
   transform: translateY(-8px) scale(1.04);
@@ -247,11 +251,17 @@ main.center-wrapper {
   margin-bottom: 12px;
   font-size: 1.35rem;
   user-select: none;
+  flex-shrink: 0;
 }
 .project-card p {
   color: #466a46;
   font-size: 1rem;
   flex-grow: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .project-card img,
 .project-card video,
