@@ -224,17 +224,24 @@ main.center-wrapper {
   gap: 28px;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
+
+/* Ajustes para cards quadrados e padronizados */
 .project-card {
   background: white;
   border-radius: 20px;
   box-shadow: 0 6px 22px rgba(46, 125, 50, 0.3);
   padding: 24px 20px;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  height: 420px;           /* fixar altura para padronizar */
+
+  /* Forçar tamanho quadrado e fixo */
+  width: 320px;
+  height: 320px;
   overflow: hidden;
+  position: relative;
   box-sizing: border-box;
 }
 .project-card:hover {
@@ -247,43 +254,31 @@ main.center-wrapper {
   margin-bottom: 12px;
   font-size: 1.35rem;
   user-select: none;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  /* Limitar título para uma linha com "..." se passar */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  word-break: break-word;
-  min-height: 3.3em;       /* altura fixa do título (2 linhas) */
-  max-height: 3.3em;
-  line-height: 1.65em;
 }
 .project-card p {
   color: #466a46;
   font-size: 1rem;
-  margin-bottom: 12px;
-  flex-shrink: 0;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
+  flex-grow: 1;
   overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5; /* Limita para 5 linhas */
+  -webkit-box-orient: vertical;
+  word-wrap: break-word;
   text-overflow: ellipsis;
-  word-break: break-word;
-
-  min-height: 8.25em;      /* altura fixa da descrição (5 linhas) */
-  max-height: 8.25em;
-  line-height: 1.65em;
+  margin-bottom: 14px;
 }
 .project-card img,
 .project-card video,
 .project-card iframe {
   width: 100%;
-  max-height: 220px;
+  max-height: 130px;
   object-fit: cover;
   border-radius: 14px;
-  margin-top: auto;  /* empurra mídia pro fim do card */
+  margin-top: auto;
   user-select: none;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));
   transition: filter 0.3s ease;
@@ -293,21 +288,27 @@ main.center-wrapper {
 .project-card iframe:hover {
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
 }
+
+/* Botões visíveis e alinhados */
 .project-card .edit-btn,
 .project-card .delete-btn {
-  margin-top: 12px;
-  padding: 10px 16px;
+  position: absolute;
+  bottom: 16px;
+  padding: 8px 14px;
   border: none;
   border-radius: 8px;
   font-weight: bold;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  color: white;
+  user-select: none;
+  z-index: 10;
 }
 .project-card .edit-btn {
   background-color: #64b5f6;
-  color: white;
+  right: 90px;
 }
 .project-card .edit-btn:hover {
   background-color: #2196f3;
@@ -315,8 +316,7 @@ main.center-wrapper {
 }
 .project-card .delete-btn {
   background-color: #ef5350;
-  color: white;
-  margin-left: 10px;
+  right: 20px;
 }
 .project-card .delete-btn:hover {
   background-color: #d32f2f;
@@ -391,99 +391,4 @@ main.center-wrapper {
 /* ========== Botão Voltar ========== */
 .close-btn {
   position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 9999;
-  background: #2e7d32;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 900;
-  cursor: pointer;
-  transition: all 0.35s ease;
-  user-select: none;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.28);
-}
-.close-btn:hover,
-.close-btn:focus {
-  background: #1b5e20;
-  transform: scale(1.05);
-  outline: none;
-}
-
-/* ========== Detalhes do Projeto ========== */
-#project-detail-section {
-  animation: fadeInUp 0.5s ease;
-  padding: 20px 30px;
-  max-width: 900px;
-  margin: 0 auto 80px auto;
-  color: #2e3a2e;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(46,125,50,0.2);
-}
-#project-detail-section .media-container {
-  margin: 20px 0;
-}
-#detail-media img,
-#detail-media video,
-#detail-media iframe {
-  width: 100%;
-  max-width: 700px;
-  height: auto;
-  max-height: 420px;
-  object-fit: contain;
-  margin: 0 auto;
-  display: block;
-  border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25);
-  transition: box-shadow 0.3s ease;
-}
-#detail-media img:hover,
-#detail-media video:hover,
-#detail-media iframe:hover {
-  box-shadow: 0 8px 28px rgba(46, 125, 50, 0.4);
-}
-
-/* ========== Rodapé ========== */
-footer {
-  background: #d1f7d1;
-  padding: 20px 0;
-  text-align: center;
-  font-size: 1rem;
-  color: #4c6740;
-  user-select: none;
-}
-
-/* ========== Responsividade ========== */
-@media (max-width: 600px) {
-  .navbar h1 {
-    font-size: 1.8rem;
-  }
-  .auth-section, .project-form-section {
-    padding: 36px 20px;
-    max-width: 100%;
-  }
-  .projects-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-  .project-card img,
-  .project-card video,
-  .project-card iframe {
-    max-height: 180px;
-  }
-  #project-detail-section {
-    max-width: 95%;
-    margin: 20px auto 60px auto;
-    padding: 16px 20px;
-  }
-  .close-btn {
-    top: 12px;
-    left: 12px;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-  }
-}
+  top: 20
