@@ -212,7 +212,7 @@ main.center-wrapper {
   outline: none;
 }
 
-/* ========== Projetos (Cards) com Estilo de Grade Quadrado ========== */
+/* ========== Projetos (Cards) ========== */
 .projects-section h2 {
   text-align: center;
   color: #2e7d32;
@@ -223,8 +223,10 @@ main.center-wrapper {
 }
 .projects-grid {
   display: grid;
-  gap: 28px;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: stretch;
+  padding: 0 10px;
 }
 .project-card {
   background: white;
@@ -235,9 +237,7 @@ main.center-wrapper {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
+  justify-content: flex-start;
 }
 .project-card:hover {
   transform: translateY(-8px) scale(1.04);
@@ -259,10 +259,10 @@ main.center-wrapper {
 .project-card video,
 .project-card iframe {
   width: 100%;
-  height: 100%;
+  max-height: 220px;
   object-fit: cover;
   border-radius: 14px;
-  margin-top: 12px;
+  margin-top: 16px;
   user-select: none;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));
   transition: filter 0.3s ease;
@@ -369,7 +369,7 @@ main.center-wrapper {
   outline: none;
 }
 
-/* ====== Botão Voltar ====== */
+/* ====== Botão Voltar (menor, esquerdo, fixo) ====== */
 .close-btn {
   position: fixed;
   top: 20px;
@@ -394,73 +394,5 @@ main.center-wrapper {
   outline: none;
 }
 
-/* ========== Detalhes do Projeto ========== */
-#project-detail-section {
-  animation: fadeInUp 0.5s ease;
-  padding: 20px 30px;
-  max-width: 900px;
-  margin: 0 auto 80px auto;
-  color: #2e3a2e;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(46,125,50,0.2);
-}
-#project-detail-section .media-container {
-  margin: 20px 0;
-}
-#detail-media img,
-#detail-media video,
-#detail-media iframe {
-  width: 100%;
-  max-height: 420px;
-  object-fit: contain;
-  border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25);
-  transition: box-shadow 0.3s ease;
-}
-#detail-media img:hover,
-#detail-media video:hover,
-#detail-media iframe:hover {
-  box-shadow: 0 8px 28px rgba(46, 125, 50, 0.4);
-}
-
-/* ========== Rodapé ========== */
-footer {
-  background: #d1f7d1;
-  padding: 20px 0;
-  text-align: center;
-  font-size: 1rem;
-  color: #4c6740;
-  user-select: none;
-}
-
-/* ========== Responsividade ========== */
-@media (max-width: 600px) {
-  .navbar h1 {
-    font-size: 1.8rem;
-  }
-  .auth-section, .project-form-section {
-    padding: 36px 20px;
-    max-width: 100%;
-  }
-  .projects-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  .project-card img,
-  .project-card video,
-  .project-card iframe {
-    max-height: 180px;
-  }
-  #project-detail-section {
-    max-width: 95%;
-    margin: 20px auto 60px auto;
-    padding: 16px 20px;
-  }
-  .close-btn {
-    top: 12px;
-    left: 12px;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-  }
-}
+/* ========== Detalhes do Projeto (Nova Seção) ========== */
+#project-detail
