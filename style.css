@@ -224,6 +224,8 @@ main.center-wrapper {
   gap: 28px;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
+
+/* Aqui corrigimos para cards quadrados, uniformes e bonitos */
 .project-card {
   background: white;
   border-radius: 20px;
@@ -235,13 +237,15 @@ main.center-wrapper {
   flex-direction: column;
   justify-content: flex-start;
 
-  /* altura mínima fixa para uniformizar os cards */
-  min-height: 420px;
+  height: 420px; /* altura fixa para todos os cards */
+  overflow: hidden; /* impedir que conteúdos grandes estiquem o card */
 }
+
 .project-card:hover {
   transform: translateY(-8px) scale(1.04);
   box-shadow: 0 10px 32px rgba(46, 125, 50, 0.45);
 }
+
 .project-card h3 {
   color: #2e7d32;
   font-weight: 900;
@@ -249,26 +253,29 @@ main.center-wrapper {
   font-size: 1.35rem;
   user-select: none;
 
-  /* Limite de linhas com corte e reticências */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 2; /* limitar o título a 2 linhas */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 3.3em; /* altura fixa para duas linhas */
+
+  word-break: break-word; /* quebrar palavras muito longas */
+  min-height: 3.3em; /* altura mínima para 2 linhas */
 }
+
 .project-card p {
   color: #466a46;
   font-size: 1rem;
   flex-grow: 1;
 
-  /* limite de linhas para descrição */
   display: -webkit-box;
-  -webkit-line-clamp: 5;
+  -webkit-line-clamp: 5; /* limitar a descrição a 5 linhas */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
   margin-bottom: 12px;
+
+  word-break: break-word;
 }
 
 .project-card img,
