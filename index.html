@@ -23,7 +23,6 @@
     <div class="navbar">
       <h1 class="float-title">Planeta Projeto 🌎</h1>
       <div class="right-buttons">
-        <!-- Botões inicialmente ocultos no CSS -->
         <button id="post-project-btn" style="display:none;">Postar Projeto</button>
         <button id="logout-btn" style="display:none;">Sair</button>
       </div>
@@ -71,14 +70,26 @@
     </section>
 
     <!-- Lista de Projetos -->
-    <section class="projects-section">
+    <section class="projects-section" id="projects-section">
       <h2>Projetos Postados</h2>
       <div id="projects" class="projects-grid"></div>
     </section>
 
+    <!-- NOVA SEÇÃO: Detalhes do Projeto clicado -->
+    <section id="project-detail-section" class="project-form-section" style="display: none;">
+      <button id="back-to-projects-btn" class="close-btn" type="button">← Voltar</button>
+      <h2 id="detail-title">Título do Projeto</h2>
+      <div class="media-container" id="detail-media"></div>
+      <p id="detail-description"></p>
+
+      <div class="modal-comments-list" id="detail-comments-list"></div>
+      <input type="text" id="detail-comment-input" placeholder="Comente..." />
+      <button id="detail-comment-btn">Enviar</button>
+    </section>
+
   </main>
 
-  <!-- Modal fullscreen para projeto -->
+  <!-- Modal fullscreen (antigo, ainda incluído caso use depois) -->
   <div id="fullscreen-project" class="fullscreen-overlay" style="display:none;">
     <div id="fullscreen-data" class="fullscreen-content"></div>
     <button class="close-btn" id="close-fullscreen">Voltar</button>
