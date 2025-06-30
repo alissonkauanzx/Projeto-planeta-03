@@ -222,7 +222,7 @@ main.center-wrapper {
 .projects-grid {
   display: grid;
   gap: 28px;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 .project-card {
   background: white;
@@ -233,7 +233,9 @@ main.center-wrapper {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
+  height: 320px;
+  overflow: hidden;
   position: relative;
 }
 .project-card:hover {
@@ -243,28 +245,29 @@ main.center-wrapper {
 .project-card h3 {
   color: #2e7d32;
   font-weight: 900;
-  margin-bottom: 12px;
   font-size: 1.35rem;
-  user-select: none;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .project-card p {
   color: #466a46;
-  font-size: 1rem;
+  font-size: 0.95rem;
   flex-grow: 1;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
 }
 .project-card img,
 .project-card video,
 .project-card iframe {
   width: 100%;
-  max-height: 220px;
+  height: 120px;
   object-fit: cover;
   border-radius: 14px;
-  margin-top: 16px;
-  user-select: none;
+  margin-top: 12px;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));
   transition: filter 0.3s ease;
 }
@@ -273,12 +276,11 @@ main.center-wrapper {
 .project-card iframe:hover {
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
 }
-
-/* ✅ Alteração: Botões reposicionados abaixo da imagem */
 .project-card .edit-btn,
 .project-card .delete-btn {
-  margin-top: 10px;
-  padding: 8px 14px;
+  position: absolute;
+  bottom: 14px;
+  padding: 8px 12px;
   border: none;
   border-radius: 8px;
   font-weight: bold;
@@ -286,25 +288,25 @@ main.center-wrapper {
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-  display: inline-block;
+  color: white;
 }
 .project-card .edit-btn {
   background-color: #64b5f6;
-  color: white;
+  left: 20px;
+}
+.project-card .delete-btn {
+  background-color: #ef5350;
+  right: 20px;
 }
 .project-card .edit-btn:hover {
   background-color: #2196f3;
   transform: scale(1.05);
 }
-.project-card .delete-btn {
-  background-color: #ef5350;
-  color: white;
-  margin-left: 8px;
-}
 .project-card .delete-btn:hover {
   background-color: #d32f2f;
   transform: scale(1.05);
 }
+
 /* ========== Comentários ========== */
 .comments-section, .modal-comments-list {
   border-top: 1px solid #cce0cc;
@@ -370,62 +372,54 @@ main.center-wrapper {
   outline: none;
 }
 
-/* ========== Botão Voltar (Close) ajustado ========== */
+/* ========== Botão Voltar ========== */
 .close-btn {
   position: fixed;
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
+  top: 20px;
+  left: 20px;
   z-index: 9999;
   background: #2e7d32;
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: 10px;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 900;
   cursor: pointer;
   transition: all 0.35s ease;
   user-select: none;
   box-shadow: 0 6px 18px rgba(0,0,0,0.28);
-  /* Tirar o pointer para não cobrir texto */
-  /* Não usar pointer-events: none para poder clicar */
 }
 .close-btn:hover,
 .close-btn:focus {
   background: #1b5e20;
-  transform: translateY(-50%) scale(1.05);
+  transform: scale(1.05);
   outline: none;
 }
 
-/* ========== Detalhes do Projeto ========== */
+/* ========== Detalhes do Projeto (Modal) ========== */
 #project-detail-section {
   animation: fadeInUp 0.5s ease;
   padding: 20px 30px;
   max-width: 900px;
-  margin: 0 auto 80px auto;
+  margin: 40px auto;
   color: #2e3a2e;
   background: white;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(46,125,50,0.2);
-  scroll-margin-top: 80px; /* Espaço ao usar scrollTo para topo */
-}
-#project-detail-section .media-container {
-  margin: 20px 0;
+  transform: scale(1);
 }
 #detail-media img,
 #detail-media video,
 #detail-media iframe {
   width: 100%;
   max-width: 700px;
-  height: auto;
   max-height: 420px;
   object-fit: contain;
   margin: 0 auto;
   display: block;
   border-radius: 14px;
   box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25);
-  transition: box-shadow 0.3s ease;
 }
 #detail-media img:hover,
 #detail-media video:hover,
@@ -453,13 +447,16 @@ footer {
     max-width: 100%;
   }
   .projects-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .project-card {
+    height: auto;
   }
   .project-card img,
   .project-card video,
   .project-card iframe {
-    max-height: 180px;
+    max-height: 160px;
   }
   #project-detail-section {
     max-width: 95%;
@@ -467,10 +464,9 @@ footer {
     padding: 16px 20px;
   }
   .close-btn {
-    top: 50%;
-    left: 8px;
-    padding: 5px 10px;
-    font-size: 0.8rem;
-    transform: translateY(-50%);
+    top: 12px;
+    left: 12px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
   }
 }
