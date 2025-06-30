@@ -35,6 +35,7 @@ const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
 const projectDetail = document.getElementById("project-detail-section");
 const header = document.querySelector("header");
+const backToProjectsBtn = document.getElementById("back-to-projects-btn");
 
 // ==================== CLOUDINARY ====================
 const configMeta = document.querySelector('meta[name="cloudinary-config"]');
@@ -55,7 +56,10 @@ function resetForm() {
 function showSection(sectionId) {
   document.querySelectorAll("main > section").forEach(sec => hide(sec));
   const sec = document.querySelector(sectionId);
-  if (sec) show(sec);
+  if (sec) {
+    show(sec);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 }
 
 // ==================== AUTENTICAÇÃO ====================
@@ -267,10 +271,8 @@ function renderCard(p) {
     ${p.videoUrl ? `<video src="${p.videoUrl}" controls muted></video>` : ""}
     ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
     ${isOwner ? `
-      <div class="card-buttons">
-        <button class="edit-btn">✏️</button>
-        <button class="delete-btn">🗑️</button>
-      </div>` : ""}
+      <button class="edit-btn">✏️</button>
+      <button class="delete-btn">🗑️</button>` : ""}
   `;
 
   el.addEventListener("click", () => openProjectDetail(p));
@@ -301,11 +303,10 @@ function renderCard(p) {
 // ==================== DETALHES DO PROJETO ====================
 function openProjectDetail(p) {
   showSection("#project-detail-section");
+  window.scrollTo({ top: 0, behavior: "smooth" });
   hide(postProjectBtn);
   hide(logoutBtn);
   header.style.display = "none";
-
-  setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
 
   document.getElementById("detail-title").textContent = p.title;
   document.getElementById("detail-description").textContent = p.description;
@@ -367,6 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
     show(logoutBtn);
     header.style.display = "block";
   });
+
   document.getElementById("cancel-project-btn").addEventListener("click", () => {
     resetForm();
     showSection("#projects-section");
