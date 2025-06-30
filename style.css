@@ -271,6 +271,37 @@ main.center-wrapper {
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
 }
 
+/* ====== Botões Editar e Apagar Projeto ====== */
+.project-card .edit-btn,
+.project-card .delete-btn {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+.project-card .edit-btn {
+  background-color: #64b5f6;
+  color: white;
+}
+.project-card .edit-btn:hover {
+  background-color: #2196f3;
+  transform: scale(1.05);
+}
+.project-card .delete-btn {
+  background-color: #ef5350;
+  color: white;
+  margin-left: 10px;
+}
+.project-card .delete-btn:hover {
+  background-color: #d32f2f;
+  transform: scale(1.05);
+}
+
 /* ========== Comentários ========== */
 .comments-section, .modal-comments-list {
   border-top: 1px solid #cce0cc;
