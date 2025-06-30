@@ -1,391 +1,466 @@
-// ==================== IMPORTS ====================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
-  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-  signOut, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import {
-  getFirestore, collection, addDoc, query, orderBy, onSnapshot,
-  doc, updateDoc, arrayUnion, getDoc, setDoc, increment
-} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  doc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// ==================== FIREBASE CONFIG ====================
+// Firebase config - substitua pelos seus dados
 const firebaseConfig = {
-  apiKey: "AIzaSyBdWzf45GmW58N7sy7WMT9MG9G4Jy3wjsg",
-  authDomain: "planeta-projeto.firebaseapp.com",
-  projectId: "planeta-projeto",
-  storageBucket: "planeta-projeto.appspot.com",
-  messagingSenderId: "1060342659751",
-  appId: "1:1060342659751:web:fbd4c421de3a02db8cb982"
+  apiKey: "SUA_API_KEY_AQUI",
+  authDomain: "SEU_AUTHDOMAIN.firebaseapp.com",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_STORAGE_BUCKET.appspot.com",
+  messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+  appId: "SEU_APP_ID"
 };
+
+// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ==================== CONSTANTES ====================
-const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2";
-const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024; // 5GB
-
-// ==================== ELEMENTOS ====================
+// --- Elementos DOM principais ---
 const loginSection = document.getElementById("login-section");
 const registerSection = document.getElementById("register-section");
-const projectForm = document.getElementById("project-form");
+const projectFormSection = document.getElementById("project-form");
+const projectsGrid = document.getElementById("projects");
+const fullscreenOverlay = document.getElementById("fullscreen-project");
+const fullscreenData = document.getElementById("fullscreen-data");
+
 const postProjectBtn = document.getElementById("post-project-btn");
 const logoutBtn = document.getElementById("logout-btn");
-const projectsContainer = document.getElementById("projects");
+
+const loginEmailInput = document.getElementById("email");
+const loginPasswordInput = document.getElementById("password");
+const loginBtn = document.getElementById("login-btn");
+const toRegisterLink = document.getElementById("to-register");
+
+const registerEmailInput = document.getElementById("reg-email");
+const registerPasswordInput = document.getElementById("reg-password");
+const registerBtn = document.getElementById("register-btn");
+const toLoginLink = document.getElementById("to-login");
+
+const projectTitleInput = document.getElementById("project-title");
+const projectDescInput = document.getElementById("project-desc");
+const projectImageInput = document.getElementById("project-image");
+const projectVideoInput = document.getElementById("project-video");
 const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
-const fullscreenOverlay = document.getElementById("fullscreen-project");
-const fullscreenContent = document.getElementById("fullscreen-data");
+const submitProjectBtn = document.getElementById("submit-project-btn");
 
-// ==================== UTILITÁRIOS ====================
-const show = el => el && (el.style.display = "block");
-const hide = el => el && (el.style.display = "none");
-function resetForm() {
-  projectForm.reset();
-  hide(uploadProgress);
-  hide(uploadMessage);
+// Botão novo para cancelar post
+let cancelPostBtn = null;
+
+// Cloudinary config
+const cloudName = "dz0kjpcoa";
+const uploadPreset = "projeto_planeta";
+
+// Estado do usuário atual
+let currentUser = null;
+
+// ------------------------ Funções auxiliares ------------------------ //
+
+// Mostrar e esconder seções
+function showSection(section) {
+  [loginSection, registerSection, projectFormSection].forEach(sec => {
+    sec.style.display = "none";
+  });
+  if (section) section.style.display = "block";
 }
 
-// ==================== FUNÇÕES GLOBAIS ====================
-window.showLogin = function () {
-  show(loginSection);
-  hide(registerSection);
-  hide(projectForm);
-};
+// Criar elemento DOM com classes e texto
+function createElement(type, classNames = [], textContent = "") {
+  const el = document.createElement(type);
+  if (Array.isArray(classNames)) el.classList.add(...classNames);
+  else if (typeof classNames === "string") el.classList.add(classNames);
+  if (textContent) el.textContent = textContent;
+  return el;
+}
 
-window.showRegister = function () {
-  hide(loginSection);
-  show(registerSection);
-  hide(projectForm);
-};
+// Upload de arquivo para Cloudinary, retorna URL e tipo
+async function uploadFileToCloudinary(file) {
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", uploadPreset);
 
-window.showProjectForm = function () {
-  hide(loginSection);
-  hide(registerSection);
-  show(projectForm);
-  resetForm();
-};
+  const res = await fetch(url, {
+    method: "POST",
+    body: formData
+  });
 
-// NOVA FUNÇÃO PARA FECHAR FORMULÁRIO
-window.hideProjectForm = function () {
-  hide(projectForm);
-  show(postProjectBtn);
-  show(projectsContainer);
-  resetForm();
-};
+  if (!res.ok) {
+    throw new Error("Erro no upload: " + res.statusText);
+  }
 
-window.login = async function () {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const data = await res.json();
+  // data.secure_url é a URL da mídia
+  // data.resource_type é o tipo (image, video, raw)
+
+  return {
+    url: data.secure_url,
+    type: data.resource_type,
+    originalFilename: data.original_filename,
+  };
+}
+
+// ------------------------ Login, Registro e Logout ------------------------ //
+
+loginBtn.addEventListener("click", async () => {
+  const email = loginEmailInput.value.trim();
+  const password = loginPasswordInput.value.trim();
   if (!email || !password) {
-    alert("Preencha e-mail e senha.");
+    alert("Preencha email e senha para entrar.");
     return;
   }
   try {
     await signInWithEmailAndPassword(auth, email, password);
-  } catch (e) {
-    alert("Erro no login: " + e.message);
-    console.error(e);
+  } catch (error) {
+    alert("Erro ao entrar: " + error.message);
   }
-};
+});
 
-window.register = async function () {
-  const email = document.getElementById("reg-email").value.trim();
-  const password = document.getElementById("reg-password").value.trim();
+toRegisterLink.addEventListener("click", e => {
+  e.preventDefault();
+  showSection(registerSection);
+});
+
+registerBtn.addEventListener("click", async () => {
+  const email = registerEmailInput.value.trim();
+  const password = registerPasswordInput.value.trim();
   if (!email || !password) {
-    alert("Preencha e-mail e senha.");
+    alert("Preencha email e senha para cadastrar.");
     return;
   }
   try {
     await createUserWithEmailAndPassword(auth, email, password);
-    alert("Conta criada com sucesso!");
-    window.showLogin();
-  } catch (e) {
-    alert("Erro no registro: " + e.message);
-    console.error(e);
-  }
-};
-
-window.logout = async function () {
-  try {
-    await signOut(auth);
-  } catch (e) {
-    alert("Erro ao sair: " + e.message);
-    console.error(e);
-  }
-};
-
-// ==================== AUTENTICAÇÃO E CONTROLE DE INTERFACE ====================
-onAuthStateChanged(auth, user => {
-  if (user) {
-    hide(loginSection);
-    hide(registerSection);
-    hide(projectForm);
-    show(postProjectBtn);
-    show(logoutBtn);
-    loadProjects();
-  } else {
-    window.showLogin();
-    hide(postProjectBtn);
-    hide(logoutBtn);
-    projectsContainer.innerHTML = "";
-    hide(fullscreenOverlay);
+  } catch (error) {
+    alert("Erro ao cadastrar: " + error.message);
   }
 });
 
-// ==================== LIMITE DIÁRIO ====================
-async function canUpload(newBytes) {
-  const today = new Date().toISOString().split("T")[0];
-  const ref = doc(db, "dailyUsage", today);
+toLoginLink.addEventListener("click", e => {
+  e.preventDefault();
+  showSection(loginSection);
+});
+
+logoutBtn.addEventListener("click", async () => {
   try {
-    const snap = await getDoc(ref);
-    const used = snap.exists() ? snap.data().totalBytes : 0;
-    if (used + newBytes > MAX_DAILY_BYTES) {
-      alert("🚫 Limite diário de 5 GB atingido.");
-      return false;
-    }
-    if (snap.exists()) {
-      await updateDoc(ref, { totalBytes: increment(newBytes) });
-    } else {
-      await setDoc(ref, { totalBytes: newBytes });
-    }
-    return true;
-  } catch (e) {
-    console.error("Erro ao verificar limite:", e);
-    alert("Erro ao verificar limite de upload.");
-    return false;
+    await signOut(auth);
+  } catch (error) {
+    alert("Erro ao sair: " + error.message);
   }
+});
+
+// Atualiza UI conforme estado de autenticação
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  if (user) {
+    showSection(null);
+    postProjectBtn.style.display = "inline-block";
+    logoutBtn.style.display = "inline-block";
+    loginSection.style.display = "none";
+    registerSection.style.display = "none";
+    projectFormSection.style.display = "none";
+    loadProjects();
+  } else {
+    showSection(loginSection);
+    postProjectBtn.style.display = "none";
+    logoutBtn.style.display = "none";
+    projectsGrid.innerHTML = "";
+  }
+});
+
+// ------------------------ Postar Projeto ------------------------ //
+
+// Abrir formulário ao clicar em "Postar Projeto"
+postProjectBtn.addEventListener("click", () => {
+  projectFormSection.style.display = "block";
+  // Adicionar botão cancelar se ainda não tiver
+  if (!cancelPostBtn) {
+    cancelPostBtn = createElement("button", ["cancel-post-btn"], "Cancelar");
+    cancelPostBtn.style.marginTop = "12px";
+    cancelPostBtn.style.backgroundColor = "#a5d6a7";
+    cancelPostBtn.style.color = "#2e3a2e";
+    cancelPostBtn.style.border = "none";
+    cancelPostBtn.style.padding = "12px";
+    cancelPostBtn.style.borderRadius = "10px";
+    cancelPostBtn.style.cursor = "pointer";
+    cancelPostBtn.style.fontWeight = "700";
+    cancelPostBtn.addEventListener("click", () => {
+      projectFormSection.style.display = "none";
+      clearProjectForm();
+    });
+    projectFormSection.appendChild(cancelPostBtn);
+  }
+});
+
+// Limpa formulário de projeto
+function clearProjectForm() {
+  projectTitleInput.value = "";
+  projectDescInput.value = "";
+  projectImageInput.value = "";
+  projectVideoInput.value = "";
+  uploadProgress.style.display = "none";
+  uploadProgress.value = 0;
+  uploadMessage.style.display = "none";
 }
 
-// ==================== UPLOAD CLOUDINARY ====================
-async function uploadToCloudinary(file) {
-  return new Promise((resolve, reject) => {
-    if (!file) return resolve(null);
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
-    const xhr = new XMLHttpRequest();
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", uploadPreset);
+// Enviar projeto para Firestore com uploads Cloudinary
+submitProjectBtn.addEventListener("click", async () => {
+  const title = projectTitleInput.value.trim();
+  const desc = projectDescInput.value.trim();
 
-    xhr.open("POST", url, true);
-    xhr.upload.onprogress = e => {
-      if (e.lengthComputable) {
-        uploadProgress.value = (e.loaded / e.total) * 100;
-        uploadMessage.textContent = `Enviando "${file.name}"`;
-        show(uploadProgress);
-        show(uploadMessage);
-      }
-    };
-    xhr.onload = () => {
-      hide(uploadProgress);
-      hide(uploadMessage);
-      if (xhr.status === 200) {
-        try {
-          const res = JSON.parse(xhr.responseText);
-          resolve(res.secure_url);
-        } catch {
-          reject(new Error("Erro ao interpretar resposta do Cloudinary"));
-        }
-      } else {
-        reject(new Error("Erro no upload para Cloudinary"));
-      }
-    };
-    xhr.onerror = () => reject(new Error("Erro de rede no upload"));
-    xhr.send(formData);
-  });
-}
-
-// ==================== SUBMISSÃO DO PROJETO ====================
-window.submitProject = async function () {
-  const title = document.getElementById("project-title").value.trim();
-  const description = document.getElementById("project-desc").value.trim();
-  const imageInput = document.getElementById("project-image");
-  const videoInput = document.getElementById("project-video");
-  const uid = auth.currentUser?.uid;
-
-  if (!uid || !title || !description) {
-    alert("Preencha todos os campos obrigatórios.");
+  if (!title || !desc) {
+    alert("Preencha título e descrição.");
     return;
   }
 
-  // Separar arquivos
-  let imageFile = null;
-  let pdfFile = null;
-  for (const f of imageInput.files) {
-    if (f.type === "application/pdf") pdfFile = f;
-    else if (f.type.startsWith("image/")) imageFile = f;
-  }
-  const videoFile = videoInput?.files[0] || null;
+  const imagesAndPDFsFiles = projectImageInput.files;
+  const videoFile = projectVideoInput.files[0];
 
-  const totalBytes = (imageFile?.size || 0) + (pdfFile?.size || 0) + (videoFile?.size || 0);
-
-  if (!(await canUpload(totalBytes))) return;
+  uploadProgress.style.display = "block";
+  uploadProgress.value = 0;
+  uploadMessage.style.display = "block";
+  uploadMessage.textContent = "Enviando...";
 
   try {
-    const [imageUrl, pdfUrl, videoUrl] = await Promise.all([
-      uploadToCloudinary(imageFile),
-      uploadToCloudinary(pdfFile),
-      uploadToCloudinary(videoFile)
-    ]);
+    // Upload múltiplo de imagens e PDFs
+    const uploadedFiles = [];
+    for (let i = 0; i < imagesAndPDFsFiles.length; i++) {
+      const file = imagesAndPDFsFiles[i];
+      const result = await uploadFileToCloudinary(file);
+      uploadedFiles.push(result);
+      uploadProgress.value = Math.round(((i + 1) / (imagesAndPDFsFiles.length + (videoFile ? 1 : 0))) * 100);
+    }
 
-    const data = {
+    // Upload do vídeo (se existir)
+    let uploadedVideo = null;
+    if (videoFile) {
+      const videoResult = await uploadFileToCloudinary(videoFile);
+      uploadedVideo = videoResult;
+      uploadProgress.value = 100;
+    }
+
+    // Criar doc no Firestore
+    await addDoc(collection(db, "projects"), {
       title,
-      description,
-      createdAt: new Date(),
-      userId: uid,
-      comments: [],
-      ...(imageUrl && { imageUrl }),
-      ...(pdfUrl && { pdfUrl }),
-      ...(videoUrl && { videoUrl })
-    };
+      description: desc,
+      userId: currentUser.uid,
+      mediaFiles: uploadedFiles, // array de {url, type, originalFilename}
+      videoFile: uploadedVideo,  // objeto {url, type, originalFilename} ou null
+      createdAt: serverTimestamp()
+    });
 
-    await addDoc(collection(db, "projects"), data);
     alert("Projeto enviado com sucesso!");
-    hide(projectForm);
-    resetForm();
-    loadProjects();
-  } catch (e) {
-    alert("Erro ao enviar projeto: " + e.message);
-    console.error("Erro no envio:", e);
-  }
-};
+    clearProjectForm();
+    projectFormSection.style.display = "none";
 
-// ==================== LISTAGEM DE PROJETOS ====================
+  } catch (error) {
+    alert("Erro ao enviar projeto: " + error.message);
+  } finally {
+    uploadProgress.style.display = "none";
+    uploadMessage.style.display = "none";
+  }
+});
+
+// ------------------------ Listar Projetos ------------------------ //
+
 function loadProjects() {
+  projectsGrid.innerHTML = "";
   const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
-  onSnapshot(q, snapshot => {
-    projectsContainer.innerHTML = "";
-    if (snapshot.empty) {
-      projectsContainer.innerHTML = "<p>Nenhum projeto encontrado.</p>";
-      return;
-    }
+
+  onSnapshot(q, (snapshot) => {
+    projectsGrid.innerHTML = "";
     snapshot.forEach(docSnap => {
-      const p = { id: docSnap.id, ...docSnap.data() };
-      projectsContainer.appendChild(renderCard(p));
+      const project = { id: docSnap.id, ...docSnap.data() };
+      const card = createProjectCard(project);
+      projectsGrid.appendChild(card);
     });
   });
 }
 
-// ==================== RENDERIZAÇÃO DE CARD ====================
-function renderCard(p) {
-  const el = document.createElement("div");
-  el.className = "project-card";
-  el.innerHTML = `
-    <h3>${p.title}</h3>
-    <p>${p.description}</p>
-    ${p.imageUrl ? `<img src="${p.imageUrl}" alt="Imagem do projeto" />` : ""}
-    ${p.videoUrl ? `<video src="${p.videoUrl}" controls muted preload="metadata" class="project-video"></video>` : ""}
-    ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view" title="PDF do projeto"></iframe>` : ""}
-  `;
-  el.onclick = () => openProjectView(p);
-  return el;
-}
+// Criar card de projeto
+function createProjectCard(project) {
+  const card = createElement("div", "project-card");
+  card.setAttribute("data-id", project.id);
 
-// ==================== VISUALIZAÇÃO EM TELA CHEIA ====================
-function openProjectView(p) {
-  hide(projectsContainer);
-  show(fullscreenOverlay);
+  const title = createElement("h3", null, project.title);
+  const desc = createElement("p", null, project.description);
 
-  fullscreenContent.innerHTML = `
-    <button class="close-btn" title="Voltar">← Voltar</button>
-    <h2>${p.title}</h2>
-    <div class="media-container">
-      ${p.imageUrl ? `<img src="${p.imageUrl}" alt="Imagem do projeto" class="modal-image" />` : ""}
-      ${p.videoUrl ? `<video src="${p.videoUrl}" controls class="modal-video"></video>` : ""}
-      ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view" title="PDF do projeto"></iframe>` : ""}
-    </div>
-    <p>${p.description}</p>
-    <div class="modal-comments-list"></div>
-    <input type="text" id="modal-comment-input" placeholder="Comente..." />
-    <button id="modal-comment-btn">Enviar</button>
-  `;
+  card.appendChild(title);
+  card.appendChild(desc);
 
-  // Posicionar botão voltar no canto esquerdo (CSS já cuida disso, veja se está no seu CSS)
-
-  const list = fullscreenContent.querySelector(".modal-comments-list");
-
-  (p.comments || []).forEach(c => {
-    const el = document.createElement("p");
-    el.textContent = `${c.userEmail || "Anônimo"}: ${c.text}`;
-    list.appendChild(el);
-  });
-
-  document.getElementById("modal-comment-btn").onclick = async () => {
-    const text = document.getElementById("modal-comment-input").value.trim();
-    if (!text) return;
-    const user = auth.currentUser;
-    if (!user) {
-      alert("Você precisa estar logado para comentar.");
-      return;
-    }
-    const comment = {
-      userId: user.uid,
-      userEmail: user.email,
-      text,
-      createdAt: new Date()
-    };
-    try {
-      await updateDoc(doc(db, "projects", p.id), {
-        comments: arrayUnion(comment)
-      });
-      const el = document.createElement("p");
-      el.textContent = `${comment.userEmail}: ${comment.text}`;
-      list.appendChild(el);
-      document.getElementById("modal-comment-input").value = "";
-    } catch (e) {
-      alert("Erro ao comentar: " + e.message);
-      console.error(e);
-    }
-  };
-
-  fullscreenContent.querySelector(".close-btn").onclick = () => {
-    hide(fullscreenOverlay);
-    fullscreenContent.innerHTML = "";
-    show(projectsContainer);
-  };
-}
-
-// ==================== EVENT LISTENERS ====================
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("login-btn").addEventListener("click", window.login);
-  document.getElementById("register-btn").addEventListener("click", window.register);
-  document.getElementById("logout-btn").addEventListener("click", window.logout);
-  document.getElementById("post-project-btn").addEventListener("click", () => {
-    hide(postProjectBtn);
-    window.showProjectForm();
-    hide(projectsContainer);
-  });
-  document.getElementById("submit-project-btn").addEventListener("click", window.submitProject);
-  
-  // Botão cancelar no formulário (adicionar no HTML para funcionar)
-  // Vamos criar dinamicamente aqui:
-  if (!document.getElementById("cancel-project-btn")) {
-    const cancelBtn = document.createElement("button");
-    cancelBtn.id = "cancel-project-btn";
-    cancelBtn.textContent = "Cancelar";
-    cancelBtn.type = "button";
-    cancelBtn.style.marginTop = "12px";
-    cancelBtn.style.backgroundColor = "#a5d6a7";
-    cancelBtn.style.color = "#2e3a2e";
-    cancelBtn.style.border = "none";
-    cancelBtn.style.padding = "12px";
-    cancelBtn.style.borderRadius = "10px";
-    cancelBtn.style.cursor = "pointer";
-    cancelBtn.addEventListener("click", () => {
-      window.hideProjectForm();
-      show(postProjectBtn);
-      show(projectsContainer);
+  // Imagens e PDFs (mostrar somente imagens pequenas)
+  if (project.mediaFiles && project.mediaFiles.length > 0) {
+    project.mediaFiles.forEach(media => {
+      if (media.type === "image") {
+        const img = createElement("img");
+        img.src = media.url;
+        img.alt = media.originalFilename || "Imagem do projeto";
+        card.appendChild(img);
+      }
     });
-    projectForm.appendChild(cancelBtn);
   }
 
-  document.getElementById("to-register").addEventListener("click", e => {
-    e.preventDefault();
-    window.showRegister();
+  // Vídeo (mostrar thumbnail ou player pequeno)
+  if (project.videoFile && project.videoFile.url) {
+    const video = createElement("video");
+    video.src = project.videoFile.url;
+    video.controls = true;
+    video.muted = true;
+    video.preload = "metadata";
+    video.style.marginTop = "12px";
+    card.appendChild(video);
+  }
+
+  // Clique para abrir fullscreen modal
+  card.addEventListener("click", () => openProjectModal(project));
+
+  return card;
+}
+
+// ------------------------ Modal Fullscreen ------------------------ //
+
+function openProjectModal(project) {
+  fullscreenData.innerHTML = ""; // limpa modal
+
+  // Botão voltar discreto e posicionado no canto esquerdo
+  const closeBtn = createElement("button", "close-btn", "← Voltar");
+  closeBtn.style.position = "absolute";
+  closeBtn.style.top = "20px";
+  closeBtn.style.left = "20px";
+  closeBtn.addEventListener("click", closeProjectModal);
+  fullscreenData.appendChild(closeBtn);
+
+  // Título e descrição
+  const title = createElement("h2", null, project.title);
+  fullscreenData.appendChild(title);
+  const desc = createElement("p", null, project.description);
+  fullscreenData.appendChild(desc);
+
+  // Container de mídia
+  const mediaContainer = createElement("div", "media-container");
+  fullscreenData.appendChild(mediaContainer);
+
+  // Mostrar todas as imagens e PDFs
+  if (project.mediaFiles && project.mediaFiles.length > 0) {
+    project.mediaFiles.forEach(media => {
+      if (media.type === "image") {
+        const img = createElement("img", "modal-image");
+        img.src = media.url;
+        img.alt = media.originalFilename || "Imagem do projeto";
+        mediaContainer.appendChild(img);
+      } else if (media.type === "raw" || media.url.endsWith(".pdf")) {
+        // PDF embed via iframe
+        const iframe = createElement("iframe", "pdf-view");
+        iframe.src = media.url;
+        iframe.type = "application/pdf";
+        iframe.title = media.originalFilename || "PDF do projeto";
+        mediaContainer.appendChild(iframe);
+      }
+    });
+  }
+
+  // Mostrar vídeo (player grande)
+  if (project.videoFile && project.videoFile.url) {
+    const video = createElement("video", "modal-video");
+    video.src = project.videoFile.url;
+    video.controls = true;
+    video.autoplay = false;
+    video.style.maxHeight = "420px";
+    mediaContainer.appendChild(video);
+  }
+
+  // Comentários
+  const commentsSection = createElement("section", "comments-section");
+  const commentsTitle = createElement("h3", null, "Comentários");
+  commentsSection.appendChild(commentsTitle);
+
+  const commentsList = createElement("div", "modal-comments-list");
+  commentsSection.appendChild(commentsList);
+
+  // Campo para adicionar comentário
+  const commentInput = createElement("input");
+  commentInput.type = "text";
+  commentInput.id = "modal-comment-input";
+  commentInput.placeholder = "Escreva um comentário...";
+  commentsSection.appendChild(commentInput);
+
+  const commentBtn = createElement("button");
+  commentBtn.id = "modal-comment-btn";
+  commentBtn.textContent = "Enviar";
+  commentsSection.appendChild(commentBtn);
+
+  fullscreenData.appendChild(commentsSection);
+
+  // Mostrar modal
+  fullscreenOverlay.classList.add("active");
+
+  // Carregar e mostrar comentários do projeto
+  const projectDocRef = doc(db, "projects", project.id);
+  onSnapshot(projectDocRef, (docSnap) => {
+    if (!docSnap.exists()) {
+      commentsList.innerHTML = "<p>Projeto não encontrado.</p>";
+      return;
+    }
+    const projectData = docSnap.data();
+    commentsList.innerHTML = "";
+    if (projectData.comments && projectData.comments.length > 0) {
+      projectData.comments.forEach(c => {
+        const p = createElement("p", null, `${c.userEmail}: ${c.text}`);
+        commentsList.appendChild(p);
+      });
+    } else {
+      commentsList.innerHTML = "<p>Seja o primeiro a comentar!</p>";
+    }
   });
-  document.getElementById("to-login").addEventListener("click", e => {
-    e.preventDefault();
-    window.showLogin();
-  });
+
+  // Enviar comentário
+  commentBtn.onclick = async () => {
+    const commentText = commentInput.value.trim();
+    if (!commentText) return alert("Escreva algo para comentar.");
+    if (!currentUser) return alert("Você precisa estar logado para comentar.");
+
+    try {
+      await updateDoc(projectDocRef, {
+        comments: arrayUnion({
+          text: commentText,
+          userEmail: currentUser.email,
+          createdAt: serverTimestamp()
+        })
+      });
+      commentInput.value = "";
+    } catch (error) {
+      alert("Erro ao enviar comentário: " + error.message);
+    }
+  };
+}
+
+// Fecha modal fullscreen
+function closeProjectModal() {
+  fullscreenOverlay.classList.remove("active");
+  fullscreenData.innerHTML = "";
+}
+
+// Fecha modal se clicar fora do conteúdo
+fullscreenOverlay.addEventListener("click", (e) => {
+  if (e.target === fullscreenOverlay) closeProjectModal();
 });
