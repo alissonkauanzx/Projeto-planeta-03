@@ -191,8 +191,6 @@ main.center-wrapper {
   box-shadow: 0 10px 25px rgba(0,0,0,0.3);
   outline: none;
 }
-
-/* ====== Botão Cancelar Postagem ====== */
 #cancel-project-btn {
   margin-top: 14px;
   background: transparent;
@@ -235,11 +233,7 @@ main.center-wrapper {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  min-height: 380px;
-  max-height: 450px;
-  overflow: hidden;
+  justify-content: flex-start;
 }
 .project-card:hover {
   transform: translateY(-8px) scale(1.04);
@@ -251,17 +245,15 @@ main.center-wrapper {
   margin-bottom: 12px;
   font-size: 1.35rem;
   user-select: none;
-  flex-shrink: 0;
 }
 .project-card p {
   color: #466a46;
   font-size: 1rem;
   flex-grow: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limita a 3 linhas */
+  -webkit-box-orient: vertical;
 }
 .project-card img,
 .project-card video,
@@ -280,8 +272,6 @@ main.center-wrapper {
 .project-card iframe:hover {
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
 }
-
-/* ====== Botões Editar e Apagar Projeto ====== */
 .project-card .edit-btn,
 .project-card .delete-btn {
   margin-top: 12px;
@@ -377,7 +367,7 @@ main.center-wrapper {
   outline: none;
 }
 
-/* ====== Botão Voltar ====== */
+/* ========== Botão Voltar ========== */
 .close-btn {
   position: fixed;
   top: 20px;
