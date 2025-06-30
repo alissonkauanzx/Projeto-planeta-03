@@ -6,7 +6,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 import {
   getFirestore, collection, addDoc, query, orderBy, onSnapshot,
-  doc, updateDoc, arrayUnion, getDoc, setDoc, increment
+  doc, updateDoc, arrayUnion, getDoc, setDoc, increment, deleteDoc
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 // ==================== FIREBASE CONFIG ====================
@@ -21,6 +21,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2"; // Seu UID
 
 // ==================== ELEMENTOS ====================
 const loginSection = document.getElementById("login-section");
@@ -46,6 +48,7 @@ function resetForm() {
   projectForm.reset();
   hide(uploadProgress);
   hide(uploadMessage);
+  projectForm.dataset.editing = ""; // Reset edição
 }
 
 function showSection(sectionId) {
@@ -167,18 +170,15 @@ async function uploadToCloudinary(file) {
       hide(uploadProgress);
       hide(uploadMessage);
       if (xhr.status === 200) {
-        const res = JSON.parse(xhr.responseText);
-        resolve(res.secure_url);
-      } else {
-        reject("Erro no upload");
-      }
+        resolve(JSON.parse(xhr.responseText).secure_url);
+      } else reject("Erro no upload");
     };
     xhr.onerror = () => reject("Erro de rede");
     xhr.send(formData);
   });
 }
 
-// ==================== ENVIO DE PROJETO ====================
+// ==================== ENVIO OU EDIÇÃO DE PROJETO ====================
 window.submitProject = async () => {
   const title = document.getElementById("project-title").value.trim();
   const description = document.getElementById("project-desc").value.trim();
@@ -203,13 +203,28 @@ window.submitProject = async () => {
       uploadToCloudinary(pdfFile),
       uploadToCloudinary(videoFile)
     ]);
-    await addDoc(collection(db, "projects"), {
-      title, description, userId: uid, createdAt: new Date(), comments: [],
-      ...(imageUrl && { imageUrl }), ...(pdfUrl && { pdfUrl }), ...(videoUrl && { videoUrl })
-    });
-    alert("Projeto postado com sucesso!");
-    hide(projectForm);
+
+    const editingId = projectForm.dataset.editing;
+
+    const data = {
+      title, description, userId: uid, comments: [],
+      createdAt: new Date(),
+      ...(imageUrl && { imageUrl }),
+      ...(pdfUrl && { pdfUrl }),
+      ...(videoUrl && { videoUrl })
+    };
+
+    if (editingId) {
+      delete data.createdAt;
+      await updateDoc(doc(db, "projects", editingId), data);
+      alert("Projeto atualizado!");
+    } else {
+      await addDoc(collection(db, "projects"), data);
+      alert("Projeto postado!");
+    }
+
     resetForm();
+    hide(projectForm);
     loadProjects();
   } catch (e) {
     alert("Erro ao enviar projeto.");
@@ -217,7 +232,7 @@ window.submitProject = async () => {
   }
 };
 
-// ==================== LISTA DE PROJETOS ====================
+// ==================== LISTAGEM ====================
 function loadProjects() {
   const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
   onSnapshot(q, snap => {
@@ -234,20 +249,42 @@ function loadProjects() {
 }
 
 function renderCard(p) {
+  const user = auth.currentUser;
+  const isOwner = user && (p.userId === user.uid || user.uid === ADMIN_UID);
+
   const el = document.createElement("div");
   el.className = "project-card";
   el.innerHTML = `
     <h3>${p.title}</h3>
     <p>${p.description}</p>
-    ${p.imageUrl ? `<img src="${p.imageUrl}" alt="Imagem do projeto" />` : ""}
-    ${p.videoUrl ? `<video src="${p.videoUrl}" controls muted preload="metadata"></video>` : ""}
+    ${p.imageUrl ? `<img src="${p.imageUrl}" />` : ""}
+    ${p.videoUrl ? `<video src="${p.videoUrl}" controls muted></video>` : ""}
     ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
+    <button class="view-btn">Ver Detalhes</button>
+    ${isOwner ? `
+      <button class="edit-btn">Editar</button>
+      <button class="delete-btn">Apagar</button>` : ""}
   `;
-  el.onclick = () => openProjectDetail(p);
+
+  el.querySelector(".view-btn").onclick = () => openProjectDetail(p);
+  if (isOwner) {
+    el.querySelector(".edit-btn").onclick = () => {
+      showSection("#project-form");
+      document.getElementById("project-title").value = p.title;
+      document.getElementById("project-desc").value = p.description;
+      projectForm.dataset.editing = p.id;
+    };
+    el.querySelector(".delete-btn").onclick = async () => {
+      if (confirm("Tem certeza que deseja apagar este projeto?")) {
+        await deleteDoc(doc(db, "projects", p.id));
+        alert("Projeto apagado.");
+      }
+    };
+  }
   return el;
 }
 
-// ==================== SEÇÃO DETALHES DO PROJETO ====================
+// ==================== DETALHES DO PROJETO ====================
 function openProjectDetail(p) {
   showSection("#project-detail-section");
   document.getElementById("detail-title").textContent = p.title;
