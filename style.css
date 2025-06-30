@@ -319,6 +319,72 @@ main.center-wrapper {
   font-size: 0.95rem;
 }
 
+/* ========== Seção de Detalhes do Projeto (NOVO) ========== */
+#project-detail-section {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(46, 125, 50, 0.3);
+  padding: 36px;
+  max-width: 800px;
+  margin: auto;
+  animation: fadeInUp 0.5s ease;
+}
+#project-detail-section h2 {
+  color: #2e7d32;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+}
+#detail-description {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  color: #466a46;
+}
+#detail-media img,
+#detail-media video,
+#detail-media iframe {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+.modal-comments-list {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+.modal-comments-list p {
+  background: #f1f8f1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  color: #2e7d32;
+  font-weight: 500;
+}
+#detail-comment-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #a5d6a7;
+  margin-top: 10px;
+  font-size: 1rem;
+}
+#detail-comment-btn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+#detail-comment-btn:hover {
+  background-color: #1b5e20;
+}
+
 /* ========== Responsivo ========== */
 @media (max-width: 600px) {
   .project-card {
