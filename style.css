@@ -192,6 +192,26 @@ main.center-wrapper {
   outline: none;
 }
 
+/* ====== Botão Cancelar Postagem ====== */
+#cancel-project-btn {
+  margin-top: 14px;
+  background: transparent;
+  color: #2e7d32;
+  border: 2px solid #a5d6a7;
+  padding: 12px;
+  width: 100%;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+#cancel-project-btn:hover,
+#cancel-project-btn:focus {
+  background-color: #e0f2f1;
+  transform: scale(1.03);
+  outline: none;
+}
+
 /* ========== Projetos (Cards) ========== */
 .projects-section h2 {
   text-align: center;
@@ -372,11 +392,12 @@ main.center-wrapper {
   border: none;
 }
 
-/* Botão fechar modal */
+/* ====== Botão fechar (reposicionado) ====== */
 .close-btn {
-  position: absolute;
-  top: 22px;
-  left: 32px;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
   background: #2e7d32;
   color: white;
   border: none;
@@ -406,7 +427,7 @@ footer {
   user-select: none;
 }
 
-/* ========== Responsividade ======== */
+/* ========== Responsividade ========== */
 @media (max-width: 600px) {
   .navbar h1 {
     font-size: 1.8rem;
