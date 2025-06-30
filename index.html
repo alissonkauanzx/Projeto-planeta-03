@@ -23,8 +23,9 @@
     <div class="navbar">
       <h1 class="float-title">Planeta Projeto 🌎</h1>
       <div class="right-buttons">
-        <button id="post-project-btn">Postar Projeto</button>
-        <button id="logout-btn">Sair</button>
+        <!-- Botões inicialmente ocultos no CSS -->
+        <button id="post-project-btn" style="display:none;">Postar Projeto</button>
+        <button id="logout-btn" style="display:none;">Sair</button>
       </div>
     </div>
   </header>
@@ -55,14 +56,18 @@
       <h2>Postar Projeto</h2>
       <input type="text" id="project-title" placeholder="Título do Projeto" required />
       <textarea id="project-desc" placeholder="Descrição do Projeto" required></textarea>
+
       <label for="project-image">Imagens e PDFs (pode selecionar múltiplos):</label>
       <input type="file" id="project-image" accept="image/*,application/pdf" multiple />
+
       <label for="project-video">Vídeo:</label>
       <input type="file" id="project-video" accept="video/*" />
+
       <progress id="upload-progress" value="0" max="100" style="display: none;"></progress>
       <p id="upload-message" style="display: none;">Enviando...</p>
+
       <button id="submit-project-btn">Enviar Projeto</button>
-      <button id="cancel-project-btn">Cancelar</button>
+      <button id="cancel-project-btn" type="button">Cancelar</button>
     </section>
 
     <!-- Lista de Projetos -->
@@ -74,7 +79,7 @@
   </main>
 
   <!-- Modal fullscreen para projeto -->
-  <div id="fullscreen-project" class="fullscreen-overlay">
+  <div id="fullscreen-project" class="fullscreen-overlay" style="display:none;">
     <div id="fullscreen-data" class="fullscreen-content"></div>
     <button class="close-btn" id="close-fullscreen">Voltar</button>
   </div>
