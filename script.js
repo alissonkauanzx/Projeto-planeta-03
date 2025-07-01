@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ==================== CONSTANTES ====================
   const ADMIN_UID = "khhRon4qIBZdyaJfVKN6ZiSApgR2";
-  const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024; // 5GB
+  const MAX_DAILY_BYTES = 5 * 1024 * 1024 * 1024;
 
   // ==================== ELEMENTOS ====================
   const loginSection = document.getElementById("login-section");
@@ -90,10 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!email || !password) return alert("Preencha e-mail e senha.");
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // login bem-sucedido: o onAuthStateChanged vai cuidar do resto
     } catch (e) {
       alert("Erro no login: " + e.message);
-      console.error(e);
     }
   }
 
@@ -107,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
       showLogin();
     } catch (e) {
       alert("Erro no registro: " + e.message);
-      console.error(e);
     }
   }
 
@@ -116,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
       await signOut(auth);
     } catch (e) {
       alert("Erro ao sair: " + e.message);
-      console.error(e);
     }
   }
 
@@ -152,7 +148,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       return true;
     } catch (e) {
-      console.error("Erro ao verificar limite:", e);
       alert("Erro ao verificar limite de upload.");
       return false;
     }
@@ -240,7 +235,6 @@ document.addEventListener("DOMContentLoaded", () => {
       loadProjects();
     } catch (e) {
       alert("Erro ao enviar projeto: " + e.message);
-      console.error(e);
     }
   }
 
@@ -304,7 +298,6 @@ document.addEventListener("DOMContentLoaded", () => {
       <button class="close-btn">Voltar</button>
     `;
 
-    // Comentários
     const list = fullscreenContent.querySelector(".modal-comments-list");
     (p.comments || []).forEach(c => {
       const el = document.createElement("p");
@@ -312,7 +305,6 @@ document.addEventListener("DOMContentLoaded", () => {
       list.appendChild(el);
     });
 
-    // Comentar
     document.getElementById("modal-comment-btn").onclick = async () => {
       const text = document.getElementById("modal-comment-input").value.trim();
       if (!text || !auth.currentUser) return alert("Precisa estar logado.");
@@ -333,7 +325,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    // Editar
     document.getElementById("edit-btn").onclick = async () => {
       const newTitle = prompt("Novo título:", p.title);
       const newDesc = prompt("Nova descrição:", p.description);
@@ -351,7 +342,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    // Apagar
     document.getElementById("delete-btn").onclick = async () => {
       if (confirm("Tem certeza que deseja apagar este projeto?")) {
         try {
@@ -364,7 +354,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    // Botão de fechar
     fullscreenContent.querySelector(".close-btn").onclick = () => {
       hideModal();
       fullscreenContent.innerHTML = "";
@@ -387,8 +376,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("logout-btn").addEventListener("click", logout);
   document.getElementById("post-project-btn").addEventListener("click", showProjectForm);
   document.getElementById("submit-project-btn").addEventListener("click", submitProject);
-  document.getElementById("cancel-project-btn").addEventListener("click", (event) => {
-    event.preventDefault();
+  document.getElementById("cancel-project-btn").addEventListener("click", (e) => {
+    e.preventDefault();
     resetForm();
     hide(projectForm);
     projectsContainer.style.display = "grid";
