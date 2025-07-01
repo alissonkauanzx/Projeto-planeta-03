@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==================== UTILITÁRIOS ====================
   const show = el => el && (el.style.display = "block");
   const hide = el => el && (el.style.display = "none");
+
   function resetForm() {
     projectForm.reset();
     hide(uploadProgress);
@@ -379,7 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("post-project-btn").addEventListener("click", showProjectForm);
   document.getElementById("submit-project-btn").addEventListener("click", submitProject);
 
-  // CORREÇÃO AQUI: adiciona listener no botão Cancelar
+  // Cancelar projeto — o botão que você pediu para garantir funcionamento
   const cancelBtn = document.getElementById("cancel-project-btn");
   if (cancelBtn) {
     cancelBtn.addEventListener("click", (e) => {
