@@ -390,6 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("cancel-project-btn").addEventListener("click", () => {
     resetForm();
     hide(projectForm);
+    projectsContainer.style.display = "grid";
   });
   document.getElementById("to-register").addEventListener("click", e => {
     e.preventDefault();
