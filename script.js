@@ -77,6 +77,7 @@ window.showProjectForm = function () {
   hide(loginSection);
   hide(registerSection);
   show(projectForm);
+  projectsContainer.style.display = 'none';
   resetForm();
   hideModal();
 };
@@ -245,6 +246,7 @@ window.submitProject = async function () {
     await addDoc(collection(db, "projects"), data);
     alert("Projeto enviado com sucesso!");
     hide(projectForm);
+    projectsContainer.style.display = 'grid';
     resetForm();
     loadProjects();
   } catch (e) {
@@ -285,11 +287,9 @@ function renderCard(p) {
 }
 
 // ==================== VISUALIZAÇÃO EM TELA CHEIA ====================
-// Mostra modal adicionando classe 'active' para ativar transição
 function showModal() {
   fullscreenOverlay.classList.add('active');
 }
-// Esconde modal removendo classe 'active'
 function hideModal() {
   fullscreenOverlay.classList.remove('active');
 }
@@ -300,7 +300,7 @@ function openProjectView(p) {
 
   fullscreenContent.innerHTML = `
     <h2>${p.title}</h2>
-    <div class="media-container">
+    <div class="media-container" id="detail-media">
       ${p.imageUrl ? `<img src="${p.imageUrl}" alt="Imagem do projeto" class="modal-image" />` : ""}
       ${p.videoUrl ? `<video src="${p.videoUrl}" controls class="modal-video"></video>` : ""}
       ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view" title="PDF do projeto"></iframe>` : ""}
@@ -369,5 +369,12 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("to-login").addEventListener("click", e => {
     e.preventDefault();
     window.showLogin();
+  });
+
+  // ✅ Botão "Cancelar" da postagem de projeto
+  document.getElementById("cancel-project-btn").addEventListener("click", () => {
+    hide(projectForm);
+    projectsContainer.style.display = 'grid';
+    resetForm();
   });
 });
