@@ -37,6 +37,7 @@ const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
 const fullscreenOverlay = document.getElementById("fullscreen-project");
 const fullscreenContent = document.getElementById("fullscreen-data");
+const cancelProjectBtn = document.getElementById("cancel-project-btn"); // botão cancelar
 
 // ==================== CLOUDINARY CONFIG ====================
 const configMeta = document.querySelector('meta[name="cloudinary-config"]');
@@ -77,7 +78,6 @@ window.showProjectForm = function () {
   hide(loginSection);
   hide(registerSection);
   show(projectForm);
-  projectsContainer.style.display = 'none';
   resetForm();
   hideModal();
 };
@@ -246,7 +246,6 @@ window.submitProject = async function () {
     await addDoc(collection(db, "projects"), data);
     alert("Projeto enviado com sucesso!");
     hide(projectForm);
-    projectsContainer.style.display = 'grid';
     resetForm();
     loadProjects();
   } catch (e) {
@@ -300,7 +299,7 @@ function openProjectView(p) {
 
   fullscreenContent.innerHTML = `
     <h2>${p.title}</h2>
-    <div class="media-container" id="detail-media">
+    <div class="media-container">
       ${p.imageUrl ? `<img src="${p.imageUrl}" alt="Imagem do projeto" class="modal-image" />` : ""}
       ${p.videoUrl ? `<video src="${p.videoUrl}" controls class="modal-video"></video>` : ""}
       ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view" title="PDF do projeto"></iframe>` : ""}
@@ -370,11 +369,11 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     window.showLogin();
   });
-
-  // ✅ Botão "Cancelar" da postagem de projeto
-  document.getElementById("cancel-project-btn").addEventListener("click", () => {
+  // Novo: botão cancelar projeto
+  cancelProjectBtn.addEventListener("click", () => {
     hide(projectForm);
-    projectsContainer.style.display = 'grid';
     resetForm();
+    projectsContainer.style.display = 'grid';
+    hideModal();
   });
 });
