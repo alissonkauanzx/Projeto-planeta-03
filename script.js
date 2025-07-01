@@ -371,7 +371,10 @@ function openProjectView(p) {
 }
 
 // ==================== EVENTOS ====================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => { document.getElementById("cancel-project-btn").addEventListener("click", () => {
+  document.getElementById("project-form").style.display = "none";
+  document.querySelector(".projects-section").style.display = "block";
+});
   document.getElementById("login-btn").addEventListener("click", window.login);
   document.getElementById("register-btn").addEventListener("click", window.register);
   document.getElementById("logout-btn").addEventListener("click", window.logout);
