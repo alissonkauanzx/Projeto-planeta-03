@@ -6,7 +6,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 import {
   getFirestore, collection, addDoc, query, orderBy, onSnapshot,
-  doc, updateDoc, deleteDoc, arrayUnion, getDoc, setDoc, increment
+  doc, updateDoc, arrayUnion, getDoc, setDoc, increment, deleteDoc
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 // ==================== FIREBASE CONFIG ====================
@@ -37,7 +37,7 @@ const uploadProgress = document.getElementById("upload-progress");
 const uploadMessage = document.getElementById("upload-message");
 const fullscreenOverlay = document.getElementById("fullscreen-project");
 const fullscreenContent = document.getElementById("fullscreen-data");
-const cancelProjectBtn = document.getElementById("cancel-project-btn");
+const header = document.querySelector("header");
 
 // ==================== CLOUDINARY CONFIG ====================
 const configMeta = document.querySelector('meta[name="cloudinary-config"]');
@@ -86,10 +86,7 @@ window.showProjectForm = function () {
 window.login = async function () {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
-  if (!email || !password) {
-    alert("Preencha e-mail e senha.");
-    return;
-  }
+  if (!email || !password) return alert("Preencha e-mail e senha.");
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (e) {
@@ -101,10 +98,7 @@ window.login = async function () {
 window.register = async function () {
   const email = document.getElementById("reg-email").value.trim();
   const password = document.getElementById("reg-password").value.trim();
-  if (!email || !password) {
-    alert("Preencha e-mail e senha.");
-    return;
-  }
+  if (!email || !password) return alert("Preencha e-mail e senha.");
   try {
     await createUserWithEmailAndPassword(auth, email, password);
     alert("Conta criada com sucesso!");
@@ -124,7 +118,7 @@ window.logout = async function () {
   }
 };
 
-// ==================== AUTENTICAÇÃO E CONTROLE DE INTERFACE ====================
+// ==================== AUTENTICAÇÃO ====================
 onAuthStateChanged(auth, user => {
   if (user) {
     hide(loginSection);
@@ -162,7 +156,7 @@ async function canUpload(newBytes) {
   }
 }
 
-// ==================== UPLOAD CLOUDINARY ====================
+// ==================== UPLOAD ====================
 async function uploadToCloudinary(file) {
   return new Promise((resolve, reject) => {
     if (!file) return resolve(null);
@@ -189,10 +183,10 @@ async function uploadToCloudinary(file) {
           const res = JSON.parse(xhr.responseText);
           resolve(res.secure_url);
         } catch {
-          reject(new Error("Erro ao interpretar resposta do Cloudinary"));
+          reject(new Error("Erro ao interpretar resposta"));
         }
       } else {
-        reject(new Error("Erro no upload para Cloudinary"));
+        reject(new Error("Erro no upload Cloudinary"));
       }
     };
     xhr.onerror = () => reject(new Error("Erro de rede no upload"));
@@ -200,18 +194,14 @@ async function uploadToCloudinary(file) {
   });
 }
 
-// ==================== SUBMISSÃO DO PROJETO ====================
+// ==================== SUBMISSÃO DE PROJETO ====================
 window.submitProject = async function () {
   const title = document.getElementById("project-title").value.trim();
   const description = document.getElementById("project-desc").value.trim();
   const imageInput = document.getElementById("project-image");
   const videoInput = document.getElementById("project-video");
   const uid = auth.currentUser?.uid;
-
-  if (!uid || !title || !description) {
-    alert("Preencha todos os campos obrigatórios.");
-    return;
-  }
+  if (!uid || !title || !description) return alert("Preencha todos os campos obrigatórios.");
 
   let imageFile = null;
   let pdfFile = null;
@@ -220,12 +210,7 @@ window.submitProject = async function () {
     else if (f.type.startsWith("image/")) imageFile = f;
   }
   const videoFile = videoInput?.files[0] || null;
-
-  const totalBytes =
-    (imageFile?.size || 0) +
-    (pdfFile?.size || 0) +
-    (videoFile?.size || 0);
-
+  const totalBytes = (imageFile?.size || 0) + (pdfFile?.size || 0) + (videoFile?.size || 0);
   if (!(await canUpload(totalBytes))) return;
 
   try {
@@ -247,13 +232,13 @@ window.submitProject = async function () {
     };
 
     await addDoc(collection(db, "projects"), data);
-    alert("Projeto enviado com sucesso!");
+    alert("Projeto enviado!");
     hide(projectForm);
     resetForm();
     loadProjects();
   } catch (e) {
     alert("Erro ao enviar projeto: " + e.message);
-    console.error("Erro no envio:", e);
+    console.error(e);
   }
 };
 
@@ -262,10 +247,6 @@ function loadProjects() {
   const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
   onSnapshot(q, snapshot => {
     projectsContainer.innerHTML = "";
-    if (snapshot.empty) {
-      projectsContainer.innerHTML = "<p>Nenhum projeto encontrado.</p>";
-      return;
-    }
     snapshot.forEach(docSnap => {
       const p = { id: docSnap.id, ...docSnap.data() };
       projectsContainer.appendChild(renderCard(p));
@@ -273,7 +254,7 @@ function loadProjects() {
   });
 }
 
-// ==================== RENDERIZAÇÃO DE CARD ====================
+// ==================== RENDER CARD ====================
 function renderCard(p) {
   const el = document.createElement("div");
   el.className = "project-card";
@@ -288,105 +269,118 @@ function renderCard(p) {
   return el;
 }
 
-// ==================== VISUALIZAÇÃO EM TELA CHEIA ====================
+// ==================== FULLSCREEN MODAL ====================
 function showModal() {
   fullscreenOverlay.classList.add("active");
+  header.style.display = "none"; // Esconde o header
 }
+
 function hideModal() {
   fullscreenOverlay.classList.remove("active");
+  header.style.display = ""; // Restaura o header
 }
 
 function openProjectView(p) {
   projectsContainer.style.display = "none";
   showModal();
 
-  const isOwner = auth.currentUser?.uid === p.userId || auth.currentUser?.uid === ADMIN_UID;
-
   fullscreenContent.innerHTML = `
-    <div class="full-header">
-      <button class="close-btn">Voltar</button>
-      ${isOwner ? `<button class="edit-btn">Editar</button><button class="delete-btn">Apagar</button>` : ""}
+    <div class="top-right-buttons">
+      <button id="edit-btn">Editar</button>
+      <button id="delete-btn">Apagar</button>
     </div>
     <h2>${p.title}</h2>
     <div class="media-container">
-      ${p.imageUrl ? `<img src="${p.imageUrl}" class="modal-image" alt="Imagem"><br>` : ""}
-      ${p.videoUrl ? `<video src="${p.videoUrl}" controls class="modal-video"></video><br>` : ""}
-      ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view" title="PDF do projeto"></iframe><br>` : ""}
+      ${p.imageUrl ? `<img src="${p.imageUrl}" class="modal-image" />` : ""}
+      ${p.videoUrl ? `<video src="${p.videoUrl}" controls class="modal-video"></video>` : ""}
+      ${p.pdfUrl ? `<iframe src="${p.pdfUrl}" class="pdf-view"></iframe>` : ""}
     </div>
     <p>${p.description}</p>
     <div class="modal-comments-list"></div>
-    <input type="text" id="modal-comment-input" placeholder="Comente..." /><br>
+    <input type="text" id="modal-comment-input" placeholder="Comente..." />
     <button id="modal-comment-btn">Enviar</button>
+    <button class="close-btn">Voltar</button>
   `;
 
-  const commentList = fullscreenContent.querySelector(".modal-comments-list");
+  // Comentários
+  const list = fullscreenContent.querySelector(".modal-comments-list");
   (p.comments || []).forEach(c => {
     const el = document.createElement("p");
     el.textContent = `${c.userEmail || "Anônimo"}: ${c.text}`;
-    commentList.appendChild(el);
+    list.appendChild(el);
   });
 
+  // Comentar
+  document.getElementById("modal-comment-btn").onclick = async () => {
+    const text = document.getElementById("modal-comment-input").value.trim();
+    if (!text || !auth.currentUser) return alert("Precisa estar logado.");
+    const comment = {
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email,
+      text,
+      createdAt: new Date()
+    };
+    try {
+      await updateDoc(doc(db, "projects", p.id), { comments: arrayUnion(comment) });
+      const el = document.createElement("p");
+      el.textContent = `${comment.userEmail}: ${comment.text}`;
+      list.appendChild(el);
+      document.getElementById("modal-comment-input").value = "";
+    } catch (e) {
+      alert("Erro ao comentar: " + e.message);
+    }
+  };
+
+  // Editar
+  document.getElementById("edit-btn").onclick = async () => {
+    const newTitle = prompt("Novo título:", p.title);
+    const newDesc = prompt("Nova descrição:", p.description);
+    if (newTitle && newDesc) {
+      try {
+        await updateDoc(doc(db, "projects", p.id), {
+          title: newTitle,
+          description: newDesc
+        });
+        alert("Projeto atualizado.");
+        hideModal();
+      } catch (e) {
+        alert("Erro ao editar: " + e.message);
+      }
+    }
+  };
+
+  // Apagar
+  document.getElementById("delete-btn").onclick = async () => {
+    if (confirm("Tem certeza que deseja apagar este projeto?")) {
+      try {
+        await deleteDoc(doc(db, "projects", p.id));
+        alert("Projeto apagado.");
+        hideModal();
+      } catch (e) {
+        alert("Erro ao apagar: " + e.message);
+      }
+    }
+  };
+
+  // Botão de fechar
   fullscreenContent.querySelector(".close-btn").onclick = () => {
     hideModal();
     fullscreenContent.innerHTML = "";
     projectsContainer.style.display = "grid";
   };
-
-  if (isOwner) {
-    fullscreenContent.querySelector(".edit-btn").onclick = () => startEditProject(p);
-    fullscreenContent.querySelector(".delete-btn").onclick = async () => {
-      if (confirm("Tem certeza que deseja apagar este projeto?")) {
-        await deleteDoc(doc(db, "projects", p.id));
-        hideModal();
-        projectsContainer.style.display = "grid";
-      }
-    };
-  }
-
-  document.getElementById("modal-comment-btn").onclick = async () => {
-    const text = document.getElementById("modal-comment-input").value.trim();
-    if (!text) return;
-    const user = auth.currentUser;
-    const comment = {
-      userId: user.uid,
-      userEmail: user.email,
-      text,
-      createdAt: new Date()
-    };
-    await updateDoc(doc(db, "projects", p.id), { comments: arrayUnion(comment) });
-    const el = document.createElement("p");
-    el.textContent = `${comment.userEmail}: ${comment.text}`;
-    commentList.appendChild(el);
-    document.getElementById("modal-comment-input").value = "";
-  };
 }
 
-// ==================== FUNÇÃO DE EDIÇÃO ====================
-function startEditProject(p) {
-  fullscreenContent.innerHTML = `
-    <button class="close-btn">Cancelar</button>
-    <h2>Editar Projeto</h2>
-    <input type="text" id="edit-title" value="${p.title}" /><br>
-    <textarea id="edit-desc">${p.description}</textarea><br>
-    <button id="save-edit-btn">Salvar</button>
-  `;
-
-  fullscreenContent.querySelector(".close-btn").onclick = () => openProjectView(p);
-  fullscreenContent.querySelector("#save-edit-btn").onclick = async () => {
-    const newTitle = document.getElementById("edit-title").value.trim();
-    const newDesc = document.getElementById("edit-desc").value.trim();
-    await updateDoc(doc(db, "projects", p.id), { title: newTitle, description: newDesc });
-    openProjectView({ ...p, title: newTitle, description: newDesc, comments: p.comments });
-  };
-}
-
-// ==================== EVENT LISTENERS ====================
+// ==================== EVENTOS ====================
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("login-btn").onclick = window.login;
-  document.getElementById("register-btn").onclick = window.register;
-  document.getElementById("logout-btn").onclick = window.logout;
-  document.getElementById("post-project-btn").onclick = window.showProjectForm;
-  document.getElementById("submit-project-btn").onclick = window.submitProject;
+  document.getElementById("login-btn").addEventListener("click", window.login);
+  document.getElementById("register-btn").addEventListener("click", window.register);
+  document.getElementById("logout-btn").addEventListener("click", window.logout);
+  document.getElementById("post-project-btn").addEventListener("click", window.showProjectForm);
+  document.getElementById("submit-project-btn").addEventListener("click", window.submitProject);
+  document.getElementById("cancel-project-btn").addEventListener("click", () => {
+    resetForm();
+    hide(projectForm);
+  });
   document.getElementById("to-register").addEventListener("click", e => {
     e.preventDefault();
     window.showRegister();
@@ -395,10 +389,4 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     window.showLogin();
   });
-  cancelProjectBtn.onclick = () => {
-    hide(projectForm);
-    resetForm();
-    projectsContainer.style.display = "grid";
-    hideModal();
-  };
 });
