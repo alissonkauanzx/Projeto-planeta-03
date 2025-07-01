@@ -380,7 +380,6 @@ document.addEventListener("DOMContentLoaded", () => { document.getElementById("c
   document.getElementById("logout-btn").addEventListener("click", window.logout);
   document.getElementById("post-project-btn").addEventListener("click", window.showProjectForm);
   document.getElementById("submit-project-btn").addEventListener("click", window.submitProject);
-  document.getElementById("cancel-project-btn").addEventListener("click", () => {
     resetForm();
     hide(projectForm);
   });
