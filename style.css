@@ -430,3 +430,22 @@ footer {
     align-items: flex-start;
   }
 }
+/* ========== Oculta o header no modo fullscreen ========== */
+.fullscreen-overlay.active ~ header {
+  display: none !important;
+}
+
+/* ========== Ajustes finais no cabeçalho fullscreen ========== */
+.full-header {
+  justify-content: flex-end;
+  gap: 10px;
+}
+.full-header .close-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #666;
+}
+.full-header .close-btn:hover {
+  background: #444;
+}
