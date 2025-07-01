@@ -191,6 +191,8 @@ main.center-wrapper {
   box-shadow: 0 10px 25px rgba(0,0,0,0.3);
   outline: none;
 }
+
+/* === Botão Cancelar no Formulário (adicionado) === */
 #cancel-project-btn {
   margin-top: 14px;
   background: transparent;
@@ -358,115 +360,3 @@ main.center-wrapper {
   margin-top: 10px;
   font-size: 1.1rem;
   cursor: pointer;
-  font-weight: 900;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  user-select: none;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.22);
-}
-#modal-comment-btn:hover,
-#detail-comment-btn:hover,
-#modal-comment-btn:focus,
-#detail-comment-btn:focus {
-  background: #1b5e20;
-  transform: scale(1.05);
-  outline: none;
-}
-
-/* ========== Botão Voltar ========== */
-.close-btn {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 9999;
-  background: #2e7d32;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 900;
-  cursor: pointer;
-  transition: all 0.35s ease;
-  user-select: none;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.28);
-}
-.close-btn:hover,
-.close-btn:focus {
-  background: #1b5e20;
-  transform: scale(1.05);
-  outline: none;
-}
-
-/* ========== Detalhes do Projeto (Modal) ========== */
-#project-detail-section {
-  animation: fadeInUp 0.5s ease;
-  padding: 20px 30px;
-  max-width: 900px;
-  margin: 40px auto;
-  color: #2e3a2e;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(46,125,50,0.2);
-  transform: scale(1);
-}
-#detail-media img,
-#detail-media video,
-#detail-media iframe {
-  width: 100%;
-  max-width: 700px;
-  max-height: 420px;
-  object-fit: contain;
-  margin: 0 auto;
-  display: block;
-  border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25);
-}
-#detail-media img:hover,
-#detail-media video:hover,
-#detail-media iframe:hover {
-  box-shadow: 0 8px 28px rgba(46, 125, 50, 0.4);
-}
-
-/* ========== Rodapé ========== */
-footer {
-  background: #d1f7d1;
-  padding: 20px 0;
-  text-align: center;
-  font-size: 1rem;
-  color: #4c6740;
-  user-select: none;
-}
-
-/* ========== Responsividade ========== */
-@media (max-width: 600px) {
-  .navbar h1 {
-    font-size: 1.8rem;
-  }
-  .auth-section, .project-form-section {
-    padding: 36px 20px;
-    max-width: 100%;
-  }
-  .projects-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-  .project-card {
-    height: auto;
-  }
-  .project-card img,
-  .project-card video,
-  .project-card iframe {
-    max-height: 160px;
-  }
-  #project-detail-section {
-    max-width: 95%;
-    margin: 20px auto 60px auto;
-    padding: 16px 20px;
-  }
-  .close-btn {
-    top: 12px;
-    left: 12px;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-  }
-}
