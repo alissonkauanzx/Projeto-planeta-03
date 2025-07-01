@@ -63,21 +63,19 @@
       <progress id="upload-progress" value="0" max="100" style="display: none;"></progress>
       <p id="upload-message" style="display: none;">Enviando...</p>
       <button id="submit-project-btn">Enviar Projeto</button>
-      <!-- Botão Cancelar (adicionado) -->
-      <button id="cancel-project-btn">Cancelar</button>
+      <!-- Botão Cancelar corrigido com type="button" -->
+      <button type="button" id="cancel-project-btn">Cancelar</button>
     </section>
 
     <!-- Lista de Projetos -->
     <section class="projects-section">
       <h2>Projetos Postados</h2>
-      <!-- IMPORTANTE: adicionar a classe "projects-grid" para o container dos cards -->
       <div id="projects" class="projects-grid"></div>
     </section>
 
   </main>
 
   <!-- Modal fullscreen para projeto -->
-  <!-- IMPORTANTE: remover style display:none inline e usar a classe para controlar visibilidade -->
   <div id="fullscreen-project" class="fullscreen-overlay">
     <div id="fullscreen-data" class="fullscreen-content"></div>
   </div>
