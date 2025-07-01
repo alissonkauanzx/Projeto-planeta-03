@@ -378,12 +378,17 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("logout-btn").addEventListener("click", logout);
   document.getElementById("post-project-btn").addEventListener("click", showProjectForm);
   document.getElementById("submit-project-btn").addEventListener("click", submitProject);
-  document.getElementById("cancel-project-btn").addEventListener("click", (e) => {
-    e.preventDefault();
-    resetForm();
-    hide(projectForm);
-    projectsContainer.style.display = "grid";
-  });
+
+  const cancelBtn = document.getElementById("cancel-project-btn");
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      resetForm();
+      hide(projectForm);
+      projectsContainer.style.display = "grid";
+    });
+  }
+
   document.getElementById("to-register").addEventListener("click", e => {
     e.preventDefault();
     showRegister();
