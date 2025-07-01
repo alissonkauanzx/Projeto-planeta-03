@@ -371,22 +371,24 @@ function openProjectView(p) {
 }
 
 // ==================== EVENTOS ====================
-document.addEventListener("DOMContentLoaded", () => { document.getElementById("cancel-project-btn").addEventListener("click", () => {
-  document.getElementById("project-form").style.display = "none";
-  document.querySelector(".projects-section").style.display = "block";
-});
+document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("login-btn").addEventListener("click", window.login);
   document.getElementById("register-btn").addEventListener("click", window.register);
   document.getElementById("logout-btn").addEventListener("click", window.logout);
   document.getElementById("post-project-btn").addEventListener("click", window.showProjectForm);
   document.getElementById("submit-project-btn").addEventListener("click", window.submitProject);
+
+  document.getElementById("cancel-project-btn").addEventListener("click", () => {
     resetForm();
     hide(projectForm);
+    document.querySelector(".projects-section").style.display = "block";
   });
+
   document.getElementById("to-register").addEventListener("click", e => {
     e.preventDefault();
     window.showRegister();
   });
+
   document.getElementById("to-login").addEventListener("click", e => {
     e.preventDefault();
     window.showLogin();
