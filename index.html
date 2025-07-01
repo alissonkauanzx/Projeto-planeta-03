@@ -13,7 +13,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Script principal -->
+  <!-- Script principal com nome corrigido -->
   <script type="module" src="script.js" defer></script>
 </head>
 <body>
@@ -23,8 +23,9 @@
     <div class="navbar">
       <h1 class="float-title">Planeta Projeto 🌎</h1>
       <div class="right-buttons">
-        <button id="post-project-btn" style="display:none;">Postar Projeto</button>
-        <button id="logout-btn" style="display:none;">Sair</button>
+        <!-- Botões iniciam escondidos pelo CSS, sem inline styles -->
+        <button id="post-project-btn" style="display: none;">Postar Projeto</button>
+        <button id="logout-btn" style="display: none;">Sair</button>
       </div>
     </div>
   </header>
@@ -55,41 +56,29 @@
       <h2>Postar Projeto</h2>
       <input type="text" id="project-title" placeholder="Título do Projeto" required />
       <textarea id="project-desc" placeholder="Descrição do Projeto" required></textarea>
-
       <label for="project-image">Imagens e PDFs (pode selecionar múltiplos):</label>
       <input type="file" id="project-image" accept="image/*,application/pdf" multiple />
-
       <label for="project-video">Vídeo:</label>
       <input type="file" id="project-video" accept="video/*" />
-
       <progress id="upload-progress" value="0" max="100" style="display: none;"></progress>
       <p id="upload-message" style="display: none;">Enviando...</p>
-
       <button id="submit-project-btn">Enviar Projeto</button>
-      <button id="cancel-project-btn" type="button">Cancelar</button>
     </section>
 
     <!-- Lista de Projetos -->
-    <section class="projects-section" id="projects-section">
+    <section class="projects-section">
       <h2>Projetos Postados</h2>
-      <div id="projects" class="projects-grid">
-        <!-- Cards gerados dinamicamente -->
-      </div>
-    </section>
-
-    <!-- Detalhes do Projeto clicado -->
-    <section id="project-detail-section" class="project-detail-section" style="display: none;">
-      <button id="back-to-projects-btn" class="close-btn" type="button">←</button>
-      <h2 id="detail-title">Título do Projeto</h2>
-      <div class="media-container" id="detail-media"></div>
-      <p id="detail-description"></p>
-
-      <div class="modal-comments-list" id="detail-comments-list"></div>
-      <input type="text" id="detail-comment-input" placeholder="Comente..." />
-      <button id="detail-comment-btn">Enviar</button>
+      <!-- IMPORTANTE: adicionar a classe "projects-grid" para o container dos cards -->
+      <div id="projects" class="projects-grid"></div>
     </section>
 
   </main>
+
+  <!-- Modal fullscreen para projeto -->
+  <!-- IMPORTANTE: remover style display:none inline e usar a classe para controlar visibilidade -->
+  <div id="fullscreen-project" class="fullscreen-overlay">
+    <div id="fullscreen-data" class="fullscreen-content"></div>
+  </div>
 
   <!-- Rodapé -->
   <footer>
