@@ -371,11 +371,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("post-project-btn").addEventListener("click", showProjectForm);
   document.getElementById("submit-project-btn").addEventListener("click", submitProject);
 
-  // *** AQUI, usa delegação para o botão cancelar ***
-  document.body.addEventListener("click", (e) => {
+  // Usando delegação para garantir que o botão Cancelar funcione mesmo se for recriado
+  document.addEventListener("click", e => {
     if (e.target && e.target.id === "cancel-project-btn") {
       e.preventDefault();
-      console.log("Botão cancelar clicado!");
+      console.log("Botão CANCELAR clicado!");
       resetForm();
       hide(projectForm);
       projectsContainer.style.display = "grid";
