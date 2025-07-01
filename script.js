@@ -10,7 +10,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-
   // ==================== FIREBASE CONFIG ====================
   const firebaseConfig = {
     apiKey: "AIzaSyBdWzf45GmW58N7sy7WMT9MG9G4Jy3wjsg",
@@ -365,18 +364,24 @@ document.addEventListener("DOMContentLoaded", () => {
   window.logout = logout;
   window.submitProject = submitProject;
 
-  // ==================== EVENTOS DIRETOS ====================
+  // ==================== EVENTOS ====================
   document.getElementById("login-btn").addEventListener("click", login);
   document.getElementById("register-btn").addEventListener("click", register);
   document.getElementById("logout-btn").addEventListener("click", logout);
   document.getElementById("post-project-btn").addEventListener("click", showProjectForm);
   document.getElementById("submit-project-btn").addEventListener("click", submitProject);
-  document.getElementById("cancel-project-btn").addEventListener("click", (e) => {
-    e.preventDefault();
-    resetForm();
-    hide(projectForm);
-    projectsContainer.style.display = "grid";
+
+  // *** AQUI, usa delegação para o botão cancelar ***
+  document.body.addEventListener("click", (e) => {
+    if (e.target && e.target.id === "cancel-project-btn") {
+      e.preventDefault();
+      console.log("Botão cancelar clicado!");
+      resetForm();
+      hide(projectForm);
+      projectsContainer.style.display = "grid";
+    }
   });
+
   document.getElementById("to-register").addEventListener("click", e => {
     e.preventDefault();
     showRegister();
@@ -385,5 +390,4 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     showLogin();
   });
-
 });
